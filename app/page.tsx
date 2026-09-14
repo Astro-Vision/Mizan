@@ -1,19 +1,37 @@
-import { Button } from "@/components/ui/button"
+import { SiteFooter } from "@/components/site/layout/site-footer"
+import { SiteHeader } from "@/components/site/layout/site-header"
+import { TestnetBanner } from "@/components/site/layout/testnet-banner"
+import { Campaigns } from "@/components/site/sections/campaigns"
+import { Categories } from "@/components/site/sections/categories"
+import { ClosingCta } from "@/components/site/sections/closing-cta"
+import { Faq } from "@/components/site/sections/faq"
+import { FundFlow } from "@/components/site/sections/fund-flow"
+import { Hero } from "@/components/site/sections/hero"
+import { HowItWorks } from "@/components/site/sections/how-it-works"
+import { ProofBar } from "@/components/site/sections/proof-bar"
+import { StatsBand } from "@/components/site/sections/stats-band"
+import { Story } from "@/components/site/sections/story"
 
-export default function Page() {
+export default function Home() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
+    <>
+      <TestnetBanner />
+      <SiteHeader />
+
+      <main>
+        <Hero />
+        <ProofBar />
+        <Categories />
+        <Campaigns />
+        <HowItWorks />
+        <FundFlow />
+        <StatsBand />
+        <Story />
+        <Faq />
+        <ClosingCta />
+      </main>
+
+      <SiteFooter />
+    </>
   )
 }
