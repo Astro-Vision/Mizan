@@ -1,0 +1,47 @@
+import type { Metadata } from "next"
+import Link from "next/link"
+import { Plus } from "lucide-react"
+
+import { CampaignTable } from "@/components/dashboard/campaign-table"
+import { getCampaigns } from "./actions"
+import { TESTNET_NOTICE } from "@/lib/site-data"
+
+export const metadata: Metadata = {
+  title: "Kampanye — Panel Admin",
+}
+
+/**
+ * Daftar kampanye admin — halaman utama CRUD.
+ *
+ * DESIGN.md:
+ * §5  — Overline: mono, huruf besar, --brand-700.
+ * §6  — Grid 12 kolom, gutter 24px.
+ * §10 — Tombol: primary untuk aksi utama.
+ * §14 — Anti-slop: nol animasi, nol gradient.
+ */
+export default async function KampanyePage() {
+  const campaigns = await getCampaigns()
+
+  return (
+    <div className="mx-auto max-w-[1240px]">
+      {/* Header */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="mz-overline">Panel Admin</p>
+          <h1 className="mt-3 text-h1 text-ink">Kampanye</h1>
+          <p className="mt-2 text-sm text-ink-muted">{TESTNET_NOTICE}</p>
+        </div>
+        <Link
+          href="/admin/kampanye/tambah"
+          className="inline-flex h-12 shrink-0 items-center gap-2 rounded-[10px] bg-brand-700 px-6 text-sm font-medium text-white transition-colors duration-150 hover:bg-brand-600 active:bg-brand-800"
+        >
+          <Plus className="size-4" strokeWidth={1.5} aria-hidden="true" />
+          Tambah Kampanye
+        </Link>
+      </div>
+
+      {/* Tabel kampanye */}
+      <CampaignTable campaigns={campaigns} />
+    </div>
+  )
+}
