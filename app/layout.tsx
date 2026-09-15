@@ -3,6 +3,7 @@ import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import PrivyProviderWrapper from "@/components/providers/privy-provider"
 import { cn } from "@/lib/utils"
 
 /**
@@ -85,7 +86,9 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-dvh bg-canvas text-ink">
-        <ThemeProvider>{children}</ThemeProvider>
+        <PrivyProviderWrapper>
+          <ThemeProvider>{children}</ThemeProvider>
+        </PrivyProviderWrapper>
       </body>
     </html>
   )

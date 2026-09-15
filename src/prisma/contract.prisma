@@ -1,13 +1,41 @@
 // use prisma-next
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  username  String?
+  id        Int          @id @default(autoincrement())
+  privyId   String       @unique
+  email     String?      @unique
+  username  String?      @unique
   name      String?
+  avatarUrl String?
+  role      Role         @default(USER)
+  userType  String?
+  domicile  String?
+  whatsappNumber String?
+  whatsappNotificationConsent Boolean @default(false)
+  referralSource String?
+  referralSourceOther String?
+  dataConsent Boolean @default(false)
+  dataConsentAt TimestamptzString?
+  dataConsentVersion String?
+  onboardingCompletedAt TimestamptzString?
   posts     Post[]
+  wallets   UserWallet[]
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
+}
+
+model UserWallet {
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int
+  address       String
+  chainType     String
+  walletType    String
+  privyWalletId String?  @unique
+  createdAt     TimestamptzString @default(now())
+  updatedAt     temporal.updatedAtString()
+
+  @@unique([address, chainType])
 }
 
 model Post {
@@ -18,4 +46,39 @@ model Post {
   authorId  Int
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
+}
+
+enum Role {
+  USER
+  ADMIN
+  BENEFACTOR
+  BENEFACTORY
+}
+
+types {
+  Embedding3072 = pgvector.Vector(3072)
+}
+
+model AuditLogs {
+  id           Uuid          @id @default(uuid())
+  panti_id     String?
+  nota_number  String?
+  total_amount Decimal?
+  status       String?
+  reason       String?
+  embedding    Embedding3072?
+  created_at   TimestamptzString? @default(now())
+  content      String?
+  metadata     Jsonb?
+
+  @@map("audit_logs")
+  @@control(observed)
+  @@rls
+}
+
+policy_insert audit_logs_langflow {
+  target = AuditLogs
+  roles = [anon, authenticated]
+  withCheck = "true"
+  @@map("langflow")
 }

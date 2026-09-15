@@ -6,6 +6,7 @@ import { Menu, Wallet, X } from "lucide-react"
 
 import { MizanWordmark } from "@/components/site/ui/mizan-mark"
 import { mzBtn } from "@/components/site/ui/mz-button"
+import { AuthMenu } from "@/components/auth/auth-menu"
 import { NAV } from "@/lib/site-data"
 
 export function SiteHeader() {
@@ -39,13 +40,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a
-            href="#hubungkan"
-            className={mzBtn("outline", "sm", "hidden sm:inline-flex")}
-          >
-            <Wallet className="size-4" strokeWidth={1.5} aria-hidden="true" />
-            Hubungkan Dompet
-          </a>
+          <AuthMenu />
 
           <button
             type="button"
@@ -88,6 +83,9 @@ export function SiteHeader() {
               <Wallet className="size-4" strokeWidth={1.5} aria-hidden="true" />
               Hubungkan Dompet
             </a>
+            <div className="mt-3 sm:hidden">
+              <AuthMenu mobile />
+            </div>
           </nav>
         </div>
       ) : null}
