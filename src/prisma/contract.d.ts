@@ -38,9 +38,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'b43c626eb3dcbe000a914e2816d6805a17561cf2805e964623a65d8a95ab9c79'>;
+  StorageHashBase<'15859cba78ee101600b5bbee86d9b613573049feca819543b94fc87fce7449b7'>;
 export type ExecutionHash =
-  ExecutionHashBase<'658a3f1aaf5f0ec0bad575e87902ed0d9f0847f7cbe7dacd410b6ad46960b94f'>;
+  ExecutionHashBase<'93333229ceda4fc25a325257690319468ab5d356764b050d964e0e30b40b5115'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -259,6 +259,18 @@ export type FieldOutputTypes = {
       readonly content: CodecTypes['pg/text@1']['output'] | null;
       readonly metadata: CodecTypes['pg/jsonb@1']['output'] | null;
     };
+    readonly Campaign: {
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly judul: CodecTypes['pg/text@1']['output'];
+      readonly penyelenggara: CodecTypes['pg/text@1']['output'];
+      readonly terkumpul: CodecTypes['pg/float8@1']['output'];
+      readonly target: CodecTypes['pg/float8@1']['output'];
+      readonly satuan: CodecTypes['pg/text@1']['output'];
+      readonly donatur: CodecTypes['pg/int4@1']['output'];
+      readonly status: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
     readonly Post: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly title: CodecTypes['pg/text@1']['output'];
@@ -313,6 +325,18 @@ export type FieldInputTypes = {
       readonly created_at: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly content: CodecTypes['pg/text@1']['input'] | null;
       readonly metadata: CodecTypes['pg/jsonb@1']['input'] | null;
+    };
+    readonly Campaign: {
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly judul: CodecTypes['pg/text@1']['input'];
+      readonly penyelenggara: CodecTypes['pg/text@1']['input'];
+      readonly terkumpul: CodecTypes['pg/float8@1']['input'];
+      readonly target: CodecTypes['pg/float8@1']['input'];
+      readonly satuan: CodecTypes['pg/text@1']['input'];
+      readonly donatur: CodecTypes['pg/int4@1']['input'];
+      readonly status: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly Post: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -369,6 +393,18 @@ export type StorageColumnTypes = {
       readonly status: CodecTypes['pg/text@1']['output'] | null;
       readonly total_amount: CodecTypes['pg/numeric@1']['output'] | null;
     };
+    readonly campaign: {
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly donatur: CodecTypes['pg/int4@1']['output'];
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly judul: CodecTypes['pg/text@1']['output'];
+      readonly penyelenggara: CodecTypes['pg/text@1']['output'];
+      readonly satuan: CodecTypes['pg/text@1']['output'];
+      readonly status: CodecTypes['pg/text@1']['output'];
+      readonly target: CodecTypes['pg/float8@1']['output'];
+      readonly terkumpul: CodecTypes['pg/float8@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
     readonly post: {
       readonly authorId: CodecTypes['pg/int4@1']['output'];
       readonly content: CodecTypes['pg/text@1']['output'] | null;
@@ -423,6 +459,18 @@ export type StorageColumnInputTypes = {
       readonly reason: CodecTypes['pg/text@1']['input'] | null;
       readonly status: CodecTypes['pg/text@1']['input'] | null;
       readonly total_amount: CodecTypes['pg/numeric@1']['input'] | null;
+    };
+    readonly campaign: {
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly donatur: CodecTypes['pg/int4@1']['input'];
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly judul: CodecTypes['pg/text@1']['input'];
+      readonly penyelenggara: CodecTypes['pg/text@1']['input'];
+      readonly satuan: CodecTypes['pg/text@1']['input'];
+      readonly status: CodecTypes['pg/text@1']['input'];
+      readonly target: CodecTypes['pg/float8@1']['input'];
+      readonly terkumpul: CodecTypes['pg/float8@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly post: {
       readonly authorId: CodecTypes['pg/int4@1']['input'];
@@ -536,6 +584,85 @@ type ContractBase = Omit<
                   readonly nativeType: 'jsonb';
                   readonly codecId: 'pg/jsonb@1';
                   readonly nullable: true;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [];
+              foreignKeys: readonly [];
+            };
+            readonly campaign: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'function';
+                    readonly expression: 'autoincrement()';
+                  };
+                };
+                readonly judul: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly penyelenggara: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly terkumpul: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/float8@1', 0>;
+                  };
+                };
+                readonly target: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: false;
+                };
+                readonly satuan: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'BNB'>;
+                  };
+                };
+                readonly donatur: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'menunggu'>;
+                  };
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updatedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
@@ -837,6 +964,7 @@ type ContractBase = Omit<
       readonly model: 'UserWallet';
     };
     readonly post: { readonly namespace: 'public' & NamespaceId; readonly model: 'Post' };
+    readonly campaign: { readonly namespace: 'public' & NamespaceId; readonly model: 'Campaign' };
     readonly audit_logs: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'AuditLogs';
@@ -907,6 +1035,73 @@ type ContractBase = Omit<
                 readonly created_at: { readonly column: 'created_at' };
                 readonly content: { readonly column: 'content' };
                 readonly metadata: { readonly column: 'metadata' };
+              };
+            };
+          };
+          readonly Campaign: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly judul: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly penyelenggara: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly terkumpul: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
+              readonly target: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
+              readonly satuan: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly donatur: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: {
+              readonly table: 'campaign';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly judul: { readonly column: 'judul' };
+                readonly penyelenggara: { readonly column: 'penyelenggara' };
+                readonly terkumpul: { readonly column: 'terkumpul' };
+                readonly target: { readonly column: 'target' };
+                readonly satuan: { readonly column: 'satuan' };
+                readonly donatur: { readonly column: 'donatur' };
+                readonly status: { readonly column: 'status' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
               };
             };
           };
@@ -1265,6 +1460,15 @@ type ContractBase = Omit<
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'campaign';
+            readonly column: 'updatedAt';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
         },
         {
           readonly ref: {

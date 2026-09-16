@@ -9,14 +9,7 @@ export const metadata: Metadata = {
   title: "Edit Kampanye — Panel Admin",
 }
 
-/**
- * Halaman edit kampanye.
- *
- * DESIGN.md:
- * §5  — Overline: mono, huruf besar, --brand-700.
- * §10 — Input: tinggi 48px, radius --radius-sm.
- * §14 — Anti-slop: nol animasi, nol gradient.
- */
+// Halaman edit kampanye
 export default async function EditKampanyePage({
   params,
 }: {

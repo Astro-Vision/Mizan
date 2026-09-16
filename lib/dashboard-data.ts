@@ -104,58 +104,6 @@ export const ADMIN_STATS: StatItem[] = [
   },
 ]
 
-export const ADMIN_CAMPAIGNS: CampaignReview[] = [
-  {
-    id: "kmp-0148",
-    judul: "Renovasi mushola dan ruang belajar di Garut",
-    penyelenggara: "Yayasan Bangun Desa",
-    terkumpul: 0,
-    target: 12,
-    satuan: "BNB",
-    donatur: 0,
-    status: "menunggu",
-  },
-  {
-    id: "kmp-0147",
-    judul: "Beasiswa hafiz untuk 15 santri di Tasikmalaya",
-    penyelenggara: "Pesantren Riyadhul Jannah",
-    terkumpul: 0,
-    target: 3500,
-    satuan: "USDT",
-    donatur: 0,
-    status: "menunggu",
-  },
-  {
-    id: "kmp-0142",
-    judul: "Bantuan pendidikan untuk 40 anak yatim di Lombok Timur",
-    penyelenggara: "Yayasan Nurul Iman",
-    terkumpul: 12.4,
-    target: 20,
-    satuan: "BNB",
-    donatur: 87,
-    status: "aktif",
-  },
-  {
-    id: "kmp-0138",
-    judul: "Air bersih untuk 120 kepala keluarga di Sumba Timur",
-    penyelenggara: "Komunitas Air Sumba",
-    terkumpul: 8.75,
-    target: 15,
-    satuan: "BNB",
-    donatur: 143,
-    status: "aktif",
-  },
-  {
-    id: "kmp-0120",
-    judul: "Distribusi paket sembako Ramadan di Bekasi",
-    penyelenggara: "Forum Zakat Bekasi",
-    terkumpul: 5000,
-    target: 5000,
-    satuan: "USDT",
-    donatur: 312,
-    status: "selesai",
-  },
-]
 
 export const ADMIN_ACTIVITIES: ActivityItem[] = [
   {

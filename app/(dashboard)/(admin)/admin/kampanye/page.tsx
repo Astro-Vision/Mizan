@@ -10,15 +10,6 @@ export const metadata: Metadata = {
   title: "Kampanye — Panel Admin",
 }
 
-/**
- * Daftar kampanye admin — halaman utama CRUD.
- *
- * DESIGN.md:
- * §5  — Overline: mono, huruf besar, --brand-700.
- * §6  — Grid 12 kolom, gutter 24px.
- * §10 — Tombol: primary untuk aksi utama.
- * §14 — Anti-slop: nol animasi, nol gradient.
- */
 export default async function KampanyePage() {
   const campaigns = await getCampaigns()
 

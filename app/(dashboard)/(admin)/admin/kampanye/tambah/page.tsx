@@ -8,14 +8,7 @@ export const metadata: Metadata = {
   title: "Tambah Kampanye — Panel Admin",
 }
 
-/**
- * Halaman tambah kampanye baru.
- *
- * DESIGN.md:
- * §5  — Overline: mono, huruf besar, --brand-700.
- * §10 — Input: tinggi 48px, radius --radius-sm.
- * §14 — Anti-slop: nol animasi, nol gradient.
- */
+// Halaman tambah kampanye baru
 export default function TambahKampanyePage() {
   return (
     <div className="mx-auto max-w-[720px]">

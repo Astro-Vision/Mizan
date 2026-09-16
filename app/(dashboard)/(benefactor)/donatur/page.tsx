@@ -15,14 +15,8 @@ export const metadata: Metadata = {
   title: "Dashboard Donatur",
 }
 
-/**
- * Halaman utama donatur — ringkasan donasi pribadi.
- *
- * DESIGN.md:
- * §5  — Nominal: mono + tabular-nums. Overline: mono, huruf besar.
- * §10 — Bilah progres: track --brand-100, isi --brand-700.
- * §11 — Bahasa Indonesia. Label testnet selalu terlihat.
- */
+// Halaman utama donatur — ringkasan donasi pribadi.
+
 export default function DonaturPage() {
   return (
     <div className="mx-auto max-w-[1240px]">

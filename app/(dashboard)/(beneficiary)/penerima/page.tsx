@@ -34,15 +34,7 @@ const MILESTONE_STATUS = {
   },
 } as const
 
-/**
- * Halaman utama penerima manfaat — ringkasan penyaluran.
- *
- * DESIGN.md:
- * §5  — Nominal: mono + tabular-nums. Overline: mono, huruf besar.
- * §10 — Badge milestone mengikuti spec chip.
- * §10 — Hash: mono, dipotong, tautan ke BscScan.
- * §11 — Bahasa Indonesia. Label testnet selalu terlihat.
- */
+// Halaman utama penerima manfaat — ringkasan penyaluran.
 export default function PenerimaPage() {
   return (
     <div className="mx-auto max-w-[1240px]">
@@ -96,13 +88,12 @@ export default function PenerimaPage() {
                 {penyaluran.milestones.map((ms, i) => (
                   <div
                     key={ms.tahap}
-                    className={`h-2 flex-1 rounded-full ${
-                      ms.status === "terverifikasi"
-                        ? "bg-brand-700"
-                        : ms.status === "menunggu"
-                          ? "bg-accent-500"
-                          : "bg-brand-100 dark:bg-brand-900"
-                    }`}
+                    className={`h-2 flex-1 rounded-full ${ms.status === "terverifikasi"
+                      ? "bg-brand-700"
+                      : ms.status === "menunggu"
+                        ? "bg-accent-500"
+                        : "bg-brand-100 dark:bg-brand-900"
+                      }`}
                   />
                 ))}
               </div>
