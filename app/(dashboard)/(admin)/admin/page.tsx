@@ -5,25 +5,17 @@ import { ActivityRow } from "@/components/dashboard/activity-row"
 import { CampaignRow } from "@/components/dashboard/campaign-row"
 import {
   ADMIN_STATS,
-  ADMIN_CAMPAIGNS,
   ADMIN_ACTIVITIES,
 } from "@/lib/dashboard-data"
+import { getCampaigns } from "./kampanye/actions"
 import { TESTNET_NOTICE } from "@/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Panel Admin",
 }
 
-/**
- * Halaman utama admin — ringkasan platform.
- *
- * Konvensi DESIGN.md:
- * §5  — Overline: mono, huruf besar, --brand-700. Judul: --text-h1.
- * §6  — Grid 12 kolom, gutter 24px. Jarak antar-section kelipatan 8.
- * §11 — Nada tenang, Bahasa Indonesia. Label testnet selalu terlihat.
- * §14 — Anti-slop: nol animasi, nol gradient, nol glassmorphism.
- */
-export default function AdminPage() {
+export default async function AdminPage() {
+  const campaigns = await getCampaigns()
   return (
     <div className="mx-auto max-w-[1240px]">
       {/* Header */}
@@ -51,7 +43,7 @@ export default function AdminPage() {
           Daftar kampanye beserta status peninjauan.
         </p>
         <div className="mt-6 rounded-2xl border border-line-soft bg-surface p-4 sm:p-6">
-          {ADMIN_CAMPAIGNS.map((campaign) => (
+          {campaigns.map((campaign) => (
             <CampaignRow key={campaign.id} campaign={campaign} />
           ))}
         </div>

@@ -2,12 +2,12 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { db } from "@/src/prisma/db"
 import type { CampaignReview } from "@/lib/dashboard-data"
 
 /* =========================================================================
    CRUD KAMPANYE — Server Actions
-   Saat ini memakai data in-memory (mock).
-   Siap disambungkan ke Prisma/Supabase — cukup ganti implementasi di bawah.
+   Menggunakan Prisma ORM untuk query ke database.
    ========================================================================= */
 
 // ── Tipe ────────────────────────────────────────────────────────────────────
@@ -18,62 +18,29 @@ export type CampaignFormState = {
   errors?: Record<string, string>
 }
 
-// ── Data store (in-memory mock) ─────────────────────────────────────────────
+// ── Helper: mapping DB row → CampaignReview ─────────────────────────────────
 
-let nextId = 200
-
-const campaigns: CampaignReview[] = [
-  {
-    id: "kmp-0148",
-    judul: "Renovasi mushola dan ruang belajar di Garut",
-    penyelenggara: "Yayasan Bangun Desa",
-    terkumpul: 0,
-    target: 12,
-    satuan: "BNB",
-    donatur: 0,
-    status: "menunggu",
-  },
-  {
-    id: "kmp-0147",
-    judul: "Beasiswa hafiz untuk 15 santri di Tasikmalaya",
-    penyelenggara: "Pesantren Riyadhul Jannah",
-    terkumpul: 0,
-    target: 3500,
-    satuan: "USDT",
-    donatur: 0,
-    status: "menunggu",
-  },
-  {
-    id: "kmp-0142",
-    judul: "Bantuan pendidikan untuk 40 anak yatim di Lombok Timur",
-    penyelenggara: "Yayasan Nurul Iman",
-    terkumpul: 12.4,
-    target: 20,
-    satuan: "BNB",
-    donatur: 87,
-    status: "aktif",
-  },
-  {
-    id: "kmp-0138",
-    judul: "Air bersih untuk 120 kepala keluarga di Sumba Timur",
-    penyelenggara: "Komunitas Air Sumba",
-    terkumpul: 8.75,
-    target: 15,
-    satuan: "BNB",
-    donatur: 143,
-    status: "aktif",
-  },
-  {
-    id: "kmp-0120",
-    judul: "Distribusi paket sembako Ramadan di Bekasi",
-    penyelenggara: "Forum Zakat Bekasi",
-    terkumpul: 5000,
-    target: 5000,
-    satuan: "USDT",
-    donatur: 312,
-    status: "selesai",
-  },
-]
+function toReview(row: {
+  id: number
+  judul: string
+  penyelenggara: string
+  terkumpul: number
+  target: number
+  satuan: string
+  donatur: number
+  status: string
+}): CampaignReview {
+  return {
+    id: String(row.id),
+    judul: row.judul,
+    penyelenggara: row.penyelenggara,
+    terkumpul: row.terkumpul,
+    target: row.target,
+    satuan: row.satuan as "BNB" | "USDT",
+    donatur: row.donatur,
+    status: row.status as "menunggu" | "aktif" | "selesai",
+  }
+}
 
 // ── Validasi ────────────────────────────────────────────────────────────────
 
@@ -133,13 +100,18 @@ function validateCampaignForm(formData: FormData): {
 // ── READ ────────────────────────────────────────────────────────────────────
 
 export async function getCampaigns(): Promise<CampaignReview[]> {
-  // TODO: Ganti dengan query Prisma/Supabase
-  return [...campaigns]
+  const rows = await db.orm.public.Campaign
+    .orderBy((c) => c.createdAt.desc())
+    .all()
+  return rows.map(toReview)
 }
 
 export async function getCampaignById(id: string): Promise<CampaignReview | null> {
-  // TODO: Ganti dengan query Prisma/Supabase
-  return campaigns.find((c) => c.id === id) ?? null
+  const numId = Number(id)
+  if (isNaN(numId)) return null
+
+  const row = await db.orm.public.Campaign.first({ id: numId })
+  return row ? toReview(row) : null
 }
 
 // ── CREATE ──────────────────────────────────────────────────────────────────
@@ -154,9 +126,7 @@ export async function createCampaign(
     return { success: false, message: "Ada kesalahan pada formulir.", errors }
   }
 
-  // TODO: Ganti dengan insert Prisma/Supabase
-  const newCampaign: CampaignReview = {
-    id: `kmp-${String(nextId++).padStart(4, "0")}`,
+  await db.orm.public.Campaign.create({
     judul: data.judul,
     penyelenggara: data.penyelenggara,
     terkumpul: data.terkumpul,
@@ -164,9 +134,7 @@ export async function createCampaign(
     satuan: data.satuan,
     donatur: data.donatur,
     status: data.status,
-  }
-
-  campaigns.unshift(newCampaign)
+  })
 
   revalidatePath("/admin/kampanye")
   redirect("/admin/kampanye")
@@ -185,22 +153,27 @@ export async function updateCampaign(
     return { success: false, message: "Ada kesalahan pada formulir.", errors }
   }
 
-  // TODO: Ganti dengan update Prisma/Supabase
-  const idx = campaigns.findIndex((c) => c.id === id)
-  if (idx === -1) {
+  const numId = Number(id)
+  if (isNaN(numId)) {
+    return { success: false, message: "ID kampanye tidak valid." }
+  }
+
+  const existing = await db.orm.public.Campaign.first({ id: numId })
+  if (!existing) {
     return { success: false, message: "Kampanye tidak ditemukan." }
   }
 
-  campaigns[idx] = {
-    ...campaigns[idx],
-    judul: data.judul,
-    penyelenggara: data.penyelenggara,
-    terkumpul: data.terkumpul,
-    target: data.target,
-    satuan: data.satuan,
-    donatur: data.donatur,
-    status: data.status,
-  }
+  await db.orm.public.Campaign
+    .where((c) => c.id.eq(numId))
+    .update({
+      judul: data.judul,
+      penyelenggara: data.penyelenggara,
+      terkumpul: data.terkumpul,
+      target: data.target,
+      satuan: data.satuan,
+      donatur: data.donatur,
+      status: data.status,
+    })
 
   revalidatePath("/admin/kampanye")
   redirect("/admin/kampanye")
@@ -209,14 +182,21 @@ export async function updateCampaign(
 // ── DELETE ──────────────────────────────────────────────────────────────────
 
 export async function deleteCampaign(id: string): Promise<CampaignFormState> {
-  // TODO: Ganti dengan delete Prisma/Supabase
-  const idx = campaigns.findIndex((c) => c.id === id)
-  if (idx === -1) {
+  const numId = Number(id)
+  if (isNaN(numId)) {
+    return { success: false, message: "ID kampanye tidak valid." }
+  }
+
+  const existing = await db.orm.public.Campaign.first({ id: numId })
+  if (!existing) {
     return { success: false, message: "Kampanye tidak ditemukan." }
   }
 
-  campaigns.splice(idx, 1)
+  await db.orm.public.Campaign
+    .where((c) => c.id.eq(numId))
+    .delete()
 
   revalidatePath("/admin/kampanye")
   return { success: true, message: "Kampanye berhasil dihapus." }
 }
+
