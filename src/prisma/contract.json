@@ -8,6 +8,14 @@
       "model": "Analysis",
       "namespace": "public"
     },
+    "audit_logs": {
+      "model": "AuditLogs",
+      "namespace": "public"
+    },
+    "campaign": {
+      "model": "Campaign",
+      "namespace": "public"
+    },
     "disasterEvent": {
       "model": "DisasterEvent",
       "namespace": "public"
@@ -30,6 +38,10 @@
     },
     "user": {
       "model": "User",
+      "namespace": "public"
+    },
+    "userWallet": {
+      "model": "UserWallet",
       "namespace": "public"
     }
   },
@@ -92,6 +104,27 @@
               {
                 "name": "LAINNYA",
                 "value": "LAINNYA"
+              }
+            ]
+          },
+          "Role": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "USER",
+                "value": "USER"
+              },
+              {
+                "name": "ADMIN",
+                "value": "ADMIN"
+              },
+              {
+                "name": "BENEFACTOR",
+                "value": "BENEFACTOR"
+              },
+              {
+                "name": "BENEFACTORY",
+                "value": "BENEFACTORY"
               }
             ]
           },
@@ -321,6 +354,228 @@
               },
               "namespaceId": "public",
               "table": "analysis"
+            }
+          },
+          "AuditLogs": {
+            "fields": {
+              "content": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "created_at": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "embedding": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/vector@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "metadata": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/jsonb@1",
+                  "kind": "scalar"
+                }
+              },
+              "nota_number": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "panti_id": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "total_amount": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "content": {
+                  "column": "content"
+                },
+                "created_at": {
+                  "column": "created_at"
+                },
+                "embedding": {
+                  "column": "embedding"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "metadata": {
+                  "column": "metadata"
+                },
+                "nota_number": {
+                  "column": "nota_number"
+                },
+                "panti_id": {
+                  "column": "panti_id"
+                },
+                "reason": {
+                  "column": "reason"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "total_amount": {
+                  "column": "total_amount"
+                }
+              },
+              "namespaceId": "public",
+              "table": "audit_logs"
+            }
+          },
+          "Campaign": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "donatur": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "judul": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "penyelenggara": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "satuan": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "target": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "terkumpul": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "donatur": {
+                  "column": "donatur"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "judul": {
+                  "column": "judul"
+                },
+                "penyelenggara": {
+                  "column": "penyelenggara"
+                },
+                "satuan": {
+                  "column": "satuan"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "target": {
+                  "column": "target"
+                },
+                "terkumpul": {
+                  "column": "terkumpul"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "campaign"
             }
           },
           "DisasterEvent": {
@@ -949,6 +1204,13 @@
           },
           "User": {
             "fields": {
+              "avatarUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -956,8 +1218,36 @@
                   "kind": "scalar"
                 }
               },
-              "email": {
+              "dataConsent": {
                 "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "dataConsentAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "dataConsentVersion": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "domicile": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "email": {
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -977,6 +1267,47 @@
                   "kind": "scalar"
                 }
               },
+              "onboardingCompletedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "privyId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "referralSource": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "referralSourceOther": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "Role",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -984,7 +1315,28 @@
                   "kind": "scalar"
                 }
               },
+              "userType": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "username": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "whatsappNotificationConsent": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "whatsappNumber": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -1007,12 +1359,42 @@
                   "model": "Post",
                   "namespace": "public"
                 }
+              },
+              "wallets": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "UserWallet",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
               "fields": {
+                "avatarUrl": {
+                  "column": "avatarUrl"
+                },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "dataConsent": {
+                  "column": "dataConsent"
+                },
+                "dataConsentAt": {
+                  "column": "dataConsentAt"
+                },
+                "dataConsentVersion": {
+                  "column": "dataConsentVersion"
+                },
+                "domicile": {
+                  "column": "domicile"
                 },
                 "email": {
                   "column": "email"
@@ -1023,15 +1405,146 @@
                 "name": {
                   "column": "name"
                 },
+                "onboardingCompletedAt": {
+                  "column": "onboardingCompletedAt"
+                },
+                "privyId": {
+                  "column": "privyId"
+                },
+                "referralSource": {
+                  "column": "referralSource"
+                },
+                "referralSourceOther": {
+                  "column": "referralSourceOther"
+                },
+                "role": {
+                  "column": "role"
+                },
                 "updatedAt": {
                   "column": "updatedAt"
                 },
+                "userType": {
+                  "column": "userType"
+                },
                 "username": {
                   "column": "username"
+                },
+                "whatsappNotificationConsent": {
+                  "column": "whatsappNotificationConsent"
+                },
+                "whatsappNumber": {
+                  "column": "whatsappNumber"
                 }
               },
               "namespaceId": "public",
               "table": "user"
+            }
+          },
+          "UserWallet": {
+            "fields": {
+              "address": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "chainType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "privyWalletId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "walletType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "address": {
+                  "column": "address"
+                },
+                "chainType": {
+                  "column": "chainType"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "privyWalletId": {
+                  "column": "privyWalletId"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "userId": {
+                  "column": "userId"
+                },
+                "walletType": {
+                  "column": "walletType"
+                }
+              },
+              "namespaceId": "public",
+              "table": "userWallet"
             }
           }
         }
@@ -1042,6 +1555,28 @@
     "namespaces": {
       "public": {
         "entries": {
+          "policy": {
+            "audit_logs_langflow": {
+              "kind": "policy",
+              "name": "langflow",
+              "namespaceId": "public",
+              "operation": "insert",
+              "permissive": true,
+              "roles": [
+                "anon",
+                "authenticated"
+              ],
+              "tableName": "audit_logs",
+              "withCheck": "true"
+            }
+          },
+          "rls": {
+            "audit_logs": {
+              "kind": "rls",
+              "namespaceId": "public",
+              "tableName": "audit_logs"
+            }
+          },
           "table": {
             "analysis": {
               "checks": [
@@ -1164,6 +1699,160 @@
                   ]
                 }
               ]
+            },
+            "audit_logs": {
+              "columns": {
+                "content": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "created_at": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "embedding": {
+                  "codecId": "pg/vector@1",
+                  "nativeType": "vector",
+                  "nullable": true,
+                  "typeRef": "Embedding3072"
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "metadata": {
+                  "codecId": "pg/jsonb@1",
+                  "nativeType": "jsonb",
+                  "nullable": true
+                },
+                "nota_number": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "panti_id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "total_amount": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": true
+                }
+              },
+              "control": "observed",
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "campaign": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "donatur": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "judul": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "penyelenggara": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "satuan": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "BNB"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "menunggu"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "target": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": false
+                },
+                "terkumpul": {
+                  "codecId": "pg/float8@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "float8",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
             },
             "disasterEvent": {
               "checks": [
@@ -1674,7 +2363,19 @@
               "uniques": []
             },
             "user": {
+              "checks": [
+                {
+                  "expression": "\"role\" IN ('USER', 'ADMIN', 'BENEFACTOR', 'BENEFACTORY')",
+                  "name": "user_role_check_758453b1",
+                  "prefix": "user_role_check"
+                }
+              ],
               "columns": {
+                "avatarUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -1684,10 +2385,34 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "dataConsent": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "dataConsentAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "dataConsentVersion": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "domicile": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "email": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
-                  "nullable": false
+                  "nullable": true
                 },
                 "id": {
                   "codecId": "pg/int4@1",
@@ -1703,12 +2428,66 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "onboardingCompletedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "privyId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "referralSource": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "referralSourceOther": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "role": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "USER"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "Role",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "userType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "username": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "whatsappNotificationConsent": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "whatsappNumber": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -1724,7 +2503,115 @@
               "uniques": [
                 {
                   "columns": [
+                    "privyId"
+                  ]
+                },
+                {
+                  "columns": [
                     "email"
+                  ]
+                },
+                {
+                  "columns": [
+                    "username"
+                  ]
+                }
+              ]
+            },
+            "userWallet": {
+              "columns": {
+                "address": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "chainType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "privyWalletId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "walletType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "userWallet"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "userWallet_userId_idx_a489d58a",
+                  "prefix": "userWallet_userId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "privyWalletId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "address",
+                    "chainType"
                   ]
                 }
               ]
@@ -1751,6 +2638,15 @@
                 "ERUPSI_GUNUNG_API",
                 "KEKERINGAN",
                 "LAINNYA"
+              ]
+            },
+            "Role": {
+              "kind": "valueSet",
+              "values": [
+                "USER",
+                "ADMIN",
+                "BENEFACTOR",
+                "BENEFACTORY"
               ]
             },
             "ScrapeJobStatus": {
@@ -1796,10 +2692,20 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "87bfc5e5a912083c3dc840346c30bbd81d3b7b08762a0ab21667388fe0e3ce51"
+    "storageHash": "831f639277eef802f353a0ebba48645d66b98ef8315749b274fe8f49a8a8d92f",
+    "types": {
+      "Embedding3072": {
+        "codecId": "pg/vector@1",
+        "kind": "codec-instance",
+        "nativeType": "vector",
+        "typeParams": {
+          "length": 3072
+        }
+      }
+    }
   },
   "execution": {
-    "executionHash": "5dc047ba54d3240cfa455da37bfa0024f95a3bed743b3f64f69c944b4850f0a7",
+    "executionHash": "00c2b20733ac587b3ad7eaa3cd37d06ec83dd95b67f7974be8da7e7494091d12",
     "mutations": {
       "defaults": [
         {
@@ -1826,6 +2732,32 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "analysis"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "audit_logs"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "campaign"
           }
         },
         {
@@ -1916,6 +2848,21 @@
             "namespace": "public",
             "table": "user"
           }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "userWallet"
+          }
         }
       ]
     }
@@ -1927,6 +2874,7 @@
       "lateral": true,
       "limit": true,
       "orderBy": true,
+      "pgvector.cosine": true,
       "returning": true
     },
     "sql": {
@@ -1938,7 +2886,58 @@
       "scalarList": true
     }
   },
-  "extensions": {},
+  "extensions": {
+    "pgvector": {
+      "capabilities": {
+        "postgres": {
+          "pgvector.cosine": true
+        }
+      },
+      "familyId": "sql",
+      "id": "pgvector",
+      "kind": "extension",
+      "targetId": "postgres",
+      "types": {
+        "codecTypes": {
+          "import": {
+            "alias": "PgVectorTypes",
+            "named": "CodecTypes",
+            "package": "@internal/extension-pgvector/codec-types"
+          },
+          "typeImports": [
+            {
+              "alias": "Vector",
+              "named": "Vector",
+              "package": "@internal/extension-pgvector/codec-types"
+            }
+          ]
+        },
+        "operationTypes": {
+          "import": {
+            "alias": "PgVectorOperationTypes",
+            "named": "OperationTypes",
+            "package": "@internal/extension-pgvector/operation-types"
+          }
+        },
+        "queryOperationTypes": {
+          "import": {
+            "alias": "PgVectorQueryOperationTypes",
+            "named": "QueryOperationTypes",
+            "package": "@internal/extension-pgvector/operation-types"
+          }
+        },
+        "storage": [
+          {
+            "familyId": "sql",
+            "nativeType": "vector",
+            "targetId": "postgres",
+            "typeId": "pg/vector@1"
+          }
+        ]
+      },
+      "version": "0.0.1"
+    }
+  },
   "meta": {},
   "_generated": {
     "warning": "⚠️  GENERATED FILE - DO NOT EDIT",
