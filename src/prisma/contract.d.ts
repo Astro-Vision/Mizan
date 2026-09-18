@@ -33,9 +33,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'1e8412e162dbbe69f4bb3bf8d07f0280ae67eaab15c34dcf201e67468315428d'>;
+  StorageHashBase<'87bfc5e5a912083c3dc840346c30bbd81d3b7b08762a0ab21667388fe0e3ce51'>;
 export type ExecutionHash =
-  ExecutionHashBase<'4abff323cc88151ef9c9a0ec90122cfee6d46814a118cdb66a9fdd94a4123463'>;
+  ExecutionHashBase<'5dc047ba54d3240cfa455da37bfa0024f95a3bed743b3f64f69c944b4850f0a7'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -241,6 +241,48 @@ type DefaultLiteralValue<CodecId extends string, Encoded> = CodecId extends keyo
 
 export type FieldOutputTypes = {
   readonly public: {
+    readonly Analysis: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly rawCaptureId: CodecTypes['pg/text@1']['output'];
+      readonly isDisaster: CodecTypes['pg/bool@1']['output'];
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly confidenceScore: CodecTypes['pg/float8@1']['output'];
+      readonly extractedLocation: CodecTypes['pg/json@1']['output'] | null;
+      readonly eventId: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
+    readonly DisasterEvent: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly title: CodecTypes['pg/text@1']['output'];
+      readonly description: CodecTypes['pg/text@1']['output'] | null;
+      readonly validationStatus: 'UNVERIFIED' | 'CORROBORATED' | 'OFFICIAL_CONFIRMED' | 'REJECTED';
+      readonly locationName: CodecTypes['pg/text@1']['output'] | null;
+      readonly province: CodecTypes['pg/text@1']['output'] | null;
+      readonly capitalCity: CodecTypes['pg/text@1']['output'] | null;
+      readonly officialConfirmed: CodecTypes['pg/bool@1']['output'];
+      readonly firstDetectedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly lastUpdatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
     readonly Post: {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly title: CodecTypes['pg/text@1']['output'];
@@ -248,6 +290,41 @@ export type FieldOutputTypes = {
       readonly authorId: CodecTypes['pg/int4@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
+    readonly RawCapture: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly sourceId: CodecTypes['pg/text@1']['output'];
+      readonly url: CodecTypes['pg/text@1']['output'] | null;
+      readonly authorName: CodecTypes['pg/text@1']['output'] | null;
+      readonly authorVerified: CodecTypes['pg/bool@1']['output'];
+      readonly contentText: CodecTypes['pg/text@1']['output'];
+      readonly mediaUrls: CodecTypes['pg/json@1']['output'] | null;
+      readonly engagementMetrics: CodecTypes['pg/json@1']['output'] | null;
+      readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly contentHash: CodecTypes['pg/text@1']['output'];
+    };
+    readonly ScrapeJob: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly startDate: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly endDate: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly status: 'PENDING' | 'PLANNING' | 'SCRAPING' | 'ANALYZING' | 'COMPLETED' | 'FAILED';
+      readonly totalSources: CodecTypes['pg/int4@1']['output'];
+      readonly processedData: CodecTypes['pg/int4@1']['output'];
+      readonly startedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly completedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly errorMessage: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
+    readonly Source: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly name: CodecTypes['pg/text@1']['output'];
+      readonly sourceType: 'OFFICIAL' | 'NEWS' | 'SOCIAL_MEDIA';
+      readonly dataFormats: 'JSON' | 'RSS' | 'HTML' | 'OTHERS';
+      readonly baseUrlOrHandle: CodecTypes['pg/text@1']['output'];
+      readonly isOfficial: CodecTypes['pg/bool@1']['output'];
+      readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly User: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -261,6 +338,48 @@ export type FieldOutputTypes = {
 };
 export type FieldInputTypes = {
   readonly public: {
+    readonly Analysis: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly rawCaptureId: CodecTypes['pg/text@1']['input'];
+      readonly isDisaster: CodecTypes['pg/bool@1']['input'];
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly confidenceScore: CodecTypes['pg/float8@1']['input'];
+      readonly extractedLocation: CodecTypes['pg/json@1']['input'] | null;
+      readonly eventId: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
+    readonly DisasterEvent: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly title: CodecTypes['pg/text@1']['input'];
+      readonly description: CodecTypes['pg/text@1']['input'] | null;
+      readonly validationStatus: 'UNVERIFIED' | 'CORROBORATED' | 'OFFICIAL_CONFIRMED' | 'REJECTED';
+      readonly locationName: CodecTypes['pg/text@1']['input'] | null;
+      readonly province: CodecTypes['pg/text@1']['input'] | null;
+      readonly capitalCity: CodecTypes['pg/text@1']['input'] | null;
+      readonly officialConfirmed: CodecTypes['pg/bool@1']['input'];
+      readonly firstDetectedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly lastUpdatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
     readonly Post: {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly title: CodecTypes['pg/text@1']['input'];
@@ -268,6 +387,41 @@ export type FieldInputTypes = {
       readonly authorId: CodecTypes['pg/int4@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
+    readonly RawCapture: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly sourceId: CodecTypes['pg/text@1']['input'];
+      readonly url: CodecTypes['pg/text@1']['input'] | null;
+      readonly authorName: CodecTypes['pg/text@1']['input'] | null;
+      readonly authorVerified: CodecTypes['pg/bool@1']['input'];
+      readonly contentText: CodecTypes['pg/text@1']['input'];
+      readonly mediaUrls: CodecTypes['pg/json@1']['input'] | null;
+      readonly engagementMetrics: CodecTypes['pg/json@1']['input'] | null;
+      readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly contentHash: CodecTypes['pg/text@1']['input'];
+    };
+    readonly ScrapeJob: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly startDate: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly endDate: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly status: 'PENDING' | 'PLANNING' | 'SCRAPING' | 'ANALYZING' | 'COMPLETED' | 'FAILED';
+      readonly totalSources: CodecTypes['pg/int4@1']['input'];
+      readonly processedData: CodecTypes['pg/int4@1']['input'];
+      readonly startedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly completedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly errorMessage: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
+    readonly Source: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly name: CodecTypes['pg/text@1']['input'];
+      readonly sourceType: 'OFFICIAL' | 'NEWS' | 'SOCIAL_MEDIA';
+      readonly dataFormats: 'JSON' | 'RSS' | 'HTML' | 'OTHERS';
+      readonly baseUrlOrHandle: CodecTypes['pg/text@1']['input'];
+      readonly isOfficial: CodecTypes['pg/bool@1']['input'];
+      readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly User: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -281,6 +435,48 @@ export type FieldInputTypes = {
 };
 export type StorageColumnTypes = {
   readonly public: {
+    readonly analysis: {
+      readonly confidenceScore: CodecTypes['pg/float8@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly eventId: CodecTypes['pg/text@1']['output'] | null;
+      readonly extractedLocation: CodecTypes['pg/json@1']['output'] | null;
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly isDisaster: CodecTypes['pg/bool@1']['output'];
+      readonly rawCaptureId: CodecTypes['pg/text@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
+    readonly disasterEvent: {
+      readonly capitalCity: CodecTypes['pg/text@1']['output'] | null;
+      readonly description: CodecTypes['pg/text@1']['output'] | null;
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly firstDetectedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly lastUpdatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly locationName: CodecTypes['pg/text@1']['output'] | null;
+      readonly officialConfirmed: CodecTypes['pg/bool@1']['output'];
+      readonly province: CodecTypes['pg/text@1']['output'] | null;
+      readonly title: CodecTypes['pg/text@1']['output'];
+      readonly validationStatus: 'UNVERIFIED' | 'CORROBORATED' | 'OFFICIAL_CONFIRMED' | 'REJECTED';
+    };
     readonly post: {
       readonly authorId: CodecTypes['pg/int4@1']['output'];
       readonly content: CodecTypes['pg/text@1']['output'] | null;
@@ -288,6 +484,41 @@ export type StorageColumnTypes = {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly title: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
+    readonly rawCapture: {
+      readonly authorName: CodecTypes['pg/text@1']['output'] | null;
+      readonly authorVerified: CodecTypes['pg/bool@1']['output'];
+      readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly contentHash: CodecTypes['pg/text@1']['output'];
+      readonly contentText: CodecTypes['pg/text@1']['output'];
+      readonly engagementMetrics: CodecTypes['pg/json@1']['output'] | null;
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly mediaUrls: CodecTypes['pg/json@1']['output'] | null;
+      readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly sourceId: CodecTypes['pg/text@1']['output'];
+      readonly url: CodecTypes['pg/text@1']['output'] | null;
+    };
+    readonly scrapeJob: {
+      readonly completedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly endDate: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly errorMessage: CodecTypes['pg/text@1']['output'] | null;
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly processedData: CodecTypes['pg/int4@1']['output'];
+      readonly startDate: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly startedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly status: 'PENDING' | 'PLANNING' | 'SCRAPING' | 'ANALYZING' | 'COMPLETED' | 'FAILED';
+      readonly totalSources: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly source: {
+      readonly baseUrlOrHandle: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly dataFormats: 'JSON' | 'RSS' | 'HTML' | 'OTHERS';
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly isOfficial: CodecTypes['pg/bool@1']['output'];
+      readonly name: CodecTypes['pg/text@1']['output'];
+      readonly sourceType: 'OFFICIAL' | 'NEWS' | 'SOCIAL_MEDIA';
     };
     readonly user: {
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -301,6 +532,48 @@ export type StorageColumnTypes = {
 };
 export type StorageColumnInputTypes = {
   readonly public: {
+    readonly analysis: {
+      readonly confidenceScore: CodecTypes['pg/float8@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly eventId: CodecTypes['pg/text@1']['input'] | null;
+      readonly extractedLocation: CodecTypes['pg/json@1']['input'] | null;
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly isDisaster: CodecTypes['pg/bool@1']['input'];
+      readonly rawCaptureId: CodecTypes['pg/text@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
+    readonly disasterEvent: {
+      readonly capitalCity: CodecTypes['pg/text@1']['input'] | null;
+      readonly description: CodecTypes['pg/text@1']['input'] | null;
+      readonly disasterType:
+        | 'GEMPA_BUMI'
+        | 'BANJIR'
+        | 'TANAH_LONGSOR'
+        | 'KARHUTLA'
+        | 'TSUNAMI'
+        | 'ERUPSI_GUNUNG_API'
+        | 'KEKERINGAN'
+        | 'LAINNYA'
+        | null;
+      readonly firstDetectedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly lastUpdatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly locationName: CodecTypes['pg/text@1']['input'] | null;
+      readonly officialConfirmed: CodecTypes['pg/bool@1']['input'];
+      readonly province: CodecTypes['pg/text@1']['input'] | null;
+      readonly title: CodecTypes['pg/text@1']['input'];
+      readonly validationStatus: 'UNVERIFIED' | 'CORROBORATED' | 'OFFICIAL_CONFIRMED' | 'REJECTED';
+    };
     readonly post: {
       readonly authorId: CodecTypes['pg/int4@1']['input'];
       readonly content: CodecTypes['pg/text@1']['input'] | null;
@@ -308,6 +581,41 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly title: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
+    readonly rawCapture: {
+      readonly authorName: CodecTypes['pg/text@1']['input'] | null;
+      readonly authorVerified: CodecTypes['pg/bool@1']['input'];
+      readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly contentHash: CodecTypes['pg/text@1']['input'];
+      readonly contentText: CodecTypes['pg/text@1']['input'];
+      readonly engagementMetrics: CodecTypes['pg/json@1']['input'] | null;
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly mediaUrls: CodecTypes['pg/json@1']['input'] | null;
+      readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly sourceId: CodecTypes['pg/text@1']['input'];
+      readonly url: CodecTypes['pg/text@1']['input'] | null;
+    };
+    readonly scrapeJob: {
+      readonly completedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly endDate: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly errorMessage: CodecTypes['pg/text@1']['input'] | null;
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly processedData: CodecTypes['pg/int4@1']['input'];
+      readonly startDate: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly startedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly status: 'PENDING' | 'PLANNING' | 'SCRAPING' | 'ANALYZING' | 'COMPLETED' | 'FAILED';
+      readonly totalSources: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly source: {
+      readonly baseUrlOrHandle: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly dataFormats: 'JSON' | 'RSS' | 'HTML' | 'OTHERS';
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly isOfficial: CodecTypes['pg/bool@1']['input'];
+      readonly name: CodecTypes['pg/text@1']['input'];
+      readonly sourceType: 'OFFICIAL' | 'NEWS' | 'SOCIAL_MEDIA';
     };
     readonly user: {
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -337,6 +645,177 @@ type ContractBase = Omit<
         readonly kind: 'postgres-schema';
         readonly entries: {
           readonly table: {
+            readonly analysis: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly rawCaptureId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly isDisaster: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                };
+                readonly disasterType: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly confidenceScore: {
+                  readonly nativeType: 'float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: false;
+                };
+                readonly extractedLocation: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                };
+                readonly eventId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updatedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['rawCaptureId'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'analysis_eventId_idx_6a266d47';
+                  readonly prefix: 'analysis_eventId_idx';
+                  readonly columns: readonly ['eventId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'analysis';
+                    readonly columns: readonly ['rawCaptureId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'rawCapture';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'analysis';
+                    readonly columns: readonly ['eventId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'disasterEvent';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly disasterEvent: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly disasterType: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly title: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly description: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly validationStatus: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'UNVERIFIED'>;
+                  };
+                };
+                readonly locationName: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly province: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly capitalCity: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly officialConfirmed: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly firstDetectedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly lastUpdatedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'disasterEvent_validationStatus_idx_e615ae80';
+                  readonly prefix: 'disasterEvent_validationStatus_idx';
+                  readonly columns: readonly ['validationStatus'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'disasterEvent_disasterType_idx_7f709b63';
+                  readonly prefix: 'disasterEvent_disasterType_idx';
+                  readonly columns: readonly ['disasterType'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [];
+            };
             readonly post: {
               columns: {
                 readonly id: {
@@ -400,6 +879,242 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly rawCapture: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly sourceId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly url: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly authorName: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly authorVerified: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly contentText: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly mediaUrls: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                };
+                readonly engagementMetrics: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                };
+                readonly publishedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
+                readonly capturedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly contentHash: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['contentHash'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'rawCapture_sourceId_idx_d92a2571';
+                  readonly prefix: 'rawCapture_sourceId_idx';
+                  readonly columns: readonly ['sourceId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'rawCapture_capturedAt_idx_2c071597';
+                  readonly prefix: 'rawCapture_capturedAt_idx';
+                  readonly columns: readonly ['capturedAt'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'rawCapture';
+                    readonly columns: readonly ['sourceId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'source';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly scrapeJob: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly startDate: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                };
+                readonly endDate: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'PENDING'>;
+                  };
+                };
+                readonly totalSources: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                };
+                readonly processedData: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                };
+                readonly startedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
+                readonly completedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
+                readonly errorMessage: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'scrapeJob_status_idx_e98638ab';
+                  readonly prefix: 'scrapeJob_status_idx';
+                  readonly columns: readonly ['status'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [];
+            };
+            readonly source: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly name: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly sourceType: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly dataFormats: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly baseUrlOrHandle: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly isOfficial: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly isActive: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
+                  };
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'source_sourceType_idx_d8b2a801';
+                  readonly prefix: 'source_sourceType_idx';
+                  readonly columns: readonly ['sourceType'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [];
+            };
             readonly user: {
               columns: {
                 readonly id: {
@@ -444,6 +1159,53 @@ type ContractBase = Omit<
               foreignKeys: readonly [];
             };
           };
+          readonly valueSet: {
+            readonly DataFormats: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['JSON', 'RSS', 'HTML', 'OTHERS'];
+            };
+            readonly DisasterType: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'GEMPA_BUMI',
+                'BANJIR',
+                'TANAH_LONGSOR',
+                'KARHUTLA',
+                'TSUNAMI',
+                'ERUPSI_GUNUNG_API',
+                'KEKERINGAN',
+                'LAINNYA',
+              ];
+            };
+            readonly ScrapeJobStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'PENDING',
+                'PLANNING',
+                'SCRAPING',
+                'ANALYZING',
+                'COMPLETED',
+                'FAILED',
+              ];
+            };
+            readonly SeverityLevel: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['RENDAH', 'SEDANG', 'TINGGI', 'KRITIS'];
+            };
+            readonly SourceType: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['OFFICIAL', 'NEWS', 'SOCIAL_MEDIA'];
+            };
+            readonly ValidationStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly [
+                'UNVERIFIED',
+                'CORROBORATED',
+                'OFFICIAL_CONFIRMED',
+                'REJECTED',
+              ];
+            };
+          };
         };
       };
     };
@@ -456,11 +1218,191 @@ type ContractBase = Omit<
   readonly roots: {
     readonly user: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
     readonly post: { readonly namespace: 'public' & NamespaceId; readonly model: 'Post' };
+    readonly source: { readonly namespace: 'public' & NamespaceId; readonly model: 'Source' };
+    readonly rawCapture: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'RawCapture';
+    };
+    readonly analysis: { readonly namespace: 'public' & NamespaceId; readonly model: 'Analysis' };
+    readonly disasterEvent: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'DisasterEvent';
+    };
+    readonly scrapeJob: { readonly namespace: 'public' & NamespaceId; readonly model: 'ScrapeJob' };
   };
   readonly domain: {
     readonly namespaces: {
       readonly public: {
         readonly models: {
+          readonly Analysis: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly rawCaptureId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly isDisaster: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly disasterType: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly confidenceScore: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
+              readonly extractedLocation: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly eventId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly event: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'DisasterEvent';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['eventId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly rawCapture: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'RawCapture';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['rawCaptureId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'analysis';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly rawCaptureId: { readonly column: 'rawCaptureId' };
+                readonly isDisaster: { readonly column: 'isDisaster' };
+                readonly disasterType: { readonly column: 'disasterType' };
+                readonly confidenceScore: { readonly column: 'confidenceScore' };
+                readonly extractedLocation: { readonly column: 'extractedLocation' };
+                readonly eventId: { readonly column: 'eventId' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly DisasterEvent: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly disasterType: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly title: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly description: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly validationStatus: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly locationName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly province: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly capitalCity: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly officialConfirmed: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly firstDetectedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly lastUpdatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly analyses: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Analysis';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['eventId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'disasterEvent';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly disasterType: { readonly column: 'disasterType' };
+                readonly title: { readonly column: 'title' };
+                readonly description: { readonly column: 'description' };
+                readonly validationStatus: { readonly column: 'validationStatus' };
+                readonly locationName: { readonly column: 'locationName' };
+                readonly province: { readonly column: 'province' };
+                readonly capitalCity: { readonly column: 'capitalCity' };
+                readonly officialConfirmed: { readonly column: 'officialConfirmed' };
+                readonly firstDetectedAt: { readonly column: 'firstDetectedAt' };
+                readonly lastUpdatedAt: { readonly column: 'lastUpdatedAt' };
+              };
+            };
+          };
           readonly Post: {
             readonly fields: {
               readonly id: {
@@ -514,6 +1456,243 @@ type ContractBase = Omit<
                 readonly authorId: { readonly column: 'authorId' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly RawCapture: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sourceId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly url: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly authorName: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly authorVerified: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly contentText: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly mediaUrls: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly engagementMetrics: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly publishedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly capturedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly contentHash: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly analysis: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Analysis';
+                };
+                readonly cardinality: '1:1';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['rawCaptureId'];
+                };
+              };
+              readonly source: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Source';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['sourceId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'rawCapture';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly sourceId: { readonly column: 'sourceId' };
+                readonly url: { readonly column: 'url' };
+                readonly authorName: { readonly column: 'authorName' };
+                readonly authorVerified: { readonly column: 'authorVerified' };
+                readonly contentText: { readonly column: 'contentText' };
+                readonly mediaUrls: { readonly column: 'mediaUrls' };
+                readonly engagementMetrics: { readonly column: 'engagementMetrics' };
+                readonly publishedAt: { readonly column: 'publishedAt' };
+                readonly capturedAt: { readonly column: 'capturedAt' };
+                readonly contentHash: { readonly column: 'contentHash' };
+              };
+            };
+          };
+          readonly ScrapeJob: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly startDate: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly endDate: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly totalSources: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly processedData: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly startedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly completedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly errorMessage: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: {
+              readonly table: 'scrapeJob';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly startDate: { readonly column: 'startDate' };
+                readonly endDate: { readonly column: 'endDate' };
+                readonly status: { readonly column: 'status' };
+                readonly totalSources: { readonly column: 'totalSources' };
+                readonly processedData: { readonly column: 'processedData' };
+                readonly startedAt: { readonly column: 'startedAt' };
+                readonly completedAt: { readonly column: 'completedAt' };
+                readonly errorMessage: { readonly column: 'errorMessage' };
+                readonly createdAt: { readonly column: 'createdAt' };
+              };
+            };
+          };
+          readonly Source: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly name: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sourceType: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly dataFormats: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly baseUrlOrHandle: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly isOfficial: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly isActive: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly rawCaptures: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'RawCapture';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['sourceId'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'source';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly name: { readonly column: 'name' };
+                readonly sourceType: { readonly column: 'sourceType' };
+                readonly dataFormats: { readonly column: 'dataFormats' };
+                readonly baseUrlOrHandle: { readonly column: 'baseUrlOrHandle' };
+                readonly isOfficial: { readonly column: 'isOfficial' };
+                readonly isActive: { readonly column: 'isActive' };
+                readonly createdAt: { readonly column: 'createdAt' };
               };
             };
           };
@@ -574,6 +1753,67 @@ type ContractBase = Omit<
             };
           };
         };
+        readonly enum: {
+          readonly SourceType: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'OFFICIAL'; readonly value: 'OFFICIAL' },
+              { readonly name: 'NEWS'; readonly value: 'NEWS' },
+              { readonly name: 'SOCIAL_MEDIA'; readonly value: 'SOCIAL_MEDIA' },
+            ];
+          };
+          readonly DataFormats: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'JSON'; readonly value: 'JSON' },
+              { readonly name: 'RSS'; readonly value: 'RSS' },
+              { readonly name: 'HTML'; readonly value: 'HTML' },
+              { readonly name: 'OTHERS'; readonly value: 'OTHERS' },
+            ];
+          };
+          readonly SeverityLevel: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'RENDAH'; readonly value: 'RENDAH' },
+              { readonly name: 'SEDANG'; readonly value: 'SEDANG' },
+              { readonly name: 'TINGGI'; readonly value: 'TINGGI' },
+              { readonly name: 'KRITIS'; readonly value: 'KRITIS' },
+            ];
+          };
+          readonly DisasterType: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'GEMPA_BUMI'; readonly value: 'GEMPA_BUMI' },
+              { readonly name: 'BANJIR'; readonly value: 'BANJIR' },
+              { readonly name: 'TANAH_LONGSOR'; readonly value: 'TANAH_LONGSOR' },
+              { readonly name: 'KARHUTLA'; readonly value: 'KARHUTLA' },
+              { readonly name: 'TSUNAMI'; readonly value: 'TSUNAMI' },
+              { readonly name: 'ERUPSI_GUNUNG_API'; readonly value: 'ERUPSI_GUNUNG_API' },
+              { readonly name: 'KEKERINGAN'; readonly value: 'KEKERINGAN' },
+              { readonly name: 'LAINNYA'; readonly value: 'LAINNYA' },
+            ];
+          };
+          readonly ValidationStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'UNVERIFIED'; readonly value: 'UNVERIFIED' },
+              { readonly name: 'CORROBORATED'; readonly value: 'CORROBORATED' },
+              { readonly name: 'OFFICIAL_CONFIRMED'; readonly value: 'OFFICIAL_CONFIRMED' },
+              { readonly name: 'REJECTED'; readonly value: 'REJECTED' },
+            ];
+          };
+          readonly ScrapeJobStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'PENDING'; readonly value: 'PENDING' },
+              { readonly name: 'PLANNING'; readonly value: 'PLANNING' },
+              { readonly name: 'SCRAPING'; readonly value: 'SCRAPING' },
+              { readonly name: 'ANALYZING'; readonly value: 'ANALYZING' },
+              { readonly name: 'COMPLETED'; readonly value: 'COMPLETED' },
+              { readonly name: 'FAILED'; readonly value: 'FAILED' },
+            ];
+          };
+        };
       };
     };
   };
@@ -603,11 +1843,69 @@ type ContractBase = Omit<
         {
           readonly ref: {
             readonly namespace: 'public';
+            readonly table: 'analysis';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'analysis';
+            readonly column: 'updatedAt';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'disasterEvent';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'disasterEvent';
+            readonly column: 'lastUpdatedAt';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
             readonly table: 'post';
             readonly column: 'updatedAt';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
           readonly onUpdate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'rawCapture';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'scrapeJob';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'source';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
         },
         {
           readonly ref: {
