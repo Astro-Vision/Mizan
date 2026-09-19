@@ -3,8 +3,8 @@
 import * as React from "react"
 import { useActionState } from "react"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
-import type { CampaignReview } from "@/lib/dashboard-data"
+import { cn } from "@/src/lib/utils"
+import type { CampaignReview } from "@/src/lib/dashboard-data"
 import type { CampaignFormState } from "@/app/(dashboard)/(admin)/admin/kampanye/actions"
 
 type CampaignFormProps = {

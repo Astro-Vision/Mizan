@@ -2,7 +2,7 @@ import { ArrowRight, Lock, ShieldCheck, Wallet } from "lucide-react"
 
 import { Neraca } from "@/components/site/ui/neraca"
 import { mzBtn } from "@/components/site/ui/mz-button"
-import { STATS } from "@/lib/site-data"
+import { STATS } from "@/src/lib/site-data"
 
 /**
  * Hero — tata letak asimetris (6/6), bukan tengah.

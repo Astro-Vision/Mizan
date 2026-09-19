@@ -1,4 +1,3 @@
-import type { Campaign } from "@/lib/site-data"
 
 /* =========================================================================
    DASHBOARD MOCK DATA

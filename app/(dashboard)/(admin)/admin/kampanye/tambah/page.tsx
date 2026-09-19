@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 
 import { CampaignForm } from "@/components/dashboard/campaign-form"
 import { createCampaign } from "../actions"
-import { TESTNET_NOTICE } from "@/lib/site-data"
+import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Tambah Kampanye — Panel Admin",

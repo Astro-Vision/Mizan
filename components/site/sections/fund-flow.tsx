@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowRight, ExternalLink } from "lucide-react"
 
 import { SectionHead } from "@/components/site/ui/section-head"
-import { FUND_FLOW, SITE } from "@/lib/site-data"
+import { FUND_FLOW, SITE } from "@/src/lib/site-data"
 
 /**
  * Alur dana — inti pembeda produk.

@@ -5,7 +5,7 @@ import { FormEvent, useState } from 'react';
 import {
   onboardingProfileSchema,
   type OnboardingProfileInput,
-} from '@/lib/onboarding/profile-schema';
+} from '@/src/lib/onboarding/profile-schema';
 
 type OnboardingFormValues = {
   username: string;

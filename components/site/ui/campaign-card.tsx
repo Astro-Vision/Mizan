@@ -1,13 +1,13 @@
 import { BadgeCheck, Clock, MapPin } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 import {
   MILESTONE_TOTAL,
   formatAngka,
   milestoneSelesai,
   presentase,
   type Campaign,
-} from "@/lib/site-data"
+} from "@/src/lib/site-data"
 
 /**
  * Baris milestone: pengganti slot foto.

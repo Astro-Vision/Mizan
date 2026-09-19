@@ -1,4 +1,4 @@
-import { STATS, STATS_FOOTNOTE } from "@/lib/site-data"
+import { STATS, STATS_FOOTNOTE } from "@/src/lib/site-data"
 
 /**
  * Band statistik. Angka statis, tanpa animasi hitung-naik — animasi semacam

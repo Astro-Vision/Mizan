@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import type { CampaignReview } from "@/src/lib/dashboard-data"
 import { db } from "@/src/prisma/db"
-import type { CampaignReview } from "@/lib/dashboard-data"
 
 /* =========================================================================
    CRUD KAMPANYE — Server Actions

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { getPrivyProfile } from '@/lib/privy/user-data';
-import { getPrivyUserFromIdentityToken } from '@/lib/privy/server';
+import { getPrivyProfile } from '@/src/lib/privy/user-data';
+import { getPrivyUserFromIdentityToken } from '@/src/lib/privy/server';
 import { db } from '@/src/prisma/db';
 
 const identityTokenSchema = z.string().trim().min(1);

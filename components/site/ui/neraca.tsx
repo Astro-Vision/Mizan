@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react"
 
-import { cn } from "@/lib/utils"
-import { formatAngka } from "@/lib/site-data"
+import { cn } from "@/src/lib/utils"
+import { formatAngka } from "@/src/lib/site-data"
 
 /**
  * NERACA MIZAN — visual khas halaman.

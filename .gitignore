@@ -30,6 +30,9 @@ pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# File contoh justru harus ter-commit supaya daftar env terdokumentasi.
+!.env.example
+!.env.langflow.example
 
 # typescript
 *.tsbuildinfo

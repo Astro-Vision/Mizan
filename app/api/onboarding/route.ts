@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import {
   onboardingProfileSchema,
   type OnboardingProfileInput,
-} from '@/lib/onboarding/profile-schema';
-import { getPrivyUserFromIdentityToken } from '@/lib/privy/server';
-import { getPrivyProfile } from '@/lib/privy/user-data';
+} from '@/src/lib/onboarding/profile-schema';
+import { getPrivyUserFromIdentityToken } from '@/src/lib/privy/server';
+import { getPrivyProfile } from '@/src/lib/privy/user-data';
 import { db } from '@/src/prisma/db';
 
 const identityTokenFromRequest = (request: Request) =>

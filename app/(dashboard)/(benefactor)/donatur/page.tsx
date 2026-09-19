@@ -7,9 +7,9 @@ import {
   BENEFACTOR_CAMPAIGNS,
   BENEFACTOR_ACTIVITIES,
   EXPLORER_URL,
-} from "@/lib/dashboard-data"
-import { formatAngka } from "@/lib/site-data"
-import { TESTNET_NOTICE } from "@/lib/site-data"
+} from "@/src/lib/dashboard-data"
+import { formatAngka } from "@/src/lib/site-data"
+import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Dashboard Donatur",

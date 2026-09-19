@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 
 import { CampaignForm } from "@/components/dashboard/campaign-form"
 import { getCampaignById, updateCampaign } from "../../actions"
-import { TESTNET_NOTICE } from "@/lib/site-data"
+import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Edit Kampanye — Panel Admin",

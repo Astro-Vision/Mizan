@@ -6,9 +6,9 @@ import { CampaignRow } from "@/components/dashboard/campaign-row"
 import {
   ADMIN_STATS,
   ADMIN_ACTIVITIES,
-} from "@/lib/dashboard-data"
+} from "@/src/lib/dashboard-data"
 import { getCampaigns } from "./kampanye/actions"
-import { TESTNET_NOTICE } from "@/lib/site-data"
+import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Panel Admin",

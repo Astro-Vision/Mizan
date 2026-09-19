@@ -2,7 +2,7 @@ import { HeartHandshake, Landmark, Scale, Siren } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 import { SectionHead } from "@/components/site/ui/section-head"
-import { CATEGORIES } from "@/lib/site-data"
+import { CATEGORIES } from "@/src/lib/site-data"
 
 const IKON: Record<string, LucideIcon> = {
   Scale,

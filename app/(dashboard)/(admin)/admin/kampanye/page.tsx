@@ -4,7 +4,7 @@ import { Plus } from "lucide-react"
 
 import { CampaignTable } from "@/components/dashboard/campaign-table"
 import { getCampaigns } from "./actions"
-import { TESTNET_NOTICE } from "@/lib/site-data"
+import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
 export const metadata: Metadata = {
   title: "Kampanye — Panel Admin",
