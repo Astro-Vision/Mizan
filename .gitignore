@@ -44,17 +44,4 @@ dist/
 .cursor/
 .devin/
 .agents/
-.dev-runs/
-
-# hardhat (nested package di contracts/)
-contracts/node_modules/
-contracts/artifacts/
-contracts/cache/
-contracts/types/
-contracts/ignition/deployments/
-
-# Local deployment addresses (copy the tracked example)
-contracts/ignition/params.bscTestnet.json
-
 /docs/
-/migrations/
