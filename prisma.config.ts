@@ -1,7 +1,10 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { definePrismaConfig } from '@prisma/cli-engine';
+import pgvector from '@prisma/orm-extension-pgvector/control';
 import { defineConfig as ormConfig } from '@prisma/orm-postgres/config';
 import pgvector from '@prisma/orm-extension-pgvector/control';
+
+config({ path: '.env.local' });
 
 export default definePrismaConfig({
   orm: ormConfig({

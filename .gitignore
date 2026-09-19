@@ -28,18 +28,45 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
+# File contoh harus tetap ter-commit
+!.env.example
+!.env.langflow.example
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# build / generated
 node_modules/
 dist/
+
+# local environment
 .env
+
+# AI / editor / agent local files
 .claude/
 .cursor/
 .devin/
 .agents/
 
-migrations
+# local development runs
+.dev-runs/
+
+# Prisma migrations
+/migrations/
+
+# Documentation
+/docs/
+
+# Hardhat (nested package di contracts/)
+contracts/node_modules/
+contracts/artifacts/
+contracts/cache/
+contracts/types/
+contracts/ignition/deployments/
+
+# Local deployment addresses
+# (copy the tracked example)
+contracts/ignition/params.bscTestnet.json
