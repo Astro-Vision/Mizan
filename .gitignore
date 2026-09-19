@@ -41,5 +41,7 @@ dist/
 .cursor/
 .devin/
 .agents/
+
+
 /docs/
 /migrations/

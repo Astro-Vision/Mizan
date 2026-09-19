@@ -2,11 +2,11 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 import { Pencil, Trash2, Loader2 } from "lucide-react"
 
-import type { CampaignReview } from "@/lib/dashboard-data"
-import { formatAngka } from "@/lib/site-data"
+import type { CampaignReview } from "@/src/lib/dashboard-data"
+import { formatAngka } from "@/src/lib/site-data"
 import { deleteCampaign } from "@/app/(dashboard)/(admin)/admin/kampanye/actions"
 
 type CampaignTableProps = {

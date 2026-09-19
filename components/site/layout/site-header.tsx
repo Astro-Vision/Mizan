@@ -7,7 +7,7 @@ import { Menu, Wallet, X } from "lucide-react"
 import { MizanWordmark } from "@/components/site/ui/mizan-mark"
 import { mzBtn } from "@/components/site/ui/mz-button"
 import { AuthMenu } from "@/components/auth/auth-menu"
-import { NAV } from "@/lib/site-data"
+import { NAV } from "@/src/lib/site-data"
 
 export function SiteHeader() {
   const [buka, setBuka] = React.useState(false)

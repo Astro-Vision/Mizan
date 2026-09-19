@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils"
-import type { StatItem } from "@/lib/dashboard-data"
+import { cn } from "@/src/lib/utils"
+import type { StatItem } from "@/src/lib/dashboard-data"
 import {
   Wallet,
   ArrowUpRight,

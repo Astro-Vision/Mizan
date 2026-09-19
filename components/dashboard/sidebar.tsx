@@ -3,9 +3,9 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 import { MizanWordmark } from "@/components/site/ui/mizan-mark"
-import type { NavItem } from "@/lib/dashboard-data"
+import type { NavItem } from "@/src/lib/dashboard-data"
 import {
   LayoutDashboard,
   Megaphone,

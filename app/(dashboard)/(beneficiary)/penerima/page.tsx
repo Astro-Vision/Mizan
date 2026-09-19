@@ -5,8 +5,8 @@ import {
   BENEFICIARY_STATS,
   BENEFICIARY_PENYALURAN,
   EXPLORER_URL,
-} from "@/lib/dashboard-data"
-import { TESTNET_NOTICE } from "@/lib/site-data"
+} from "@/src/lib/dashboard-data"
+import { TESTNET_NOTICE } from "@/src/lib/site-data"
 import { ArrowUpRight, ShieldCheck, Clock, Circle } from "lucide-react"
 
 export const metadata: Metadata = {

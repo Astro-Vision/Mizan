@@ -1,6 +1,6 @@
 import { ExternalLink, Quote } from "lucide-react"
 
-import { STORY, SITE } from "@/lib/site-data"
+import { STORY, SITE } from "@/src/lib/site-data"
 
 /**
  * Kisah penerima — satu cerita besar, bukan carousel.

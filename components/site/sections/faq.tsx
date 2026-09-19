@@ -1,5 +1,5 @@
 import { SectionHead } from "@/components/site/ui/section-head"
-import { FAQ } from "@/lib/site-data"
+import { FAQ } from "@/src/lib/site-data"
 
 /**
  * Tanya jawab — dua kolom, semua jawaban terbuka.

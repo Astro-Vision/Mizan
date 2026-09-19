@@ -1,6 +1,6 @@
 import { CircleAlert } from "lucide-react"
 
-import { SITE, TESTNET_NOTICE } from "@/lib/site-data"
+import { SITE, TESTNET_NOTICE } from "@/src/lib/site-data"
 
 /**
  * Bilah peringatan testnet.

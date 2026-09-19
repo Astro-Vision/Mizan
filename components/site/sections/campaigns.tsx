@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react"
 
 import { CampaignCard } from "@/components/site/ui/campaign-card"
 import { SectionHead } from "@/components/site/ui/section-head"
-import { CAMPAIGNS, FEATURED } from "@/lib/site-data"
+import { CAMPAIGNS, FEATURED } from "@/src/lib/site-data"
 
 /**
  * Kampanye unggulan. Hierarki dibuat lewat ukuran — satu besar, tiga kecil —

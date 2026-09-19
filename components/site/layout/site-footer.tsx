@@ -1,7 +1,7 @@
 import { ExternalLink } from "lucide-react"
 
 import { MizanMark } from "@/components/site/ui/mizan-mark"
-import { NAV, SITE, TESTNET_NOTICE } from "@/lib/site-data"
+import { NAV, SITE, TESTNET_NOTICE } from "@/src/lib/site-data"
 
 const SUMBER: { label: string; href: string; external?: boolean }[] = [
   { label: "Kontrak di BscScan", href: `${SITE.explorer}/address/${SITE.contract}`, external: true },

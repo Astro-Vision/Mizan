@@ -1,5 +1,5 @@
 import { DashboardShell } from "@/components/dashboard/sidebar"
-import { BENEFICIARY_NAV, BENEFICIARY_WALLET } from "@/lib/dashboard-data"
+import { BENEFICIARY_NAV, BENEFICIARY_WALLET } from "@/src/lib/dashboard-data"
 
 export default function BeneficiaryLayout({
   children,

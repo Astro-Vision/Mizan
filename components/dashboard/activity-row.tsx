@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 import { ArrowUpRight } from "lucide-react"
 
-import type { ActivityItem } from "@/lib/dashboard-data"
-import { EXPLORER_URL } from "@/lib/dashboard-data"
+import type { ActivityItem } from "@/src/lib/dashboard-data"
+import { EXPLORER_URL } from "@/src/lib/dashboard-data"
 
 type ActivityRowProps = {
   item: ActivityItem

@@ -4,7 +4,7 @@
  * bukan hiasan: menakar dan menyeimbangkan amanah.
  */
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 
 export function MizanMark({ className }: { className?: string }) {
   return (

@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 
-import type { CampaignReview } from "@/lib/dashboard-data"
-import { formatAngka } from "@/lib/site-data"
+import type { CampaignReview } from "@/src/lib/dashboard-data"
+import { formatAngka } from "@/src/lib/site-data"
 
 type CampaignRowProps = {
   campaign: CampaignReview
