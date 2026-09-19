@@ -30,6 +30,9 @@ pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# File contoh justru harus ter-commit supaya daftar env terdokumentasi.
+!.env.example
+!.env.langflow.example
 
 # typescript
 *.tsbuildinfo
@@ -41,7 +44,17 @@ dist/
 .cursor/
 .devin/
 .agents/
+.dev-runs/
 
+# hardhat (nested package di contracts/)
+contracts/node_modules/
+contracts/artifacts/
+contracts/cache/
+contracts/types/
+contracts/ignition/deployments/
+
+# Local deployment addresses (copy the tracked example)
+contracts/ignition/params.bscTestnet.json
 
 /docs/
 /migrations/
