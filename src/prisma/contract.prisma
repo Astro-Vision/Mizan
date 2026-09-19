@@ -76,9 +76,217 @@ model AuditLogs {
   @@rls
 }
 
+model Campaign {
+  id             Int              @id @default(autoincrement())
+  judul          String
+  penyelenggara  String
+  terkumpul      Float            @default(0)
+  target         Float
+  satuan         String           @default("BNB")
+  donatur        Int              @default(0)
+  status         String           @default("menunggu")
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+}
+
 policy_insert audit_logs_langflow {
   target = AuditLogs
   roles = [anon, authenticated]
   withCheck = "true"
   @@map("langflow")
+}
+
+model Source {
+  id              String     @id @default(uuid())
+
+  name            String
+  sourceType      SourceType
+  dataFormats     DataFormats
+  baseUrlOrHandle String
+
+  isOfficial      Boolean    @default(false)
+  isActive        Boolean    @default(true)
+
+  createdAt       TimestamptzString @default(now())
+
+  rawCaptures     RawCapture[]
+
+  @@index([sourceType])
+}
+
+enum SourceType {
+  OFFICIAL // BMK, BNPB, BMKG, etc
+  NEWS
+  SOCIAL_MEDIA 
+}
+
+enum DataFormats {
+  JSON
+  RSS
+  HTML
+  OTHERS
+}
+
+
+// =================================
+// RAW CAPTURE
+// =================================
+
+model RawCapture {
+  id                String   @id @default(uuid())
+
+  sourceId          String
+  source            Source   @relation(
+    fields: [sourceId],
+    references: [id]
+  )
+
+  url               String?
+
+  authorName        String?
+  authorVerified    Boolean  @default(false)
+
+  contentText       String
+
+  mediaUrls         Json?
+  engagementMetrics Json?
+
+  publishedAt       TimestamptzString?
+
+  capturedAt        TimestamptzString @default(now())
+
+  contentHash       String   @unique
+
+  analysis          Analysis?
+
+  @@index([sourceId])
+  @@index([capturedAt])
+}
+
+
+// =================================
+// AI ANALYSIS
+// =================================
+
+model Analysis {
+  id                String   @id @default(uuid())
+
+  rawCaptureId      String   @unique
+
+  rawCapture        RawCapture @relation(
+    fields: [rawCaptureId],
+    references: [id]
+  )
+
+  isDisaster        Boolean
+
+  disasterType      DisasterType?
+
+  confidenceScore   Float
+
+  extractedLocation Json?
+
+  eventId           String?
+
+  event             DisasterEvent? @relation(
+    fields: [eventId],
+    references: [id]
+  )
+
+  createdAt        TimestamptzString @default(now())
+
+  updatedAt         temporal.updatedAtString()
+
+  @@index([eventId])
+}
+
+
+// =================================
+// DISASTER EVENT
+// =================================
+
+model DisasterEvent {
+  id                String @id @default(uuid())
+
+  disasterType      DisasterType?
+
+  title             String
+
+  description       String?
+  
+  validationStatus  ValidationStatus @default(UNVERIFIED)
+
+  locationName      String?
+  province          String?
+  capitalCity       String?
+
+  officialConfirmed Boolean @default(false)
+
+  firstDetectedAt   TimestamptzString @default(now())
+
+  lastUpdatedAt     temporal.updatedAtString()
+
+  analyses          Analysis[]
+
+  @@index([validationStatus])
+  @@index([disasterType])
+}
+
+model ScrapeJob {
+  id String @id @default(uuid())
+
+  startDate TimestamptzString
+  endDate   TimestamptzString
+
+  status ScrapeJobStatus @default(PENDING)
+
+  totalSources  Int @default(0)
+  processedData Int @default(0)
+
+  startedAt  TimestamptzString?
+  completedAt TimestamptzString?
+
+  errorMessage String?
+
+  createdAt TimestamptzString @default(now())
+
+  @@index([status])
+}
+
+// =================================
+// ENUM
+// =================================
+
+enum SeverityLevel {
+  RENDAH
+  SEDANG
+  TINGGI
+  KRITIS
+}
+
+enum DisasterType {
+  GEMPA_BUMI // bnpb & bmkg
+  BANJIR // bnpb & bpbd
+  TANAH_LONGSOR // bnpb & bpbd
+  KARHUTLA  // bnpb & bpbd 
+  TSUNAMI // bnpb & bmkg
+  ERUPSI_GUNUNG_API // bnpb & bmkg
+  KEKERINGAN // bnpb
+  LAINNYA // bnpb
+}
+
+enum ValidationStatus {
+  UNVERIFIED
+  CORROBORATED
+  OFFICIAL_CONFIRMED
+  REJECTED
+}
+
+enum ScrapeJobStatus {
+  PENDING
+  PLANNING
+  SCRAPING
+  ANALYZING
+  COMPLETED
+  FAILED
 }

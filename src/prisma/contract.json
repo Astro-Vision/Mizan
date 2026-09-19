@@ -4,12 +4,36 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
+    "analysis": {
+      "model": "Analysis",
+      "namespace": "public"
+    },
     "audit_logs": {
       "model": "AuditLogs",
       "namespace": "public"
     },
+    "campaign": {
+      "model": "Campaign",
+      "namespace": "public"
+    },
+    "disasterEvent": {
+      "model": "DisasterEvent",
+      "namespace": "public"
+    },
     "post": {
       "model": "Post",
+      "namespace": "public"
+    },
+    "rawCapture": {
+      "model": "RawCapture",
+      "namespace": "public"
+    },
+    "scrapeJob": {
+      "model": "ScrapeJob",
+      "namespace": "public"
+    },
+    "source": {
+      "model": "Source",
       "namespace": "public"
     },
     "user": {
@@ -25,6 +49,64 @@
     "namespaces": {
       "public": {
         "enum": {
+          "DataFormats": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "JSON",
+                "value": "JSON"
+              },
+              {
+                "name": "RSS",
+                "value": "RSS"
+              },
+              {
+                "name": "HTML",
+                "value": "HTML"
+              },
+              {
+                "name": "OTHERS",
+                "value": "OTHERS"
+              }
+            ]
+          },
+          "DisasterType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "GEMPA_BUMI",
+                "value": "GEMPA_BUMI"
+              },
+              {
+                "name": "BANJIR",
+                "value": "BANJIR"
+              },
+              {
+                "name": "TANAH_LONGSOR",
+                "value": "TANAH_LONGSOR"
+              },
+              {
+                "name": "KARHUTLA",
+                "value": "KARHUTLA"
+              },
+              {
+                "name": "TSUNAMI",
+                "value": "TSUNAMI"
+              },
+              {
+                "name": "ERUPSI_GUNUNG_API",
+                "value": "ERUPSI_GUNUNG_API"
+              },
+              {
+                "name": "KEKERINGAN",
+                "value": "KEKERINGAN"
+              },
+              {
+                "name": "LAINNYA",
+                "value": "LAINNYA"
+              }
+            ]
+          },
           "Role": {
             "codecId": "pg/text@1",
             "members": [
@@ -45,9 +127,235 @@
                 "value": "BENEFACTORY"
               }
             ]
+          },
+          "ScrapeJobStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "PLANNING",
+                "value": "PLANNING"
+              },
+              {
+                "name": "SCRAPING",
+                "value": "SCRAPING"
+              },
+              {
+                "name": "ANALYZING",
+                "value": "ANALYZING"
+              },
+              {
+                "name": "COMPLETED",
+                "value": "COMPLETED"
+              },
+              {
+                "name": "FAILED",
+                "value": "FAILED"
+              }
+            ]
+          },
+          "SeverityLevel": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "RENDAH",
+                "value": "RENDAH"
+              },
+              {
+                "name": "SEDANG",
+                "value": "SEDANG"
+              },
+              {
+                "name": "TINGGI",
+                "value": "TINGGI"
+              },
+              {
+                "name": "KRITIS",
+                "value": "KRITIS"
+              }
+            ]
+          },
+          "SourceType": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "OFFICIAL",
+                "value": "OFFICIAL"
+              },
+              {
+                "name": "NEWS",
+                "value": "NEWS"
+              },
+              {
+                "name": "SOCIAL_MEDIA",
+                "value": "SOCIAL_MEDIA"
+              }
+            ]
+          },
+          "ValidationStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "UNVERIFIED",
+                "value": "UNVERIFIED"
+              },
+              {
+                "name": "CORROBORATED",
+                "value": "CORROBORATED"
+              },
+              {
+                "name": "OFFICIAL_CONFIRMED",
+                "value": "OFFICIAL_CONFIRMED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              }
+            ]
           }
         },
         "models": {
+          "Analysis": {
+            "fields": {
+              "confidenceScore": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "disasterType": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "DisasterType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "eventId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "extractedLocation": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "isDisaster": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "rawCaptureId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "event": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "eventId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "DisasterEvent",
+                  "namespace": "public"
+                }
+              },
+              "rawCapture": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "rawCaptureId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "RawCapture",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "confidenceScore": {
+                  "column": "confidenceScore"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "disasterType": {
+                  "column": "disasterType"
+                },
+                "eventId": {
+                  "column": "eventId"
+                },
+                "extractedLocation": {
+                  "column": "extractedLocation"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "isDisaster": {
+                  "column": "isDisaster"
+                },
+                "rawCaptureId": {
+                  "column": "rawCaptureId"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "analysis"
+            }
+          },
           "AuditLogs": {
             "fields": {
               "content": {
@@ -159,6 +467,266 @@
               "table": "audit_logs"
             }
           },
+          "Campaign": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "donatur": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "judul": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "penyelenggara": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "satuan": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "target": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "terkumpul": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "donatur": {
+                  "column": "donatur"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "judul": {
+                  "column": "judul"
+                },
+                "penyelenggara": {
+                  "column": "penyelenggara"
+                },
+                "satuan": {
+                  "column": "satuan"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "target": {
+                  "column": "target"
+                },
+                "terkumpul": {
+                  "column": "terkumpul"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "campaign"
+            }
+          },
+          "DisasterEvent": {
+            "fields": {
+              "capitalCity": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "disasterType": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "DisasterType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "firstDetectedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "lastUpdatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "locationName": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "officialConfirmed": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "province": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "title": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "validationStatus": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ValidationStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              }
+            },
+            "relations": {
+              "analyses": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "eventId"
+                  ]
+                },
+                "to": {
+                  "model": "Analysis",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "capitalCity": {
+                  "column": "capitalCity"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "disasterType": {
+                  "column": "disasterType"
+                },
+                "firstDetectedAt": {
+                  "column": "firstDetectedAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "lastUpdatedAt": {
+                  "column": "lastUpdatedAt"
+                },
+                "locationName": {
+                  "column": "locationName"
+                },
+                "officialConfirmed": {
+                  "column": "officialConfirmed"
+                },
+                "province": {
+                  "column": "province"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "validationStatus": {
+                  "column": "validationStatus"
+                }
+              },
+              "namespaceId": "public",
+              "table": "disasterEvent"
+            }
+          },
           "Post": {
             "fields": {
               "authorId": {
@@ -244,6 +812,394 @@
               },
               "namespaceId": "public",
               "table": "post"
+            }
+          },
+          "RawCapture": {
+            "fields": {
+              "authorName": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "authorVerified": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "capturedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "contentHash": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "contentText": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "engagementMetrics": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "mediaUrls": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "publishedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "sourceId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "url": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "analysis": {
+                "cardinality": "1:1",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "rawCaptureId"
+                  ]
+                },
+                "to": {
+                  "model": "Analysis",
+                  "namespace": "public"
+                }
+              },
+              "source": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "sourceId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Source",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "authorName": {
+                  "column": "authorName"
+                },
+                "authorVerified": {
+                  "column": "authorVerified"
+                },
+                "capturedAt": {
+                  "column": "capturedAt"
+                },
+                "contentHash": {
+                  "column": "contentHash"
+                },
+                "contentText": {
+                  "column": "contentText"
+                },
+                "engagementMetrics": {
+                  "column": "engagementMetrics"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "mediaUrls": {
+                  "column": "mediaUrls"
+                },
+                "publishedAt": {
+                  "column": "publishedAt"
+                },
+                "sourceId": {
+                  "column": "sourceId"
+                },
+                "url": {
+                  "column": "url"
+                }
+              },
+              "namespaceId": "public",
+              "table": "rawCapture"
+            }
+          },
+          "ScrapeJob": {
+            "fields": {
+              "completedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "endDate": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "errorMessage": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "processedData": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "startDate": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "startedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "ScrapeJobStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "totalSources": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "completedAt": {
+                  "column": "completedAt"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "endDate": {
+                  "column": "endDate"
+                },
+                "errorMessage": {
+                  "column": "errorMessage"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "processedData": {
+                  "column": "processedData"
+                },
+                "startDate": {
+                  "column": "startDate"
+                },
+                "startedAt": {
+                  "column": "startedAt"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "totalSources": {
+                  "column": "totalSources"
+                }
+              },
+              "namespaceId": "public",
+              "table": "scrapeJob"
+            }
+          },
+          "Source": {
+            "fields": {
+              "baseUrlOrHandle": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "dataFormats": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "DataFormats",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "isActive": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "isOfficial": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "sourceType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "SourceType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              }
+            },
+            "relations": {
+              "rawCaptures": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "sourceId"
+                  ]
+                },
+                "to": {
+                  "model": "RawCapture",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "baseUrlOrHandle": {
+                  "column": "baseUrlOrHandle"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "dataFormats": {
+                  "column": "dataFormats"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "isActive": {
+                  "column": "isActive"
+                },
+                "isOfficial": {
+                  "column": "isOfficial"
+                },
+                "name": {
+                  "column": "name"
+                },
+                "sourceType": {
+                  "column": "sourceType"
+                }
+              },
+              "namespaceId": "public",
+              "table": "source"
             }
           },
           "User": {
@@ -622,6 +1578,128 @@
             }
           },
           "table": {
+            "analysis": {
+              "checks": [
+                {
+                  "expression": "\"disasterType\" IN ('GEMPA_BUMI', 'BANJIR', 'TANAH_LONGSOR', 'KARHUTLA', 'TSUNAMI', 'ERUPSI_GUNUNG_API', 'KEKERINGAN', 'LAINNYA')",
+                  "name": "analysis_disasterType_check_77cea590",
+                  "prefix": "analysis_disasterType_check"
+                }
+              ],
+              "columns": {
+                "confidenceScore": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "disasterType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "DisasterType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "eventId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "extractedLocation": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "isDisaster": {
+                  "codecId": "pg/bool@1",
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "rawCaptureId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "rawCaptureId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "analysis"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "rawCapture"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "eventId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "analysis"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "disasterEvent"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "eventId"
+                  ],
+                  "name": "analysis_eventId_idx_6a266d47",
+                  "prefix": "analysis_eventId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "rawCaptureId"
+                  ]
+                }
+              ]
+            },
             "audit_logs": {
               "columns": {
                 "content": {
@@ -683,6 +1761,212 @@
               "control": "observed",
               "foreignKeys": [],
               "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "campaign": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "donatur": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "judul": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "penyelenggara": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "satuan": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "BNB"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "menunggu"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "target": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": false
+                },
+                "terkumpul": {
+                  "codecId": "pg/float8@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "float8",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "disasterEvent": {
+              "checks": [
+                {
+                  "expression": "\"disasterType\" IN ('GEMPA_BUMI', 'BANJIR', 'TANAH_LONGSOR', 'KARHUTLA', 'TSUNAMI', 'ERUPSI_GUNUNG_API', 'KEKERINGAN', 'LAINNYA')",
+                  "name": "disasterEvent_disasterType_check_77cea590",
+                  "prefix": "disasterEvent_disasterType_check"
+                },
+                {
+                  "expression": "\"validationStatus\" IN ('UNVERIFIED', 'CORROBORATED', 'OFFICIAL_CONFIRMED', 'REJECTED')",
+                  "name": "disasterEvent_validationStatus_check_a271e93d",
+                  "prefix": "disasterEvent_validationStatus_check"
+                }
+              ],
+              "columns": {
+                "capitalCity": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "description": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "disasterType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "DisasterType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "firstDetectedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "lastUpdatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "locationName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "officialConfirmed": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "province": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "title": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "validationStatus": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "UNVERIFIED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ValidationStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "disasterType"
+                  ],
+                  "name": "disasterEvent_disasterType_idx_7f709b63",
+                  "prefix": "disasterEvent_disasterType_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "validationStatus"
+                  ],
+                  "name": "disasterEvent_validationStatus_idx_e615ae80",
+                  "prefix": "disasterEvent_validationStatus_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -756,6 +2040,318 @@
                   ],
                   "name": "post_authorId_idx_e47547ed",
                   "prefix": "post_authorId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "rawCapture": {
+              "columns": {
+                "authorName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "authorVerified": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "capturedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "contentHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "contentText": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "engagementMetrics": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "mediaUrls": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "publishedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "sourceId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "url": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "sourceId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "rawCapture"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "source"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "capturedAt"
+                  ],
+                  "name": "rawCapture_capturedAt_idx_2c071597",
+                  "prefix": "rawCapture_capturedAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "sourceId"
+                  ],
+                  "name": "rawCapture_sourceId_idx_d92a2571",
+                  "prefix": "rawCapture_sourceId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "contentHash"
+                  ]
+                }
+              ]
+            },
+            "scrapeJob": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('PENDING', 'PLANNING', 'SCRAPING', 'ANALYZING', 'COMPLETED', 'FAILED')",
+                  "name": "scrapeJob_status_check_f5cc9040",
+                  "prefix": "scrapeJob_status_check"
+                }
+              ],
+              "columns": {
+                "completedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "endDate": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "errorMessage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "processedData": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "startDate": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "startedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "ScrapeJobStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "totalSources": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "scrapeJob_status_idx_e98638ab",
+                  "prefix": "scrapeJob_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "source": {
+              "checks": [
+                {
+                  "expression": "\"dataFormats\" IN ('JSON', 'RSS', 'HTML', 'OTHERS')",
+                  "name": "source_dataFormats_check_ff9e5fea",
+                  "prefix": "source_dataFormats_check"
+                },
+                {
+                  "expression": "\"sourceType\" IN ('OFFICIAL', 'NEWS', 'SOCIAL_MEDIA')",
+                  "name": "source_sourceType_check_51734c6c",
+                  "prefix": "source_sourceType_check"
+                }
+              ],
+              "columns": {
+                "baseUrlOrHandle": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "dataFormats": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "DataFormats",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "isActive": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": true
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "isOfficial": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "sourceType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "SourceType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "sourceType"
+                  ],
+                  "name": "source_sourceType_idx_d8b2a801",
+                  "prefix": "source_sourceType_idx",
                   "unique": false
                 }
               ],
@@ -1022,6 +2618,28 @@
             }
           },
           "valueSet": {
+            "DataFormats": {
+              "kind": "valueSet",
+              "values": [
+                "JSON",
+                "RSS",
+                "HTML",
+                "OTHERS"
+              ]
+            },
+            "DisasterType": {
+              "kind": "valueSet",
+              "values": [
+                "GEMPA_BUMI",
+                "BANJIR",
+                "TANAH_LONGSOR",
+                "KARHUTLA",
+                "TSUNAMI",
+                "ERUPSI_GUNUNG_API",
+                "KEKERINGAN",
+                "LAINNYA"
+              ]
+            },
             "Role": {
               "kind": "valueSet",
               "values": [
@@ -1030,6 +2648,43 @@
                 "BENEFACTOR",
                 "BENEFACTORY"
               ]
+            },
+            "ScrapeJobStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "PLANNING",
+                "SCRAPING",
+                "ANALYZING",
+                "COMPLETED",
+                "FAILED"
+              ]
+            },
+            "SeverityLevel": {
+              "kind": "valueSet",
+              "values": [
+                "RENDAH",
+                "SEDANG",
+                "TINGGI",
+                "KRITIS"
+              ]
+            },
+            "SourceType": {
+              "kind": "valueSet",
+              "values": [
+                "OFFICIAL",
+                "NEWS",
+                "SOCIAL_MEDIA"
+              ]
+            },
+            "ValidationStatus": {
+              "kind": "valueSet",
+              "values": [
+                "UNVERIFIED",
+                "CORROBORATED",
+                "OFFICIAL_CONFIRMED",
+                "REJECTED"
+              ]
             }
           }
         },
@@ -1037,7 +2692,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "b43c626eb3dcbe000a914e2816d6805a17561cf2805e964623a65d8a95ab9c79",
+    "storageHash": "831f639277eef802f353a0ebba48645d66b98ef8315749b274fe8f49a8a8d92f",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
@@ -1050,9 +2705,35 @@
     }
   },
   "execution": {
-    "executionHash": "658a3f1aaf5f0ec0bad575e87902ed0d9f0847f7cbe7dacd410b6ad46960b94f",
+    "executionHash": "00c2b20733ac587b3ad7eaa3cd37d06ec83dd95b67f7974be8da7e7494091d12",
     "mutations": {
       "defaults": [
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "analysis"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "analysis"
+          }
+        },
         {
           "onCreate": {
             "id": "uuidv4",
@@ -1076,7 +2757,81 @@
           "ref": {
             "column": "updatedAt",
             "namespace": "public",
+            "table": "campaign"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "disasterEvent"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "lastUpdatedAt",
+            "namespace": "public",
+            "table": "disasterEvent"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
             "table": "post"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "rawCapture"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "scrapeJob"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "source"
           }
         },
         {
