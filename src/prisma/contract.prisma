@@ -59,6 +59,19 @@ types {
   Embedding3072 = pgvector.Vector(3072)
 }
 
+model Campaign {
+  id             Int              @id @default(autoincrement())
+  judul          String
+  penyelenggara  String
+  terkumpul      Float            @default(0)
+  target         Float
+  satuan         String           @default("BNB")
+  donatur        Int              @default(0)
+  status         String           @default("menunggu")
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+}
+
 model AuditLogs {
   id           Uuid          @id @default(uuid())
   panti_id     String?

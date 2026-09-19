@@ -1,6 +1,6 @@
 import { ExternalLink } from "lucide-react"
 
-import { PROOFS, SITE } from "@/lib/site-data"
+import { PROOFS, SITE } from "@/src/lib/site-data"
 
 /**
  * Bilah bukti. Menggantikan strip "Trusted by <logo>" gaya lama, yang

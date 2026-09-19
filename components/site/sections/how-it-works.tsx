@@ -1,5 +1,5 @@
-import { SectionHead } from "@/components/site/ui/section-head"
-import { STEPS } from "@/lib/site-data"
+import { STEPS } from "@/src/lib/site-data"
+import { SectionHead } from "../ui/section-head"
 
 /**
  * Cara kerja. Timeline vertikal dengan garis penghubung, bukan tiga kartu

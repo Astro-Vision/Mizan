@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 
 /**
  * Gaya tombol Mizan. Diekspor sebagai fungsi kelas, bukan komponen, agar bisa
