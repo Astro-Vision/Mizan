@@ -15,9 +15,6 @@ export default defineConfig({
     version: "0.8.28",
     settings: {
       optimizer: { enabled: true, runs: 200 },
-      // Sengaja shanghai, bukan cancun: bytecode harus aman di BSC tanpa
-      // bergantung pada opcode transient storage. Konsekuensinya jangan
-      // memakai ReentrancyGuardTransient.
       evmVersion: "shanghai",
     },
   },
@@ -27,7 +24,6 @@ export default defineConfig({
   },
 
   networks: {
-    // Jaringan simulasi in-memory untuk test dan percobaan lokal.
     hardhatSim: {
       type: "edr-simulated",
       chainType: "l1",

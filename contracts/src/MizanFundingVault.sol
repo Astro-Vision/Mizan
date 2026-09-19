@@ -6,14 +6,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title MizanFundingVault
-/// @notice Enforcement layer finansial untuk programmable funding Mizan.
-/// @dev Contract ini hanya menegakkan invariant yang bisa ditegakkan on-chain.
-///      Penilaian kelayakan (AI, policy, approval manual) terjadi di backend;
-///      contract hanya mempercayai pemegang VERIFIER_ROLE.
-///
-///      Yang TIDAK ada di sini, dan tidak boleh ditambahkan: konten campaign,
-///      file bukti, rekening bank, data pribadi, pemanggilan HTTP, referensi AI,
-///      dan penarikan dana ke address arbitrer.
+/// @notice Holds campaign funds and releases them after milestone approval.
 contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
     // ---------------------------------------------------------------------
     // Roles
@@ -62,15 +55,11 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
     mapping(uint256 => mapping(uint256 => Milestone)) private _milestones;
     mapping(uint256 => mapping(address => uint256)) private _contributions;
 
-    /// @notice Jaring terakhir terhadap double-release saat backend melakukan retry.
     mapping(bytes32 => bool) public releaseKeyUsed;
 
     uint256 public fundingCount;
 
-    /// @notice Batas atas satu transaksi release. Nol berarti tanpa batas.
     uint256 public maxReleasePerTx;
-
-    /// @notice Batas bawah requestedAmount milestone. Nol berarti tanpa batas.
     uint256 public minMilestoneAmount;
 
     // ---------------------------------------------------------------------
@@ -146,10 +135,7 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
     // Constructor
     // ---------------------------------------------------------------------
 
-    /// @param admin Penerima DEFAULT_ADMIN_ROLE.
-    /// @dev Hanya DEFAULT_ADMIN_ROLE yang diberikan di sini. CAMPAIGN_MANAGER_ROLE,
-    ///      VERIFIER_ROLE, dan PAUSER_ROLE harus di-grant terpisah supaya pemisahan
-    ///      wewenang benar-benar terjadi, bukan menumpuk di satu address.
+    /// @param admin Initial DEFAULT_ADMIN_ROLE holder.
     constructor(address admin) {
         if (admin == address(0)) revert InvalidAdmin();
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
@@ -159,8 +145,8 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
     // Campaign
     // ---------------------------------------------------------------------
 
-    /// @notice Mendaftarkan campaign yang sudah disetujui admin off-chain.
-    /// @param externalRef Hash/ref UUID campaign di database. Opaque bagi contract.
+    /// @notice Registers an approved off-chain campaign.
+    /// @param externalRef Off-chain campaign reference hash.
     function registerCampaign(
         uint256 campaignId,
         bytes32 externalRef,
@@ -182,8 +168,7 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
         emit CampaignRegistered(campaignId, externalRef, recipient, targetAmount);
     }
 
-    /// @notice Membekukan atau mengaktifkan kembali satu campaign.
-    /// @dev Recipient sengaja tidak dapat diubah setelah pendaftaran.
+    /// @notice Enables or disables a campaign.
     function setCampaignActive(uint256 campaignId, bool active)
         external
         onlyRole(CAMPAIGN_MANAGER_ROLE)
@@ -197,7 +182,7 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
     // Funding
     // ---------------------------------------------------------------------
 
-    /// @notice Menyetor native BNB dan mengikatnya ke satu campaign.
+    /// @notice Funds a campaign with native BNB.
     function fundCampaign(uint256 campaignId) external payable whenNotPaused nonReentrant {
         Campaign storage c = _requireActiveCampaign(campaignId);
         if (msg.value == 0) revert InvalidAmount();
@@ -205,8 +190,6 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
         c.fundedAmount += msg.value;
         _contributions[campaignId][msg.sender] += msg.value;
 
-        // fundingId hanya penanda untuk indexing backend. Detail tiap donasi
-        // diambil dari event ini, tidak disimpan sebagai struct demi hemat gas.
         uint256 fundingId = ++fundingCount;
 
         emit FundsCommitted(campaignId, fundingId, msg.sender, msg.value, c.fundedAmount);
@@ -216,8 +199,7 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
     // Milestone
     // ---------------------------------------------------------------------
 
-    /// @notice Mencatat pengajuan milestone beserta hash bukti.
-    /// @param evidenceHash Hash bundel bukti off-chain. Contract tidak menilai isinya.
+    /// @notice Submits a milestone proof hash for review.
     function submitMilestone(
         uint256 campaignId,
         uint256 milestoneId,
@@ -243,12 +225,9 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
         emit MilestoneSubmitted(campaignId, milestoneId, requestedAmount, evidenceHash);
     }
 
-    /// @notice Mencatat hasil verifikasi dari backend yang sudah lolos policy dan approval manual.
-    /// @param assessmentRef Ref versi AI assessment. Opaque, hanya untuk traceability.
-    /// @param policyRef Ref versi policy. Opaque, hanya untuk traceability.
-    /// @dev Contract tidak menilai kebenaran laporan. Yang ditegakkan di sini hanya
-    ///      wewenang pemanggil, kesahihan state, dan ketersediaan dana. Menyimpan ref
-    ///      sebagai bytes32 opaque membuat perubahan format output AI tidak mengubah ABI.
+    /// @notice Approves or rejects a submitted milestone.
+    /// @param assessmentRef Off-chain assessment reference hash.
+    /// @param policyRef Off-chain policy reference hash.
     function verifyMilestone(
         uint256 campaignId,
         uint256 milestoneId,
@@ -268,8 +247,6 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
         m.policyRef = policyRef;
 
         if (approved) {
-            // Reserve saat verifikasi, bukan saat release, supaya dua milestone
-            // tidak bisa sama-sama lolos untuk dana yang sama.
             uint256 available = _available(c);
             if (m.requestedAmount > available) {
                 revert InsufficientAvailableFunds(campaignId, m.requestedAmount, available);
@@ -287,9 +264,8 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
     // Release
     // ---------------------------------------------------------------------
 
-    /// @notice Melepas dana milestone terverifikasi ke recipient campaign.
-    /// @param idempotencyKey Kunci deterministik dari backend, biasanya
-    ///        keccak256(campaignId, milestoneId, releaseVersion).
+    /// @notice Releases an approved milestone to the campaign recipient.
+    /// @param idempotencyKey Unique key that makes release retries safe.
     function releaseFunds(
         uint256 campaignId,
         uint256 milestoneId,
@@ -310,8 +286,6 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
             revert ReleaseExceedsMaxPerTx(amount, maxReleasePerTx);
         }
 
-        // Pertahanan berlapis: reservedAmount seharusnya sudah menjamin ini,
-        // tapi tetap dicek sebelum dana keluar.
         if (amount > c.fundedAmount - c.releasedAmount) {
             revert InsufficientAvailableFunds(
                 campaignId,
@@ -322,7 +296,6 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
 
         address recipient = c.recipient;
 
-        // Checks-Effects-Interactions: seluruh state diselesaikan sebelum transfer.
         releaseKeyUsed[idempotencyKey] = true;
         c.reservedAmount -= amount;
         c.releasedAmount += amount;
@@ -345,8 +318,7 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
         _unpause();
     }
 
-    /// @notice Parameter Type C: dapat diubah tanpa redeploy sehingga perubahan
-    ///         threshold policy tidak menyentuh Solidity.
+    /// @notice Sets optional release guardrails. Zero disables each limit.
     function setReleaseLimits(uint256 newMaxReleasePerTx, uint256 newMinMilestoneAmount)
         external
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -382,8 +354,7 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
         return _contributions[campaignId][funder];
     }
 
-    /// @notice Satu-satunya view yang dipakai backend adapter untuk read-back
-    ///         sebelum menyusun transaksi.
+    /// @notice Compact campaign state for backend reads.
     function getCampaignState(uint256 campaignId)
         external
         view
@@ -434,13 +405,8 @@ contract MizanFundingVault is AccessControl, ReentrancyGuard, Pausable {
         if (!c.active) revert CampaignNotActive(campaignId);
     }
 
-    /// @dev Akunting sengaja dipisah dari mekanisme transfer. Dukungan BEP-20
-    ///      nanti hanya perlu mengubah fungsi ini, bukan signature fungsi publik.
     function _payout(address to, uint256 amount) private {
         (bool ok, ) = payable(to).call{value: amount}("");
         if (!ok) revert TransferFailed(to, amount);
     }
-
-    // Tidak ada receive() maupun fallback(): transfer telanjang ke contract akan
-    // revert. Dana harus selalu terikat ke campaign lewat fundCampaign().
 }

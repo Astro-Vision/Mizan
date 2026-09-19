@@ -1,16 +1,3 @@
-/**
- * Smoke test happy-path di BSC Testnet terhadap vault yang sudah di-deploy.
- *
- * Prasyarat di .env:
- *   BSC_TESTNET_RPC_URL
- *   DEPLOYER_PRIVATE_KEY          → dipakai sebagai donatur (fundCampaign)
- *   CAMPAIGN_MANAGER_PRIVATE_KEY  → register + submitMilestone
- *   VERIFIER_PRIVATE_KEY          → verify + releaseFunds
- *   VAULT_ADDRESS                 → hasil deploy (opsional; default dari ignition)
- *
- * Jalankan:
- *   npx tsx scripts/smoke-testnet.ts
- */
 import { existsSync, readFileSync } from "node:fs"
 import { loadEnvFile } from "node:process"
 import { fileURLToPath } from "node:url"
@@ -26,6 +13,8 @@ import {
 } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { bscTestnet } from "viem/chains"
+
+type VaultArtifact = { abi: unknown[] }
 
 const envFile = fileURLToPath(new URL("../.env", import.meta.url))
 if (existsSync(envFile)) loadEnvFile(envFile)
@@ -56,7 +45,7 @@ if (!vaultAddress) throw new Error("VAULT_ADDRESS tidak ditemukan")
 const artifactPath = fileURLToPath(
   new URL("../artifacts/src/MizanFundingVault.sol/MizanFundingVault.json", import.meta.url),
 )
-const artifact = JSON.parse(readFileSync(artifactPath, "utf8")) as { abi: unknown[] }
+const artifact = JSON.parse(readFileSync(artifactPath, "utf8")) as VaultArtifact
 
 const funder = privateKeyToAccount(funderKey)
 const manager = privateKeyToAccount(managerKey)
