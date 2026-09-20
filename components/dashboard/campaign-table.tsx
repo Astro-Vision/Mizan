@@ -36,8 +36,8 @@ const STATUS_STYLES: Record<
     label: "Approved",
   },
   REJECTED: {
-    bg: "bg-red-50 dark:bg-red-950",
-    text: "text-red-700 dark:text-red-300",
+    bg: "bg-coral/10",
+    text: "text-coral",
     label: "Rejected",
   },
 }
@@ -54,16 +54,16 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
   return (
     <div className="rounded-2xl border border-line-soft bg-surface">
       <div className="hidden border-b border-line-soft px-6 py-3 sm:flex">
-        <span className="min-w-0 flex-1 text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+        <span className="min-w-0 flex-1 text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
           Kampanye / AI source
         </span>
-        <span className="w-32 text-right text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+        <span className="w-32 text-right text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
           Target
         </span>
-        <span className="w-32 text-center text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+        <span className="w-32 text-center text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
           Review
         </span>
-        <span className="w-40 text-center text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+        <span className="w-40 text-center text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
           Aksi
         </span>
       </div>
@@ -93,10 +93,15 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
   return (
     <div className="flex flex-col gap-3 border-b border-line-soft px-6 py-4 last:border-b-0 sm:flex-row sm:items-center sm:gap-4">
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold leading-[1.3] text-ink">{campaign.judul}</p>
+        <p className="text-sm leading-[1.3] font-semibold text-ink">
+          {campaign.judul}
+        </p>
         <p className="mt-1 text-xs text-ink-muted">{campaign.penyelenggara}</p>
         <p className="mt-2 text-xs text-ink-muted">
-          Confidence AI: {campaign.aiConfidence == null ? "—" : `${Math.round(campaign.aiConfidence * 100)}%`}
+          Confidence AI:{" "}
+          {campaign.aiConfidence == null
+            ? "—"
+            : `${Math.round(campaign.aiConfidence * 100)}%`}
           {campaign.aiReference ? ` · ${campaign.aiReference}` : ""}
         </p>
         {campaign.recipientWallet ? (
@@ -106,16 +111,17 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
         ) : null}
       </div>
 
-      <p className="shrink-0 text-right font-mono text-sm tabular-nums text-ink sm:w-32">
-        {formatAngka(campaign.target)} <span className="text-xs text-ink-muted">BNB</span>
+      <p className="shrink-0 text-right font-mono text-sm text-ink tabular-nums sm:w-32">
+        {formatAngka(campaign.target)}{" "}
+        <span className="text-xs text-ink-muted">BNB</span>
       </p>
 
       <div className="sm:w-32 sm:text-center">
         <span
           className={cn(
-            "inline-flex h-7 items-center rounded-full px-3 text-[0.75rem] font-semibold uppercase tracking-[0.02em]",
+            "inline-flex h-7 items-center rounded-full px-3 text-[0.75rem] font-semibold tracking-[0.02em] uppercase",
             style.bg,
-            style.text,
+            style.text
           )}
         >
           {style.label}
@@ -139,7 +145,7 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
               title="Reject"
               disabled={busy}
               onClick={() => void run(rejectCampaign)}
-              className="flex size-8 items-center justify-center rounded-[6px] text-red-700 hover:bg-red-50 disabled:opacity-50 dark:text-red-300 dark:hover:bg-red-950"
+              className="flex size-8 items-center justify-center rounded-[6px] text-coral hover:bg-coral/10 disabled:opacity-50"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
