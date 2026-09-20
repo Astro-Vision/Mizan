@@ -1,47 +1,55 @@
 @import "tailwindcss";
 
-/* Tema dikendalikan kelas (next-themes), bukan preferensi sistem mentah */
+/* Halaman publik menggunakan tema terang Mizan sebagai tema utama. */
 @custom-variant dark (&:is(.dark *));
 
 /* =========================================================================
    MIZAN — Sistem Desain
-   Semua nilai kontras dihitung. Lihat DESIGN.md §4.4.
-   Aturan: satu peran = satu nilai. Warna adalah makna, bukan dekorasi.
+   Palette Mizan — primary purple, violet, magenta, coral, dan warm yellow.
+   Satu peran = satu nilai. Warna adalah makna, bukan dekorasi.
    ========================================================================= */
 
 :root {
-  /* ── Merek: merah bata ───────────────────────────────────────────── */
-  --brand-50: #fff5f3;
-  --brand-100: #ffe6e2;
-  --brand-200: #ffcbc4;
-  --brand-300: #fca69b;
-  --brand-400: #f27262;
-  --brand-500: #e04334;
-  --brand-600: #c41e14;
-  --brand-700: #a5050a; /* PRIMARY */
-  --brand-800: #7c0a0c;
-  --brand-900: #5a0e0e;
-  --brand-950: #330607;
+  /* ── Mizan brand palette ─────────────────────────────────────────── */
+  --primary-purple: #702082;
+  --brand-violet: #8e3fa3;
+  --bright-purple: #a83bb5;
+  --magenta: #c347b9;
+  --soft-lavender: #eee3f1;
+  --very-light-purple: #f8f3f9;
+  --coral: #f57961;
+  --warm-yellow: #f5c557;
 
-  /* ── Aksen: amber ────────────────────────────────────────────────── */
-  --accent-200: #ffe9a8;
-  --accent-400: #ffd34d;
-  --accent-500: #ffc000; /* HANYA latar, wajib teks gelap */
-  --accent-600: #e0a800;
-  --accent-text: #916d00; /* amber sebagai TEKS di latar terang (4.52:1) */
-  /* Teks di ATAS amber. WAJIB tetap gelap di KEDUA mode — kalau memakai
-     --ink, di mode gelap nilainya jadi terang dan kontrasnya jatuh ke 1.48:1. */
-  --on-accent: #17130f;
+  /* Backward-compatible scale used by existing Tailwind component classes. */
+  --brand-50: var(--very-light-purple);
+  --brand-100: var(--soft-lavender);
+  --brand-200: #dfc5e5;
+  --brand-300: #c18dcc;
+  --brand-400: var(--bright-purple);
+  --brand-500: var(--brand-violet);
+  --brand-600: #7d2c91;
+  --brand-700: var(--primary-purple);
+  --brand-800: #561765;
+  --brand-900: #3e104a;
+  --brand-950: #2a0b32;
 
-  /* ── Netral hangat (di-tint ke arah merek) ───────────────────────── */
-  --canvas: #fbf8f6;
+  /* Highlight/status scale. CTA utama tetap primary purple. */
+  --accent-200: var(--warm-yellow);
+  --accent-400: #f7d477;
+  --accent-500: var(--coral);
+  --accent-600: #d65e4a;
+  --accent-text: #8b4f00;
+  --on-accent: #25212a;
+
+  /* ── Netral ───────────────────────────────────────────────────────── */
+  --canvas: var(--surface);
   --surface: #ffffff;
-  --surface-sunken: #f4efeb;
-  --ink: #17130f; /* 17.47:1 */
-  --ink-body: #4a4139; /*  9.43:1 */
-  --ink-muted: #6e635a; /*  5.52:1 */
-  --line-soft: #e8e1da; /* dekoratif saja */
-  --line-ui: #938f8a; /* batas komponen, 3.04:1 */
+  --surface-sunken: var(--soft-lavender);
+  --ink: #25212a;
+  --ink-body: #403a46;
+  --ink-muted: #68636c;
+  --line-soft: #e4d7e7;
+  --line-ui: #9b8aa0;
 
   /* ── Token semantik ──────────────────────────────────────────────── */
   --background: var(--canvas);
@@ -52,54 +60,26 @@
   --popover-foreground: var(--ink);
   --primary: var(--brand-700);
   --primary-foreground: #ffffff; /* 8.00:1 */
-  --secondary: var(--brand-50);
+  --secondary: var(--soft-lavender);
   --secondary-foreground: var(--brand-700);
   --muted: var(--surface-sunken);
   --muted-foreground: var(--ink-muted);
-  --accent: var(--brand-50);
+  --accent: var(--brand-violet);
   --accent-foreground: var(--brand-700);
-  --destructive: var(--brand-600);
+  --destructive: var(--coral);
   --destructive-foreground: #ffffff;
   --border: var(--line-soft);
   --input: var(--line-ui);
   --ring: var(--brand-700);
 }
 
-/* ── Mode gelap: hangat gelap, bukan hitam murni ───────────────────── */
-.dark {
-  --canvas: #14100e; /* 17.02:1 dengan --ink */
-  --surface: #1c1714;
-  --surface-sunken: #241e1a;
-  --ink: #f7f2ee;
-  --ink-body: #ded5ce;
-  --ink-muted: #a89c92; /* 7.06:1 */
-  --line-soft: #2e2723;
-  --line-ui: #6b605a;
-
-  --primary: var(--brand-600); /* putih di atasnya 5.93:1 — brand-500 GAGAL (4.18:1) */
-  --primary-foreground: #ffffff;
-  --secondary: #241e1a;
-  --secondary-foreground: var(--brand-300);
-  --muted: #241e1a;
-  --muted-foreground: var(--ink-muted);
-  --accent: #241e1a;
-  --accent-foreground: var(--brand-300);
-  --border: var(--line-soft);
-  --input: var(--line-ui);
-  --ring: var(--brand-400);
-
-  /* Amber sebagai TEKS perlu versi lebih terang agar terbaca di latar gelap.
-     Amber sebagai LATAR tetap butuh teks gelap (--on-accent tidak berubah). */
-  --accent-text: #c9a227;
-  --on-accent: #17130f;
-}
-
 /* =========================================================================
    PEMETAAN TEMA TAILWIND
    ========================================================================= */
 @theme inline {
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", sans-serif;
+  --font-sans:
+    var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
 
   /* Merek & aksen */
@@ -114,6 +94,15 @@
   --color-brand-800: var(--brand-800);
   --color-brand-900: var(--brand-900);
   --color-brand-950: var(--brand-950);
+
+  --color-primary-purple: var(--primary-purple);
+  --color-brand-violet: var(--brand-violet);
+  --color-bright-purple: var(--bright-purple);
+  --color-magenta: var(--magenta);
+  --color-soft-lavender: var(--soft-lavender);
+  --color-very-light-purple: var(--very-light-purple);
+  --color-coral: var(--coral);
+  --color-warm-yellow: var(--warm-yellow);
 
   --color-accent-200: var(--accent-200);
   --color-accent-400: var(--accent-400);
@@ -189,10 +178,10 @@
   --text-label--font-weight: 600;
 
   /* Bayangan — ditint hangat, tipis, satu per elemen */
-  --shadow-xs: 0 1px 2px rgba(23, 19, 15, 0.06);
-  --shadow-sm: 0 2px 8px rgba(23, 19, 15, 0.06);
-  --shadow-md: 0 8px 24px -6px rgba(23, 19, 15, 0.1);
-  --shadow-lg: 0 24px 48px -12px rgba(23, 19, 15, 0.16);
+  --shadow-xs: 0 1px 2px rgba(37, 33, 42, 0.06);
+  --shadow-sm: 0 2px 8px rgba(37, 33, 42, 0.06);
+  --shadow-md: 0 8px 24px -6px rgba(37, 33, 42, 0.1);
+  --shadow-lg: 0 24px 48px -12px rgba(37, 33, 42, 0.16);
 
   /* Gerakan */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -311,6 +300,169 @@
     border: 1px solid var(--line-soft);
     border-radius: var(--radius-lg);
   }
+
+  /* Hero human-centered: image is the atmosphere, content stays readable. */
+  .mz-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 650px;
+    background: var(--very-light-purple);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .mz-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .mz-hero__media img {
+    opacity: 0.96;
+  }
+
+  .mz-hero__wash {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--surface) 96%, transparent) 0%,
+      color-mix(in srgb, var(--surface) 86%, transparent) 35%,
+      color-mix(in srgb, var(--surface) 42%, transparent) 64%,
+      transparent 100%
+    );
+  }
+
+  @media (max-width: 1023px) {
+    .mz-hero__media img {
+      object-position: 62% center;
+    }
+
+    .mz-hero__wash {
+      background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--surface) 96%, transparent) 0%,
+        color-mix(in srgb, var(--surface) 82%, transparent) 48%,
+        color-mix(in srgb, var(--surface) 28%, transparent) 100%
+      );
+    }
+  }
+
+  /* Scroll-driven journey: one surface for both process and audit trail. */
+  .mz-journey {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    scroll-margin-top: 6rem;
+    background: var(--very-light-purple);
+  }
+
+  .mz-journey__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.42;
+    background-image:
+      linear-gradient(var(--soft-lavender) 1px, transparent 1px),
+      linear-gradient(90deg, var(--soft-lavender) 1px, transparent 1px);
+    background-size: 4rem 4rem;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 18%,
+      black 82%,
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .mz-journey__glow {
+    position: absolute;
+    top: 8%;
+    right: -12%;
+    z-index: 0;
+    width: min(56vw, 44rem);
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--magenta) 18%, transparent) 0%,
+      color-mix(in srgb, var(--brand-violet) 10%, transparent) 42%,
+      transparent 72%
+    );
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  .mz-journey__scroll-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--primary-purple);
+    box-shadow: 0 0 0 5px
+      color-mix(in srgb, var(--primary-purple) 12%, transparent);
+  }
+
+  .mz-journey__step-marker {
+    display: flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line-soft);
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+    color: var(--ink-muted);
+    transition:
+      border-color 220ms var(--ease-out),
+      background 220ms var(--ease-out),
+      color 220ms var(--ease-out),
+      transform 220ms var(--ease-out);
+  }
+
+  .mz-journey__step-marker--active {
+    border-color: var(--primary-purple);
+    background: var(--primary-purple);
+    color: var(--surface);
+    transform: scale(1.08);
+  }
+
+  .mz-journey__step-marker--complete {
+    border-color: var(--brand-violet);
+    background: var(--soft-lavender);
+    color: var(--primary-purple);
+  }
+
+  .mz-journey-card {
+    min-height: 25rem;
+    border: 1px solid color-mix(in srgb, var(--surface) 70%, var(--line-soft));
+    border-radius: 2rem;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    box-shadow: 0 28px 70px -34px
+      color-mix(in srgb, var(--ink) 30%, transparent);
+    backdrop-filter: blur(18px);
+  }
+
+  @media (max-width: 1023px) {
+    .mz-journey__grid {
+      background-size: 3rem 3rem;
+    }
+
+    .mz-journey__glow {
+      top: 34%;
+      right: -40%;
+      width: 36rem;
+    }
+
+    .mz-journey-card {
+      min-height: 0;
+      border-radius: 1.5rem;
+    }
+  }
 }
 
 /* =========================================================================
@@ -346,4 +498,113 @@
 .mz-pan {
   transform-origin: top center;
   animation: mz-pan-counter 1100ms var(--ease-out) 250ms both;
+}
+
+/* ========================================================================
+   INTRO LOGO
+   Video logo incoming diputar saat halaman pertama kali dimuat, lalu
+   menghilang dengan halus sebelum halaman siap digunakan.
+   ======================================================================== */
+@keyframes mz-nav-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mz-content-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mz-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--surface);
+  pointer-events: auto;
+}
+
+.mz-intro-logo {
+  position: relative;
+  display: inline-flex;
+  width: min(80vw, 360px);
+  aspect-ratio: 3 / 1;
+  overflow: hidden;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+}
+
+.mz-intro-logo__image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: auto;
+  max-width: none;
+  transform: translate(-50%, -50%);
+}
+
+.mz-site-header {
+  opacity: 0;
+  animation: mz-nav-reveal 350ms var(--ease-out) 1000ms both;
+}
+
+.mz-site-wordmark {
+  opacity: 0;
+  animation: mz-nav-reveal 300ms var(--ease-out) 2800ms both;
+}
+
+.mz-site-logo {
+  position: relative;
+  display: inline-flex;
+  width: 6.75rem;
+  height: 2.25rem;
+  overflow: hidden;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.mz-site-logo__image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10.125rem;
+  height: auto;
+  max-width: none;
+  transform: translate(-50%, -50%);
+}
+
+.mz-page-content {
+  opacity: 0;
+  animation: mz-content-reveal 650ms var(--ease-out) 2050ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mz-intro,
+  .mz-site-header,
+  .mz-page-content,
+  .mz-site-wordmark {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .mz-intro {
+    display: none;
+  }
 }

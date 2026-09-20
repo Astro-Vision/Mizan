@@ -48,3 +48,22 @@ export function MizanWordmark({ className }: { className?: string }) {
     </span>
   )
 }
+
+/** Placeholder intro logo: dua lapisan memudahkan penggantian asset image 1/2 nanti. */
+export function MizanIntroLogo({ solid = false }: { solid?: boolean }) {
+  return (
+    <div className="mz-intro-logo__content" aria-label="Mizan">
+      <span className="mz-intro-logo__mark" aria-hidden="true">
+        <span
+          className={cn("mz-intro-logo__mark-outline", !solid && "is-active")}
+        >
+          <MizanMark className="text-brand-violet" />
+        </span>
+        <span className={cn("mz-intro-logo__mark-solid", solid && "is-active")}>
+          <MizanMark className="text-primary-purple" />
+        </span>
+      </span>
+      <span className="mz-intro-logo__wordmark">Mizan</span>
+    </div>
+  )
+}

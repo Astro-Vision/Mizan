@@ -1,7 +1,10 @@
+"use client"
+
 import { HeartHandshake, Landmark, Scale, Siren } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 import { SectionHead } from "@/components/site/ui/section-head"
+import { useLanguage } from "@/components/site/language-provider"
 import { CATEGORIES } from "@/src/lib/site-data"
 
 const IKON: Record<string, LucideIcon> = {
@@ -17,13 +20,17 @@ const IKON: Record<string, LucideIcon> = {
  */
 
 export function Categories() {
+  const { t } = useLanguage()
+
   return (
     <section id="zakat" className="mz-section">
       <div className="mz-container">
         <SectionHead
-          overline="Kategori penyaluran"
-          title="Aturan penyalurannya beda, jadi dipisah."
-          desc="Zakat punya ketentuan penerima yang ketat; donasi umum tidak. Mencampur keduanya dalam satu keranjang justru menyulitkan pertanggungjawaban."
+          overline={t("Kategori penyaluran")}
+          title={t("Aturan penyalurannya beda, jadi dipisah.")}
+          desc={t(
+            "Zakat punya ketentuan penerima yang ketat; donasi umum tidak. Mencampur keduanya dalam satu keranjang justru menyulitkan pertanggungjawaban."
+          )}
         />
 
         <ul className="mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line-soft bg-line-soft sm:grid-cols-2 lg:grid-cols-4">
@@ -39,11 +46,11 @@ export function Categories() {
                   strokeWidth={1.5}
                   aria-hidden="true"
                 />
-                <h3 className="mt-5 text-h3 text-ink">{k.name}</h3>
-                <p className="mt-1 mz-num text-xs text-ink-muted">
-                  {k.asnaf}
+                <h3 className="mt-5 text-h3 text-ink">{t(k.name)}</h3>
+                <p className="mz-num mt-1 text-xs text-ink-muted">
+                  {t(k.asnaf)}
                 </p>
-                <p className="mt-3 text-sm text-ink-body">{k.desc}</p>
+                <p className="mt-3 text-sm text-ink-body">{t(k.desc)}</p>
               </li>
             )
           })}

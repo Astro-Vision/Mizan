@@ -5,37 +5,31 @@ import { cn } from "@/src/lib/utils"
  * dipakai pada <a> maupun <button> tanpa masalah polimorfisme.
  *
  * Aturan (DESIGN.md §10):
- *  - Satu warna = satu makna. `accent` maksimum SATU per layar.
+ *  - Satu warna = satu makna. `accent` memakai primary purple untuk CTA.
  *  - Tinggi 40 / 48 / 56 px. Radius satu peran.
  *  - Tanpa gradient, tanpa glow.
  */
 
 export type ButtonVariant =
-  | "primary"
-  | "accent"
-  | "outline"
-  | "ghost"
-  | "onDark"
+  "primary" | "accent" | "outline" | "ghost" | "onDark"
 
 export type ButtonSize = "sm" | "md" | "lg"
 
 const BASE =
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap transition-colors duration-150 outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 disabled:pointer-events-none disabled:opacity-50"
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md font-semibold whitespace-nowrap transition-colors duration-150 outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-purple disabled:pointer-events-none disabled:opacity-50"
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  /* Aksi utama halaman */
-  primary: "bg-brand-700 text-white hover:bg-brand-600 active:bg-brand-800",
-  /* Aksi donasi. WAJIB teks gelap di KEDUA mode — putih di atas amber cuma
-     1,64:1. Karena itu memakai --on-accent, bukan --ink yang berubah di mode
-     gelap dan akan menjatuhkan kontrasnya ke 1,48:1. */
+  /* Aksi utama halaman dan CTA donasi: Primary Purple. */
+  primary:
+    "bg-primary-purple text-white hover:bg-brand-600 active:bg-brand-800",
   accent:
-    "bg-accent-500 text-on-accent hover:bg-accent-400 active:bg-accent-600 focus-visible:outline-ink",
+    "bg-primary-purple text-white hover:bg-brand-600 active:bg-brand-800 focus-visible:outline-primary-purple",
   /* Aksi sekunder */
   outline:
     "border border-brand-200 text-brand-700 hover:bg-brand-50 active:bg-brand-100 dark:border-brand-900 dark:text-brand-300 dark:hover:bg-brand-950",
   /* Aksi tersier */
   ghost: "text-ink-body hover:bg-surface-sunken hover:text-ink",
-  /* Di atas latar merah tua */
+  /* Di atas latar primary purple gelap */
   onDark:
     "border border-white/30 text-white hover:bg-white/10 active:bg-white/15 focus-visible:outline-white",
 }
@@ -49,7 +43,7 @@ const SIZES: Record<ButtonSize, string> = {
 export function mzBtn(
   variant: ButtonVariant = "primary",
   size: ButtonSize = "md",
-  className?: string,
+  className?: string
 ) {
   return cn(BASE, VARIANTS[variant], SIZES[size], className)
 }
