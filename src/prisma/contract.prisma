@@ -1,110 +1,167 @@
 // use prisma-next
 
-model User {
-  id        Int          @id @default(autoincrement())
-  privyId   String       @unique
-  email     String?      @unique
-  username  String?      @unique
-  name      String?
-  avatarUrl String?
-  role      Role         @default(USER)
-  userType  String?
-  domicile  String?
-  whatsappNumber String?
-  whatsappNotificationConsent Boolean @default(false)
-  referralSource String?
-  referralSourceOther String?
-  dataConsent Boolean @default(false)
-  dataConsentAt TimestamptzString?
-  dataConsentVersion String?
-  onboardingCompletedAt TimestamptzString?
-  posts     Post[]
-  wallets   UserWallet[]
-  communities Community[]
-  approvedCampaigns Campaign[] @relation("CampaignApprover")
-  campaignPayments CampaignPayment[]
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
-}
-
-model UserWallet {
-  id            Int      @id @default(autoincrement())
-  user          User     @relation(fields: [userId], references: [id])
-  userId        Int
-  address       String
-  chainType     String
-  walletType    String
-  privyWalletId String?  @unique
-  createdAt     TimestamptzString @default(now())
-  updatedAt     temporal.updatedAtString()
-
-  @@unique([address, chainType])
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  createdAt TimestamptzString @default(now())
-  updatedAt temporal.updatedAtString()
-}
-
-enum Role {
-  USER
-  ADMIN
-  BENEFACTOR
-  BENEFACTORY
-}
+// =================================
+// TYPES
+// =================================
 
 types {
   Embedding3072 = pgvector.Vector(3072)
 }
 
-model Campaign {
-  id             Int              @id @default(autoincrement())
-  judul          String
-  penyelenggara  String
-  community      Community?       @relation(fields: [communityId], references: [id])
-  communityId    Int?
-  source         CampaignSource   @default(AI_MOCK)
-  aiDraft        Json?
-  aiReference    String?
-  aiConfidence   Float?
-  reviewStatus   CampaignReviewStatus @default(AI_DRAFT)
-  approvedBy     User?            @relation("CampaignApprover", fields: [approvedById], references: [id])
-  approvedById   Int?
-  approvedAt     TimestamptzString?
-  rejectionReason String?
-  recipientWallet String?
-  targetAmountWei String           @default("0")
-  contractCampaignId String?
-  contractTransactionHash String?
-  payments       CampaignPayment[]
-  terkumpul      Float            @default(0)
-  target         Float
-  satuan         String           @default("BNB")
-  donatur        Int              @default(0)
-  status         String           @default("menunggu")
-  createdAt      TimestamptzString @default(now())
-  updatedAt      temporal.updatedAtString()
+// =================================
+// ENUMS — Access & Roles
+// =================================
+
+enum Role {
+  BENEFACTOR  // default role for every new sign-up (donor)
+  BENEFICIARY // staff of a verified Community — creates & manages campaigns
+  ADMIN       // internal Mizan team
 }
 
+// =================================
+// AUTH & USERS
+// =================================
+
+model User {
+  id        Int     @id @default(autoincrement())
+  privyId   String  @unique
+  email     String? @unique
+  username  String? @unique
+  name      String?
+  avatarUrl String?
+  role      Role    @default(BENEFACTOR)
+  userType  String?
+  domicile  String?
+
+  whatsappNumber              String?
+  whatsappNotificationConsent Boolean @default(false)
+
+  referralSource      String?
+  referralSourceOther String?
+
+  dataConsent            Boolean            @default(false)
+  dataConsentAt          TimestamptzString?
+  dataConsentVersion     String?
+  onboardingCompletedAt  TimestamptzString?
+
+  posts             Post[]
+  wallets           UserWallet[]
+  communities       Community[]       // communities owned by this user
+  approvedCampaigns Campaign[]        @relation("CampaignApprover")
+  campaignPayments  CampaignPayment[]
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model UserWallet {
+  id            Int     @id @default(autoincrement())
+  address       String
+  chainType     String
+  walletType    String
+  privyWalletId String? @unique
+
+  userId        Int
+  user          User   @relation(fields: [userId], references: [id])
+  
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@unique([address, chainType])
+}
+
+model Post {
+  id       Int     @id @default(autoincrement())
+  title    String
+  content  String?
+  author   User    @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+// =================================
+// COMMUNITY (beneficiary organization)
+// =================================
+
 model Community {
-  id                 Int                        @id @default(autoincrement())
+  id                 Int                          @id @default(autoincrement())
   name               String
-  owner              User                       @relation(fields: [ownerId], references: [id])
+  owner              User                         @relation(fields: [ownerId], references: [id])
   ownerId            Int
   walletAddress      String
-  chainType          String                     @default("BSC_TESTNET")
-  verificationStatus CommunityVerificationStatus @default(PENDING)
-  campaigns          Campaign[]
-  createdAt          TimestamptzString          @default(now())
-  updatedAt          temporal.updatedAtString()
+  chainType          String                       @default("BSC_TESTNET")
+  verificationStatus CommunityVerificationStatus  @default(PENDING)
+
+  campaigns Campaign[]
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
 
   @@unique([walletAddress, chainType])
   @@index([ownerId])
+}
+
+enum CommunityVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+// =================================
+// CAMPAIGN & PAYMENTS
+// =================================
+
+model Campaign {
+  id            Int        @id @default(autoincrement())
+  title         String
+  organizerName String                    // free-text label, used before a verified Community is linked
+  community     Community? @relation(fields: [communityId], references: [id])
+  communityId   Int?
+
+  source       CampaignSource       @default(AI_MOCK)
+  aiDraft      Json?
+  aiReference  String?
+  aiConfidence Float?
+
+  reviewStatus    CampaignReviewStatus @default(AI_DRAFT)
+  approvedBy      User?                @relation("CampaignApprover", fields: [approvedById], references: [id])
+  approvedById    Int?
+  approvedAt      TimestamptzString?
+  rejectionReason String?
+
+  status CampaignStatus @default(ACTIVE)
+
+  recipientWallet         String?
+  targetAmountWei         String @default("0")
+  raisedAmountWei         String @default("0")
+  currency                String @default("BNB")
+  donorCount              Int    @default(0)
+  contractCampaignId      String?
+  contractTransactionHash String?
+
+  payments CampaignPayment[]
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+enum CampaignSource {
+  AI_MOCK
+}
+
+enum CampaignReviewStatus {
+  AI_DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum CampaignStatus {
+  ACTIVE
+  COMPLETED
+  CLOSED
 }
 
 model CampaignPayment {
@@ -119,28 +176,12 @@ model CampaignPayment {
   status          PaymentStatus @default(PENDING)
   transactionHash String?
   idempotencyKey  String        @unique
-  createdAt       TimestamptzString @default(now())
-  updatedAt       temporal.updatedAtString()
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
 
   @@index([campaignId])
   @@index([donorId])
-}
-
-enum CampaignSource {
-  AI_MOCK
-}
-
-enum CampaignReviewStatus {
-  AI_DRAFT
-  PENDING_REVIEW
-  APPROVED
-  REJECTED
-}
-
-enum CommunityVerificationStatus {
-  PENDING
-  VERIFIED
-  REJECTED
 }
 
 enum PaymentMode {
@@ -154,65 +195,30 @@ enum PaymentStatus {
   FAILED
 }
 
-model AuditLogs {
-  id           Uuid          @id @default(uuid())
-  panti_id     String?
-  nota_number  String?
-  total_amount Decimal?
-  status       String?
-  reason       String?
-  embedding    Embedding3072?
-  created_at   TimestamptzString? @default(now())
-  content      String?
-  metadata     Jsonb?
-
-  @@map("audit_logs")
-  @@control(observed)
-  @@rls
-}
-
-model Campaign {
-  id             Int              @id @default(autoincrement())
-  judul          String
-  penyelenggara  String
-  terkumpul      Float            @default(0)
-  target         Float
-  satuan         String           @default("BNB")
-  donatur        Int              @default(0)
-  status         String           @default("menunggu")
-  createdAt      TimestamptzString @default(now())
-  updatedAt      temporal.updatedAtString()
-}
-
-policy_insert audit_logs_langflow {
-  target = AuditLogs
-  roles = [anon, authenticated]
-  withCheck = "true"
-  @@map("langflow")
-}
+// =================================
+// DISASTER INTELLIGENCE (AI agent — Alpin)
+// =================================
 
 model Source {
-  id              String     @id @default(uuid())
-
+  id              String      @id @default(uuid())
   name            String
   sourceType      SourceType
   dataFormats     DataFormats
   baseUrlOrHandle String
+  isOfficial      Boolean     @default(false)
+  isActive        Boolean     @default(true)
 
-  isOfficial      Boolean    @default(false)
-  isActive        Boolean    @default(true)
+  rawCaptures RawCapture[]
 
-  createdAt       TimestamptzString @default(now())
-
-  rawCaptures     RawCapture[]
+  createdAt TimestamptzString @default(now())
 
   @@index([sourceType])
 }
 
 enum SourceType {
-  OFFICIAL // BMK, BNPB, BMKG, etc
+  OFFICIAL // BNPB, BMKG, etc.
   NEWS
-  SOCIAL_MEDIA 
+  SOCIAL_MEDIA
 }
 
 enum DataFormats {
@@ -222,106 +228,65 @@ enum DataFormats {
   OTHERS
 }
 
-
-// =================================
-// RAW CAPTURE
-// =================================
-
 model RawCapture {
-  id                String   @id @default(uuid())
-
-  sourceId          String
-  source            Source   @relation(
-    fields: [sourceId],
-    references: [id]
-  )
+  id     String @id @default(uuid())
+  source Source @relation(fields: [sourceId], references: [id])
+  sourceId String
 
   url               String?
-
   authorName        String?
-  authorVerified    Boolean  @default(false)
-
+  authorVerified    Boolean @default(false)
   contentText       String
-
   mediaUrls         Json?
   engagementMetrics Json?
-
   publishedAt       TimestamptzString?
+  contentHash       String  @unique
 
-  capturedAt        TimestamptzString @default(now())
+  analysis Analysis?
 
-  contentHash       String   @unique
-
-  analysis          Analysis?
+  capturedAt TimestamptzString @default(now())
 
   @@index([sourceId])
   @@index([capturedAt])
 }
 
-
-// =================================
-// AI ANALYSIS
-// =================================
-
 model Analysis {
-  id                String   @id @default(uuid())
-
-  rawCaptureId      String   @unique
-
-  rawCapture        RawCapture @relation(
-    fields: [rawCaptureId],
-    references: [id]
-  )
+  id           String @id @default(uuid())
+  rawCapture   RawCapture @relation(fields: [rawCaptureId], references: [id])
+  rawCaptureId String @unique
 
   isDisaster        Boolean
-
   disasterType      DisasterType?
+  confidenceScore    Float
+  extractedLocation  Json?
 
-  confidenceScore   Float
+  event   DisasterEvent? @relation(fields: [eventId], references: [id])
+  eventId String?
 
-  extractedLocation Json?
-
-  eventId           String?
-
-  event             DisasterEvent? @relation(
-    fields: [eventId],
-    references: [id]
-  )
-
-  createdAt        TimestamptzString @default(now())
-
-  updatedAt         temporal.updatedAtString()
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
 
   @@index([eventId])
 }
 
-
-// =================================
-// DISASTER EVENT
-// =================================
-
 model DisasterEvent {
-  id                String @id @default(uuid())
+  id String @id @default(uuid())
 
-  disasterType      DisasterType?
-
-  title             String
-
-  description       String?
-  
-  validationStatus  ValidationStatus @default(UNVERIFIED)
+  disasterType     DisasterType?
+  severityLevel    SeverityLevel?
+  title            String
+  description      String?
+  validationStatus ValidationStatus @default(UNVERIFIED)
 
   locationName      String?
   province          String?
-  capitalCity       String?
-
+  city              String?
   officialConfirmed Boolean @default(false)
 
-  firstDetectedAt   TimestamptzString @default(now())
+  analyses Analysis[]
 
-  lastUpdatedAt     temporal.updatedAtString()
-
-  analyses          Analysis[]
+  firstDetectedAt TimestamptzString @default(now())
+  lastUpdatedAt   temporal.updatedAtString()
 
   @@index([validationStatus])
   @@index([disasterType])
@@ -332,25 +297,19 @@ model ScrapeJob {
 
   startDate TimestamptzString
   endDate   TimestamptzString
-
-  status ScrapeJobStatus @default(PENDING)
+  status    ScrapeJobStatus @default(PENDING)
 
   totalSources  Int @default(0)
   processedData Int @default(0)
 
-  startedAt  TimestamptzString?
-  completedAt TimestamptzString?
-
+  startedAt    TimestamptzString?
+  completedAt  TimestamptzString?
   errorMessage String?
 
   createdAt TimestamptzString @default(now())
 
   @@index([status])
 }
-
-// =================================
-// ENUM
-// =================================
 
 enum SeverityLevel {
   RENDAH
@@ -360,14 +319,14 @@ enum SeverityLevel {
 }
 
 enum DisasterType {
-  GEMPA_BUMI // bnpb & bmkg
-  BANJIR // bnpb & bpbd
-  TANAH_LONGSOR // bnpb & bpbd
-  KARHUTLA  // bnpb & bpbd 
-  TSUNAMI // bnpb & bmkg
-  ERUPSI_GUNUNG_API // bnpb & bmkg
-  KEKERINGAN // bnpb
-  LAINNYA // bnpb
+  GEMPA_BUMI
+  BANJIR
+  TANAH_LONGSOR
+  KARHUTLA
+  TSUNAMI
+  ERUPSI_GUNUNG_API
+  KEKERINGAN
+  LAINNYA
 }
 
 enum ValidationStatus {
@@ -384,4 +343,34 @@ enum ScrapeJobStatus {
   ANALYZING
   COMPLETED
   FAILED
+}
+
+// =================================
+// AUDIT / OBSERVABILITY
+// =================================
+
+model AuditLog {
+  id          Uuid     @id @default(uuid())
+  campaignId  String?  // was `panti_id` — generalized to campaign scope, confirm this mapping is correct
+  notaNumber  String?
+  totalAmount Decimal?
+  status      String?
+  reason      String?
+  embedding   Embedding3072?
+  content     String?
+  metadata    Jsonb?
+
+  createdAt TimestamptzString? @default(now())
+
+  @@map("audit_logs")
+  @@control(observed)
+  @@rls
+}
+
+policy_insert audit_logs_langflow {
+  target    = AuditLog
+  roles     = [anon, authenticated]
+  withCheck = "true"
+
+  @@map("langflow")
 }
