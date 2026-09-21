@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 import { CampaignForm } from "@/components/dashboard/campaign-form"
-import { createCampaign } from "../actions"
+import { createMockAiCampaign } from "../actions"
 import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export default function TambahKampanyePage() {
 
       {/* Form */}
       <div className="rounded-2xl border border-line-soft bg-surface p-6 sm:p-8">
-        <CampaignForm action={createCampaign} submitLabel="Tambah Kampanye" />
+        <CampaignForm action={createMockAiCampaign} submitLabel="Tambah Kampanye" />
       </div>
     </div>
   )

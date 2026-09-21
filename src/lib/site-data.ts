@@ -15,7 +15,7 @@ export const NAV = [
     { label: "Zakat", href: "#zakat" },
     { label: "Kampanye", href: "#kampanye" },
     { label: "Cara Kerja", href: "#cara-kerja" },
-    { label: "Transparansi", href: "#alur-dana" },
+    { label: "Transparansi", href: "#cara-kerja" },
     { label: "Tanya Jawab", href: "#tanya-jawab" },
 ] as const
 
@@ -80,6 +80,13 @@ export type Campaign = {
     sisaHari: number
     terverifikasi: boolean
     ringkas: string
+    gambar: string
+    komunitas: {
+        nama: string
+        tipe: string
+        bio: string
+        inisial: string
+    }
 }
 
 export const FEATURED: Campaign = {
@@ -96,6 +103,13 @@ export const FEATURED: Campaign = {
     terverifikasi: true,
     ringkas:
         "Biaya sekolah, seragam, dan perlengkapan belajar selama satu tahun ajaran untuk 40 anak. Dana dicairkan tiga kali, mengikuti bukti penerimaan dari sekolah.",
+    gambar: "/background-hero.png",
+    komunitas: {
+        nama: "Yayasan Nurul Iman",
+        tipe: "Yayasan terverifikasi",
+        bio: "Komunitas pendidikan yang mendampingi anak yatim dan keluarga rentan di Lombok Timur.",
+        inisial: "NI",
+    },
 }
 
 export const CAMPAIGNS: Campaign[] = [
@@ -113,6 +127,13 @@ export const CAMPAIGNS: Campaign[] = [
         terverifikasi: true,
         ringkas:
             "Sumur bor dan penampungan air untuk tiga dusun yang selama ini menempuh 4 km untuk mengambil air.",
+        gambar: "/background-hero.png",
+        komunitas: {
+            nama: "Komunitas Air Sumba",
+            tipe: "Komunitas lokal terverifikasi",
+            bio: "Relawan lokal yang memperjuangkan akses air bersih untuk keluarga di Sumba Timur.",
+            inisial: "AS",
+        },
     },
     {
         id: "kmp-0131",
@@ -128,6 +149,13 @@ export const CAMPAIGNS: Campaign[] = [
         terverifikasi: true,
         ringkas:
             "Zakat produktif berupa modal dan pendampingan usaha selama enam bulan, disalurkan bertahap per kelompok.",
+        gambar: "/background-hero.png",
+        komunitas: {
+            nama: "Amanah Mikro Community",
+            tipe: "Data community terverifikasi",
+            bio: "Komunitas pendamping usaha mikro yang membantu ibu tunggal membangun penghasilan yang berkelanjutan.",
+            inisial: "AM",
+        },
     },
     {
         id: "kmp-0127",
@@ -143,8 +171,21 @@ export const CAMPAIGNS: Campaign[] = [
         terverifikasi: true,
         ringkas:
             "Tenda, air bersih, dan dapur umum untuk tiga posko. Pencairan mengikuti kuitansi harian dari koordinator lapangan.",
+        gambar: "/background-hero.png",
+        komunitas: {
+            nama: "Relawan Siaga Nusantara",
+            tipe: "Relawan terverifikasi",
+            bio: "Jaringan relawan yang menyalurkan bantuan darurat secara langsung ke posko pengungsian.",
+            inisial: "RS",
+        },
     },
 ]
+
+export const ALL_CAMPAIGNS = [FEATURED, ...CAMPAIGNS]
+
+export function getCampaignById(id: string) {
+    return ALL_CAMPAIGNS.find((campaign) => campaign.id === id)
+}
 
 export const STEPS = [
     {

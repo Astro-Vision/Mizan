@@ -1,5 +1,5 @@
 /**
- * Menyalin ABI dari artifact Hardhat ke lib/chain/abi sebagai file ber-versi.
+ * Menyalin ABI dari artifact Hardhat ke src/lib/chain/abi sebagai file ber-versi.
  *
  * Alasannya: aplikasi Next.js tidak boleh mengimpor artifact Hardhat langsung.
  * ABI diperlakukan sebagai interface ber-versi, sehingga perubahan interface
@@ -25,7 +25,7 @@ const artifactPath = path.join(
 
 const version = process.env["MIZAN_CONTRACT_VERSION"] ?? "v1"
 if (!/^v[1-9][0-9]*$/.test(version) || /\s/.test(version)) throw new Error("Versi ABI harus v1, v2, ...")
-const outDir = path.resolve(contractsRoot, "..", "lib", "chain", "abi")
+const outDir = path.resolve(contractsRoot, "..", "src", "lib", "chain", "abi")
 const outPath = path.join(outDir, `${CONTRACT_NAME}.${version}.json`)
 
 let artifact: { abi?: unknown[] }

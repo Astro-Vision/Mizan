@@ -8,8 +8,12 @@ import { cn } from "@/src/lib/utils";
 =======
 import { cn } from "../src/lib/utils"
 import PrivyProviderWrapper from "../components/providers/privy-provider"
+<<<<<<< HEAD
 import { ThemeProvider } from "../components/theme-provider"
 >>>>>>> 18c36dd28752ce7a0e1f6f434b25d21a0a04f8ce
+=======
+import { LanguageProvider } from "../components/site/language-provider"
+>>>>>>> 1e33f0656f1a2f082083cc26ce8ab3657b3c89f3
 
 /**
  * Plus Jakarta Sans — teks.
@@ -68,10 +72,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf8f6" },
-    { media: "(prefers-color-scheme: dark)", color: "#14100e" },
-  ],
+  themeColor: "#F8F3F9",
 }
 
 export default function RootLayout({
@@ -87,12 +88,12 @@ export default function RootLayout({
         "antialiased",
         jakarta.variable,
         jetbrains.variable,
-        "font-sans",
+        "font-sans"
       )}
     >
       <body className="min-h-dvh bg-canvas text-ink">
         <PrivyProviderWrapper>
-          <ThemeProvider>{children}</ThemeProvider>
+          <LanguageProvider>{children}</LanguageProvider>
         </PrivyProviderWrapper>
       </body>
     </html>
