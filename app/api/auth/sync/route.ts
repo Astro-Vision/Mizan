@@ -80,7 +80,7 @@ const syncUserWithRetry = async (
           : await transaction.orm.public.User.create({
               privyId: profile.privyId,
               email: profile.email,
-              role: "USER",
+              role: "BENEFACTOR",
             })
 
         if (!syncedUser) {

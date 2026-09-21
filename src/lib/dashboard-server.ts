@@ -4,7 +4,7 @@ import { db } from '@/src/prisma/db'
 
 export type LiveCampaignSnapshot = {
   id: string
-  judul: string
+  title: string
   penyelenggara: string
   targetAmountWei: string
   fundedAmountWei: string
@@ -29,7 +29,7 @@ export function formatWeiBnb(value: string) {
 
 export async function getLiveCampaignSnapshots() {
   const campaigns = await db.orm.public.Campaign
-    .where({ reviewStatus: 'APPROVED', status: 'aktif' })
+    .where({ reviewStatus: 'APPROVED', status: 'ACTIVE' })
     .orderBy((campaign) => campaign.createdAt.desc())
     .all()
 
@@ -46,7 +46,7 @@ export async function getLiveCampaignSnapshots() {
 
       return {
         id: String(campaign.id),
-        judul: campaign.judul,
+        title: campaign.title,
         penyelenggara: campaign.penyelenggara,
         targetAmountWei: campaign.targetAmountWei,
         fundedAmountWei,
