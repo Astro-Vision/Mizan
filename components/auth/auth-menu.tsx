@@ -1,24 +1,26 @@
-'use client';
+"use client"
 
-import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth';
-import { LogOut, Wallet } from 'lucide-react';
+import { useLogin, useLogout, usePrivy } from "@privy-io/react-auth"
+import { LogOut, Wallet } from "lucide-react"
 
-import { mzBtn } from '@/components/site/ui/mz-button';
+import { mzBtn } from "@/components/site/ui/mz-button"
+import { useLanguage } from "@/components/site/language-provider"
 
 const shortenAddress = (address: string) =>
-  `${address.slice(0, 6)}…${address.slice(-4)}`;
+  `${address.slice(0, 6)}…${address.slice(-4)}`
 
 export function AuthMenu({ mobile = false }: { mobile?: boolean }) {
-  const { authenticated, ready, user } = usePrivy();
-  const { login } = useLogin();
-  const { logout } = useLogout();
+  const { authenticated, ready, user } = usePrivy()
+  const { t } = useLanguage()
+  const { login } = useLogin()
+  const { logout } = useLogout()
 
   if (!ready) {
     return (
       <span className="text-xs font-medium text-ink-muted" aria-live="polite">
-        Memuat…
+        {t("Memuat…")}
       </span>
-    );
+    )
   }
 
   if (!authenticated) {
@@ -27,26 +29,30 @@ export function AuthMenu({ mobile = false }: { mobile?: boolean }) {
         type="button"
         onClick={() => login()}
         className={`${mzBtn(
-          'outline',
-          'sm',
-          mobile ? 'w-full' : undefined,
+          "primary",
+          "sm",
+          mobile ? "w-full" : undefined
         )} cursor-pointer`}
       >
         <Wallet className="size-4" strokeWidth={1.5} aria-hidden="true" />
-        Hubungkan Dompet
+        {t("Hubungkan Dompet")}
       </button>
-    );
+    )
   }
 
-  const accountLabel = user?.email?.address ?? user?.wallet?.address;
-  const visibleLabel = accountLabel?.includes('@')
+  const accountLabel = user?.email?.address ?? user?.wallet?.address
+  const visibleLabel = accountLabel?.includes("@")
     ? accountLabel
     : accountLabel
       ? shortenAddress(accountLabel)
-      : 'Akun terhubung';
+      : t("Akun terhubung")
 
   return (
-    <div className={mobile ? 'flex w-full flex-col gap-2' : 'flex items-center gap-2'}>
+    <div
+      className={
+        mobile ? "flex w-full flex-col gap-2" : "flex items-center gap-2"
+      }
+    >
       <span
         className="max-w-44 truncate text-xs font-medium text-ink-body"
         title={accountLabel ?? undefined}
@@ -56,11 +62,11 @@ export function AuthMenu({ mobile = false }: { mobile?: boolean }) {
       <button
         type="button"
         onClick={() => void logout()}
-        className={mzBtn('ghost', 'sm', mobile ? 'w-full' : undefined)}
+        className={mzBtn("ghost", "sm", mobile ? "w-full" : undefined)}
       >
         <LogOut className="size-4" strokeWidth={1.5} aria-hidden="true" />
-        Keluar
+        {t("Keluar")}
       </button>
     </div>
-  );
+  )
 }

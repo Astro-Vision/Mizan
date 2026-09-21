@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/src/lib/utils"
+import { useWallets } from "@privy-io/react-auth"
 import { MizanWordmark } from "@/components/site/ui/mizan-mark"
 import type { NavItem } from "@/src/lib/dashboard-data"
 import {
@@ -65,9 +66,15 @@ export function DashboardShell({
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
+  const { wallets } = useWallets()
+  const connectedWallet = wallets.find((wallet) => wallet.type === "ethereum")
+  const liveWalletFull = connectedWallet?.address ?? walletFull
+  const liveWalletShort = connectedWallet
+    ? `${connectedWallet.address.slice(0, 6)}…${connectedWallet.address.slice(-4)}`
+    : walletShort
 
   function handleCopy() {
-    navigator.clipboard.writeText(walletFull)
+    navigator.clipboard.writeText(liveWalletFull)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }
@@ -139,7 +146,7 @@ export function DashboardShell({
         <p className="mb-1 text-xs text-ink-muted">Dompet terhubung</p>
         <div className="flex items-center gap-2">
           <span className="flex-1 truncate font-mono text-sm text-ink">
-            {walletShort}
+            {liveWalletShort}
           </span>
           <button
             type="button"

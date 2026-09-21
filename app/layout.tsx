@@ -4,7 +4,7 @@ import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import "./globals.css"
 import { cn } from "../src/lib/utils"
 import PrivyProviderWrapper from "../components/providers/privy-provider"
-import { ThemeProvider } from "../components/theme-provider"
+import { LanguageProvider } from "../components/site/language-provider"
 
 /**
  * Plus Jakarta Sans — teks.
@@ -63,10 +63,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf8f6" },
-    { media: "(prefers-color-scheme: dark)", color: "#14100e" },
-  ],
+  themeColor: "#F8F3F9",
 }
 
 export default function RootLayout({
@@ -82,12 +79,12 @@ export default function RootLayout({
         "antialiased",
         jakarta.variable,
         jetbrains.variable,
-        "font-sans",
+        "font-sans"
       )}
     >
       <body className="min-h-dvh bg-canvas text-ink">
         <PrivyProviderWrapper>
-          <ThemeProvider>{children}</ThemeProvider>
+          <LanguageProvider>{children}</LanguageProvider>
         </PrivyProviderWrapper>
       </body>
     </html>

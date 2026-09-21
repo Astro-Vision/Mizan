@@ -1,30 +1,36 @@
+"use client"
+
 import { ArrowRight } from "lucide-react"
+import { useState } from "react"
 
 import { CampaignCard } from "@/components/site/ui/campaign-card"
 import { SectionHead } from "@/components/site/ui/section-head"
+import { SitePreferences } from "@/components/site/layout/site-preferences"
+import { useLanguage } from "@/components/site/language-provider"
+import { useMarketRates, type DisplayCurrency } from "@/src/lib/market-rates"
 import { CAMPAIGNS, FEATURED } from "@/src/lib/site-data"
 
-/**
- * Kampanye unggulan. Hierarki dibuat lewat ukuran — satu besar, tiga kecil —
- * bukan lewat urutan. Semua kartu sama besar berarti mata tidak tahu harus
- * melihat ke mana. Lihat DESIGN.md §2 butir 8.
- */
-
 export function Campaigns() {
+  const [currency, setCurrency] = useState<DisplayCurrency>("BNB")
+  const { rates, loading } = useMarketRates()
+  const { t } = useLanguage()
+
   return (
     <section id="kampanye" className="mz-section bg-surface-sunken">
       <div className="mz-container">
         <SectionHead
-          overline="Kampanye"
-          title="Yang sedang berjalan"
-          desc="Setiap kampanye mencairkan dana bertahap. Sisa dana yang tidak tersalur dikembalikan ke donatur, bukan disimpan."
+          overline={t("Kampanye")}
+          title={t("Yang sedang berjalan")}
+          desc={t(
+            "Pilih kampanye yang ingin kamu dukung. Setiap pencairan tercatat dan dapat diperiksa siapa pun."
+          )}
           align="between"
           action={
             <a
               href="#kampanye"
               className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-brand-700 transition-colors duration-150 hover:text-brand-600 dark:text-brand-300"
             >
-              Lihat semua kampanye
+              {t("Lihat semua kampanye")}
               <ArrowRight
                 className="size-4"
                 strokeWidth={1.5}
@@ -34,15 +40,32 @@ export function Campaigns() {
           }
         />
 
-        <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
           <div className="lg:col-span-3">
-            <CampaignCard campaign={FEATURED} variant="featured" />
+            <CampaignCard
+              campaign={FEATURED}
+              variant="featured"
+              currency={currency}
+              rates={rates}
+            />
           </div>
-          {CAMPAIGNS.map((c) => (
-            <CampaignCard key={c.id} campaign={c} />
+          {CAMPAIGNS.map((campaign) => (
+            <CampaignCard
+              key={campaign.id}
+              campaign={campaign}
+              currency={currency}
+              rates={rates}
+            />
           ))}
         </div>
       </div>
+
+      <SitePreferences
+        currency={currency}
+        onCurrencyChange={setCurrency}
+        loading={loading}
+        lastUpdatedAt={rates?.lastUpdatedAt ?? null}
+      />
     </section>
   )
 }

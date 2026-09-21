@@ -1,91 +1,152 @@
-'use client';
+"use client"
 
-import { useEffect, useRef, useState } from 'react';
-import { useIdentityToken, usePrivy } from '@privy-io/react-auth';
+import { useEffect, useRef, useState } from "react"
+import { useIdentityToken, usePrivy } from "@privy-io/react-auth"
+import { usePathname, useRouter } from "next/navigation"
 
-import { OnboardingModal } from '@/components/auth/onboarding-modal';
+import { OnboardingModal } from "@/components/auth/onboarding-modal"
+import { getDashboardPath } from "@/src/lib/role-dashboard"
+
+type AuthSyncResponse = {
+  onboardingRequired?: boolean
+  syncSkipped?: boolean
+  error?: string
+  details?: string
+  user?: {
+    role?: string | null
+    userType?: string | null
+  }
+}
+
+const MAX_SYNC_RETRIES = 10
 
 export function AuthSync() {
-  const { authenticated, ready, user } = usePrivy();
-  const { identityToken } = useIdentityToken();
-  const [syncError, setSyncError] = useState<string | null>(null);
-  const [onboardingRequired, setOnboardingRequired] = useState(false);
-  const inFlightRequests = useRef(new Set<string>());
+  const { authenticated, ready, user } = usePrivy()
+  const { identityToken } = useIdentityToken()
+  const pathname = usePathname()
+  const router = useRouter()
+  const [syncError, setSyncError] = useState<string | null>(null)
+  const [onboardingRequired, setOnboardingRequired] = useState(false)
+  const [syncedRole, setSyncedRole] = useState<string | null>(null)
+  const [syncRetryCount, setSyncRetryCount] = useState(0)
+  const inFlightRequests = useRef(new Set<string>())
   const linkedAccountSignature =
     user?.linkedAccounts
       .map((account) => {
         const address =
-          'address' in account && typeof account.address === 'string'
+          "address" in account && typeof account.address === "string"
             ? account.address
-            : '';
-        return `${account.type}:${address}`;
+            : ""
+        return `${account.type}:${address}`
       })
-      .join('|') ?? '';
+      .join("|") ?? ""
 
   useEffect(() => {
     if (!ready || !authenticated || !identityToken) {
-      setOnboardingRequired(() => false);
-      return;
+      return
     }
 
-    const requestKey = `${identityToken}:${linkedAccountSignature}`;
+    const requestKey = `${identityToken}:${linkedAccountSignature}`
 
     if (inFlightRequests.current.has(requestKey)) {
-      return;
+      return
     }
 
-    inFlightRequests.current.add(requestKey);
+    inFlightRequests.current.add(requestKey)
+    let retryTimer: ReturnType<typeof setTimeout> | undefined
 
     const syncUser = async () => {
       try {
-        const response = await fetch('/api/auth/sync', {
-          method: 'POST',
+        const response = await fetch("/api/auth/sync", {
+          method: "POST",
           headers: {
-            'privy-id-token': identityToken,
+            "privy-id-token": identityToken,
           },
-        });
+        })
 
-        const body = (await response.json().catch(() => null)) as {
-          onboardingRequired?: boolean;
-          error?: string;
-          details?: string;
-        } | null;
+        const body = (await response
+          .json()
+          .catch(() => null)) as AuthSyncResponse | null
 
         if (!response.ok) {
           throw new Error(
-            `Auth sync failed with status ${response.status}: ${body?.error ?? 'UNKNOWN_ERROR'}${body?.details ? ` (${body.details})` : ''}`,
-          );
+            `Auth sync failed with status ${response.status}: ${body?.error ?? "UNKNOWN_ERROR"}${body?.details ? ` (${body.details})` : ""}`
+          )
         }
 
-        setSyncError(null);
-        setOnboardingRequired(body?.onboardingRequired === true);
-      } catch (error) {
-        console.error('Auth sync request failed', error);
-        setSyncError('Sinkronisasi akun gagal. Coba muat ulang halaman.');
-      } finally {
-        inFlightRequests.current.delete(requestKey);
-      }
-    };
+        setSyncError(null)
+        const needsOnboarding = body?.onboardingRequired === true
+        setSyncedRole(body?.user?.role ?? null)
+        setOnboardingRequired(needsOnboarding)
 
-    void syncUser();
-  }, [authenticated, identityToken, linkedAccountSignature, ready]);
+        if (body?.syncSkipped) {
+          if (syncRetryCount < MAX_SYNC_RETRIES) {
+            retryTimer = setTimeout(() => {
+              setSyncRetryCount((current) => current + 1)
+            }, 1500)
+          } else {
+            setSyncError(
+              "Role belum dapat dibaca. Pastikan database Mizan aktif, lalu muat ulang halaman."
+            )
+          }
+          return
+        }
+
+        if (!needsOnboarding && body?.user?.role) {
+          const dashboardPath = getDashboardPath(
+            body.user.role,
+            body.user.userType
+          )
+
+          if (pathname !== dashboardPath) {
+            router.replace(dashboardPath)
+          }
+        }
+      } catch {
+        // Sync is optional for the public page. A missing local database must
+        // not cover the landing page with an error banner.
+        setSyncError(null)
+      } finally {
+        inFlightRequests.current.delete(requestKey)
+      }
+    }
+
+    void syncUser()
+
+    return () => {
+      if (retryTimer) {
+        clearTimeout(retryTimer)
+      }
+    }
+  }, [
+    authenticated,
+    identityToken,
+    linkedAccountSignature,
+    pathname,
+    ready,
+    router,
+    syncRetryCount,
+  ])
 
   return (
     <>
       {syncError ? (
         <p
-          className="fixed inset-x-4 bottom-4 z-[60] rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-lg dark:border-red-900 dark:bg-red-950 dark:text-red-200"
+          className="fixed inset-x-4 bottom-4 z-[60] rounded-md border border-coral/30 bg-coral/10 px-4 py-3 text-sm text-coral shadow-lg"
           role="alert"
         >
           {syncError}
         </p>
       ) : null}
-      {onboardingRequired && identityToken ? (
+      {onboardingRequired && ready && authenticated && identityToken ? (
         <OnboardingModal
           identityToken={identityToken}
-          onCompleted={() => setOnboardingRequired(false)}
+          onCompleted={(userType) => {
+            setOnboardingRequired(false)
+            router.replace(getDashboardPath(syncedRole ?? "USER", userType))
+          }}
         />
       ) : null}
     </>
-  );
+  )
 }

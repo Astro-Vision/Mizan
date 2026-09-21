@@ -1,5 +1,8 @@
+"use client"
+
 import { ExternalLink, Quote } from "lucide-react"
 
+import { useLanguage } from "@/components/site/language-provider"
 import { STORY, SITE } from "@/src/lib/site-data"
 
 /**
@@ -11,11 +14,13 @@ import { STORY, SITE } from "@/src/lib/site-data"
  */
 
 export function Story() {
+  const { t } = useLanguage()
+
   return (
     <section className="mz-section" aria-labelledby="mz-kisah">
       <div className="mz-container grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-7">
-          <p className="mz-overline">Suara dari lapangan</p>
+          <p className="mz-overline">{t("Suara dari lapangan")}</p>
 
           <blockquote className="mt-6">
             <Quote
@@ -23,11 +28,8 @@ export function Story() {
               strokeWidth={1.5}
               aria-hidden="true"
             />
-            <p
-              id="mz-kisah"
-              className="mt-5 text-h1 text-balance text-ink"
-            >
-              {STORY.quote}
+            <p id="mz-kisah" className="mt-5 text-h1 text-balance text-ink">
+              {t(STORY.quote)}
             </p>
           </blockquote>
 
@@ -42,19 +44,19 @@ export function Story() {
             </div>
             <div>
               <p className="text-sm font-semibold text-ink">{STORY.name}</p>
-              <p className="text-xs text-ink-muted">{STORY.role}</p>
+              <p className="text-xs text-ink-muted">{t(STORY.role)}</p>
             </div>
           </footer>
 
-          <p className="mt-6 mz-prose text-sm text-ink-body">
-            {STORY.context}
+          <p className="mz-prose mt-6 text-sm text-ink-body">
+            {t(STORY.context)}
           </p>
         </div>
 
         <div className="lg:col-span-5">
           <div className="mz-card p-7">
-            <h3 className="text-label uppercase tracking-[0.08em] text-ink-muted">
-              Bukti penyaluran
+            <h3 className="text-label tracking-[0.08em] text-ink-muted uppercase">
+              {t("Bukti penyaluran")}
             </h3>
 
             <dl className="mt-6 flex flex-col divide-y divide-line-soft">
@@ -63,7 +65,7 @@ export function Story() {
                   key={n.label}
                   className="flex items-baseline justify-between gap-4 py-4 first:pt-0 last:pb-0"
                 >
-                  <dt className="text-sm text-ink-body">{n.label}</dt>
+                  <dt className="text-sm text-ink-body">{t(n.label)}</dt>
                   <dd className="mz-num text-lg font-semibold text-ink">
                     {n.value}
                   </dd>
@@ -77,7 +79,7 @@ export function Story() {
               rel="noopener noreferrer"
               className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-brand-700 transition-colors duration-150 hover:text-brand-600 dark:text-brand-300"
             >
-              Periksa transaksinya
+              {t("Periksa transaksinya")}
               <ExternalLink
                 className="size-4"
                 strokeWidth={1.5}

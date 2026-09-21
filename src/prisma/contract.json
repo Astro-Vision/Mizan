@@ -16,6 +16,14 @@
       "model": "Campaign",
       "namespace": "public"
     },
+    "campaignPayment": {
+      "model": "CampaignPayment",
+      "namespace": "public"
+    },
+    "community": {
+      "model": "Community",
+      "namespace": "public"
+    },
     "disasterEvent": {
       "model": "DisasterEvent",
       "namespace": "public"
@@ -49,6 +57,53 @@
     "namespaces": {
       "public": {
         "enum": {
+          "CampaignReviewStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "AI_DRAFT",
+                "value": "AI_DRAFT"
+              },
+              {
+                "name": "PENDING_REVIEW",
+                "value": "PENDING_REVIEW"
+              },
+              {
+                "name": "APPROVED",
+                "value": "APPROVED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              }
+            ]
+          },
+          "CampaignSource": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "AI_MOCK",
+                "value": "AI_MOCK"
+              }
+            ]
+          },
+          "CommunityVerificationStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "VERIFIED",
+                "value": "VERIFIED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              }
+            ]
+          },
           "DataFormats": {
             "codecId": "pg/text@1",
             "members": [
@@ -104,6 +159,36 @@
               {
                 "name": "LAINNYA",
                 "value": "LAINNYA"
+              }
+            ]
+          },
+          "PaymentMode": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "MOCK",
+                "value": "MOCK"
+              },
+              {
+                "name": "ONCHAIN",
+                "value": "ONCHAIN"
+              }
+            ]
+          },
+          "PaymentStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "CONFIRMED",
+                "value": "CONFIRMED"
+              },
+              {
+                "name": "FAILED",
+                "value": "FAILED"
               }
             ]
           },
@@ -469,6 +554,62 @@
           },
           "Campaign": {
             "fields": {
+              "aiConfidence": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "aiDraft": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "aiReference": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "approvedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "approvedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "communityId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "contractCampaignId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "contractTransactionHash": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -504,11 +645,51 @@
                   "kind": "scalar"
                 }
               },
+              "recipientWallet": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "rejectionReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reviewStatus": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CampaignReviewStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "satuan": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
+                }
+              },
+              "source": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CampaignSource",
+                  "namespaceId": "public",
+                  "plane": "domain"
                 }
               },
               "status": {
@@ -522,6 +703,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "targetAmountWei": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -540,9 +728,79 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "approvedBy": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "approvedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "community": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "communityId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Community",
+                  "namespace": "public"
+                }
+              },
+              "payments": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "campaignId"
+                  ]
+                },
+                "to": {
+                  "model": "CampaignPayment",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
+                "aiConfidence": {
+                  "column": "aiConfidence"
+                },
+                "aiDraft": {
+                  "column": "aiDraft"
+                },
+                "aiReference": {
+                  "column": "aiReference"
+                },
+                "approvedAt": {
+                  "column": "approvedAt"
+                },
+                "approvedById": {
+                  "column": "approvedById"
+                },
+                "communityId": {
+                  "column": "communityId"
+                },
+                "contractCampaignId": {
+                  "column": "contractCampaignId"
+                },
+                "contractTransactionHash": {
+                  "column": "contractTransactionHash"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -558,14 +816,29 @@
                 "penyelenggara": {
                   "column": "penyelenggara"
                 },
+                "recipientWallet": {
+                  "column": "recipientWallet"
+                },
+                "rejectionReason": {
+                  "column": "rejectionReason"
+                },
+                "reviewStatus": {
+                  "column": "reviewStatus"
+                },
                 "satuan": {
                   "column": "satuan"
+                },
+                "source": {
+                  "column": "source"
                 },
                 "status": {
                   "column": "status"
                 },
                 "target": {
                   "column": "target"
+                },
+                "targetAmountWei": {
+                  "column": "targetAmountWei"
                 },
                 "terkumpul": {
                   "column": "terkumpul"
@@ -576,6 +849,298 @@
               },
               "namespaceId": "public",
               "table": "campaign"
+            }
+          },
+          "CampaignPayment": {
+            "fields": {
+              "amountWei": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "campaignId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "donorId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "donorWallet": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "idempotencyKey": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "mode": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "PaymentMode",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "PaymentStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "transactionHash": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "campaign": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "campaignId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Campaign",
+                  "namespace": "public"
+                }
+              },
+              "donor": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "donorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "amountWei": {
+                  "column": "amountWei"
+                },
+                "campaignId": {
+                  "column": "campaignId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "donorId": {
+                  "column": "donorId"
+                },
+                "donorWallet": {
+                  "column": "donorWallet"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "idempotencyKey": {
+                  "column": "idempotencyKey"
+                },
+                "mode": {
+                  "column": "mode"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "transactionHash": {
+                  "column": "transactionHash"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "campaignPayment"
+            }
+          },
+          "Community": {
+            "fields": {
+              "chainType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "ownerId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "verificationStatus": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CommunityVerificationStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "walletAddress": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "campaigns": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "communityId"
+                  ]
+                },
+                "to": {
+                  "model": "Campaign",
+                  "namespace": "public"
+                }
+              },
+              "owner": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "ownerId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "chainType": {
+                  "column": "chainType"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "name": {
+                  "column": "name"
+                },
+                "ownerId": {
+                  "column": "ownerId"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "verificationStatus": {
+                  "column": "verificationStatus"
+                },
+                "walletAddress": {
+                  "column": "walletAddress"
+                }
+              },
+              "namespaceId": "public",
+              "table": "community"
             }
           },
           "DisasterEvent": {
@@ -1345,6 +1910,51 @@
               }
             },
             "relations": {
+              "approvedCampaigns": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "approvedById"
+                  ]
+                },
+                "to": {
+                  "model": "Campaign",
+                  "namespace": "public"
+                }
+              },
+              "campaignPayments": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "donorId"
+                  ]
+                },
+                "to": {
+                  "model": "CampaignPayment",
+                  "namespace": "public"
+                }
+              },
+              "communities": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "ownerId"
+                  ]
+                },
+                "to": {
+                  "model": "Community",
+                  "namespace": "public"
+                }
+              },
               "posts": {
                 "cardinality": "1:N",
                 "on": {
@@ -1769,7 +2379,59 @@
               "uniques": []
             },
             "campaign": {
+              "checks": [
+                {
+                  "expression": "\"reviewStatus\" IN ('AI_DRAFT', 'PENDING_REVIEW', 'APPROVED', 'REJECTED')",
+                  "name": "campaign_reviewStatus_check_8871a79a",
+                  "prefix": "campaign_reviewStatus_check"
+                },
+                {
+                  "expression": "\"source\" IN ('AI_MOCK')",
+                  "name": "campaign_source_check_49f4562b",
+                  "prefix": "campaign_source_check"
+                }
+              ],
               "columns": {
+                "aiConfidence": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": true
+                },
+                "aiDraft": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "aiReference": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "approvedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "approvedById": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "communityId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "contractCampaignId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "contractTransactionHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -1807,6 +2469,31 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "recipientWallet": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "rejectionReason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reviewStatus": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "AI_DRAFT"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CampaignReviewStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "satuan": {
                   "codecId": "pg/text@1",
                   "default": {
@@ -1815,6 +2502,21 @@
                   },
                   "nativeType": "text",
                   "nullable": false
+                },
+                "source": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "AI_MOCK"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CampaignSource",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "status": {
                   "codecId": "pg/text@1",
@@ -1828,6 +2530,15 @@
                 "target": {
                   "codecId": "pg/float8@1",
                   "nativeType": "float8",
+                  "nullable": false
+                },
+                "targetAmountWei": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "0"
+                  },
+                  "nativeType": "text",
                   "nullable": false
                 },
                 "terkumpul": {
@@ -1845,14 +2556,341 @@
                   "nullable": false
                 }
               },
-              "foreignKeys": [],
-              "indexes": [],
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "communityId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "campaign"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "community"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "approvedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "campaign"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "approvedById"
+                  ],
+                  "name": "campaign_approvedById_idx_01ef8410",
+                  "prefix": "campaign_approvedById_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "communityId"
+                  ],
+                  "name": "campaign_communityId_idx_e2c72225",
+                  "prefix": "campaign_communityId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
                 ]
               },
               "uniques": []
+            },
+            "campaignPayment": {
+              "checks": [
+                {
+                  "expression": "\"mode\" IN ('MOCK', 'ONCHAIN')",
+                  "name": "campaignPayment_mode_check_7b45e9f3",
+                  "prefix": "campaignPayment_mode_check"
+                },
+                {
+                  "expression": "\"status\" IN ('PENDING', 'CONFIRMED', 'FAILED')",
+                  "name": "campaignPayment_status_check_1439faa3",
+                  "prefix": "campaignPayment_status_check"
+                }
+              ],
+              "columns": {
+                "amountWei": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "campaignId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "donorId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "donorWallet": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "idempotencyKey": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "mode": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "MOCK"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "PaymentMode",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "PaymentStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "transactionHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "campaignId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "campaignPayment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "campaign"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "donorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "campaignPayment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "campaignId"
+                  ],
+                  "name": "campaignPayment_campaignId_idx_3aacd648",
+                  "prefix": "campaignPayment_campaignId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "donorId"
+                  ],
+                  "name": "campaignPayment_donorId_idx_e0e8e1e7",
+                  "prefix": "campaignPayment_donorId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "idempotencyKey"
+                  ]
+                }
+              ]
+            },
+            "community": {
+              "checks": [
+                {
+                  "expression": "\"verificationStatus\" IN ('PENDING', 'VERIFIED', 'REJECTED')",
+                  "name": "community_verificationStatus_check_c2f2b79a",
+                  "prefix": "community_verificationStatus_check"
+                }
+              ],
+              "columns": {
+                "chainType": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "BSC_TESTNET"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "ownerId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "verificationStatus": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CommunityVerificationStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "walletAddress": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "ownerId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "community"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "ownerId"
+                  ],
+                  "name": "community_ownerId_idx_e2d0c1ef",
+                  "prefix": "community_ownerId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "walletAddress",
+                    "chainType"
+                  ]
+                }
+              ]
             },
             "disasterEvent": {
               "checks": [
@@ -2618,6 +3656,29 @@
             }
           },
           "valueSet": {
+            "CampaignReviewStatus": {
+              "kind": "valueSet",
+              "values": [
+                "AI_DRAFT",
+                "PENDING_REVIEW",
+                "APPROVED",
+                "REJECTED"
+              ]
+            },
+            "CampaignSource": {
+              "kind": "valueSet",
+              "values": [
+                "AI_MOCK"
+              ]
+            },
+            "CommunityVerificationStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "VERIFIED",
+                "REJECTED"
+              ]
+            },
             "DataFormats": {
               "kind": "valueSet",
               "values": [
@@ -2638,6 +3699,21 @@
                 "ERUPSI_GUNUNG_API",
                 "KEKERINGAN",
                 "LAINNYA"
+              ]
+            },
+            "PaymentMode": {
+              "kind": "valueSet",
+              "values": [
+                "MOCK",
+                "ONCHAIN"
+              ]
+            },
+            "PaymentStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "CONFIRMED",
+                "FAILED"
               ]
             },
             "Role": {
@@ -2692,7 +3768,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "831f639277eef802f353a0ebba48645d66b98ef8315749b274fe8f49a8a8d92f",
+    "storageHash": "471c3375a45c5c83a01aeaf1cf75090b29197abbf13fb1c1b3aff699e5de8b80",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
@@ -2705,7 +3781,7 @@
     }
   },
   "execution": {
-    "executionHash": "00c2b20733ac587b3ad7eaa3cd37d06ec83dd95b67f7974be8da7e7494091d12",
+    "executionHash": "4ffa87f2c088183e5b4ebc621f28379390ccf0b1dd99b66742da4a48d85eb564",
     "mutations": {
       "defaults": [
         {
@@ -2758,6 +3834,36 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "campaign"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "campaignPayment"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "community"
           }
         },
         {

@@ -20,6 +20,9 @@ model User {
   onboardingCompletedAt TimestamptzString?
   posts     Post[]
   wallets   UserWallet[]
+  communities Community[]
+  approvedCampaigns Campaign[] @relation("CampaignApprover")
+  campaignPayments CampaignPayment[]
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
 }
@@ -63,6 +66,22 @@ model Campaign {
   id             Int              @id @default(autoincrement())
   judul          String
   penyelenggara  String
+  community      Community?       @relation(fields: [communityId], references: [id])
+  communityId    Int?
+  source         CampaignSource   @default(AI_MOCK)
+  aiDraft        Json?
+  aiReference    String?
+  aiConfidence   Float?
+  reviewStatus   CampaignReviewStatus @default(AI_DRAFT)
+  approvedBy     User?            @relation("CampaignApprover", fields: [approvedById], references: [id])
+  approvedById   Int?
+  approvedAt     TimestamptzString?
+  rejectionReason String?
+  recipientWallet String?
+  targetAmountWei String           @default("0")
+  contractCampaignId String?
+  contractTransactionHash String?
+  payments       CampaignPayment[]
   terkumpul      Float            @default(0)
   target         Float
   satuan         String           @default("BNB")
@@ -70,6 +89,69 @@ model Campaign {
   status         String           @default("menunggu")
   createdAt      TimestamptzString @default(now())
   updatedAt      temporal.updatedAtString()
+}
+
+model Community {
+  id                 Int                        @id @default(autoincrement())
+  name               String
+  owner              User                       @relation(fields: [ownerId], references: [id])
+  ownerId            Int
+  walletAddress      String
+  chainType          String                     @default("BSC_TESTNET")
+  verificationStatus CommunityVerificationStatus @default(PENDING)
+  campaigns          Campaign[]
+  createdAt          TimestamptzString          @default(now())
+  updatedAt          temporal.updatedAtString()
+
+  @@unique([walletAddress, chainType])
+  @@index([ownerId])
+}
+
+model CampaignPayment {
+  id              Int           @id @default(autoincrement())
+  campaign        Campaign      @relation(fields: [campaignId], references: [id])
+  campaignId      Int
+  donor           User          @relation(fields: [donorId], references: [id])
+  donorId         Int
+  donorWallet     String
+  amountWei       String
+  mode            PaymentMode   @default(MOCK)
+  status          PaymentStatus @default(PENDING)
+  transactionHash String?
+  idempotencyKey  String        @unique
+  createdAt       TimestamptzString @default(now())
+  updatedAt       temporal.updatedAtString()
+
+  @@index([campaignId])
+  @@index([donorId])
+}
+
+enum CampaignSource {
+  AI_MOCK
+}
+
+enum CampaignReviewStatus {
+  AI_DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum CommunityVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum PaymentMode {
+  MOCK
+  ONCHAIN
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
 }
 
 model AuditLogs {
