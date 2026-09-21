@@ -2208,6 +2208,7 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'AuditLogs';
     };
+    readonly campaign: { readonly namespace: 'public' & NamespaceId; readonly model: 'Campaign' };
     readonly source: { readonly namespace: 'public' & NamespaceId; readonly model: 'Source' };
     readonly rawCapture: {
       readonly namespace: 'public' & NamespaceId;
