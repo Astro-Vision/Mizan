@@ -102,18 +102,6 @@ export async function scrapeBNPB(
     return []
   }
 
-  console.log("Total rows scraped:", rawResults.length)
-  console.log(
-    "Contoh 5 disasterDate mentah:",
-    rawResults.slice(0, 5).map((r) => r.disasterDate)
-  )
-  console.log("Range tanggal terlama-terbaru:", {
-    earliest: rawResults.map((r) => r.disasterDate).sort()[0],
-    latest: rawResults
-      .map((r) => r.disasterDate)
-      .sort()
-      .reverse()[0],
-  })
 
   let filteredResult = rawResults
 

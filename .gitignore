@@ -70,3 +70,5 @@ contracts/ignition/deployments/
 # Local deployment addresses
 # (copy the tracked example)
 contracts/ignition/params.bscTestnet.json
+=======
+/docs/

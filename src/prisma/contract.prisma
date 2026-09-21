@@ -89,14 +89,25 @@ model AuditLogs {
   @@rls
 }
 
+model Campaign {
+  id             Int              @id @default(autoincrement())
+  judul          String
+  penyelenggara  String
+  terkumpul      Float            @default(0)
+  target         Float
+  satuan         String           @default("BNB")
+  donatur        Int              @default(0)
+  status         String           @default("menunggu")
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+}
+
 policy_insert audit_logs_langflow {
   target = AuditLogs
   roles = [anon, authenticated]
   withCheck = "true"
   @@map("langflow")
 }
-
-// 
 
 model Source {
   id              String     @id @default(uuid())
@@ -234,6 +245,26 @@ model DisasterEvent {
   @@index([disasterType])
 }
 
+model ScrapeJob {
+  id String @id @default(uuid())
+
+  startDate TimestamptzString
+  endDate   TimestamptzString
+
+  status ScrapeJobStatus @default(PENDING)
+
+  totalSources  Int @default(0)
+  processedData Int @default(0)
+
+  startedAt  TimestamptzString?
+  completedAt TimestamptzString?
+
+  errorMessage String?
+
+  createdAt TimestamptzString @default(now())
+
+  @@index([status])
+}
 
 // =================================
 // ENUM
@@ -262,28 +293,6 @@ enum ValidationStatus {
   CORROBORATED
   OFFICIAL_CONFIRMED
   REJECTED
-}
-
-
-model ScrapeJob {
-  id String @id @default(uuid())
-
-  startDate TimestamptzString
-  endDate   TimestamptzString
-
-  status ScrapeJobStatus @default(PENDING)
-
-  totalSources  Int @default(0)
-  processedData Int @default(0)
-
-  startedAt  TimestamptzString?
-  completedAt TimestamptzString?
-
-  errorMessage String?
-
-  createdAt TimestamptzString @default(now())
-
-  @@index([status])
 }
 
 enum ScrapeJobStatus {
