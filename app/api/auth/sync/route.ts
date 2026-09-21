@@ -4,6 +4,12 @@ import { z } from "zod"
 import { getPrivyProfile } from "@/src/lib/privy/user-data"
 import { getPrivyUserFromIdentityToken } from "@/src/lib/privy/server"
 import { db } from "@/src/prisma/db"
+import { getOnboardingUserType } from "@/src/lib/role-dashboard"
+import {
+  createDashboardSession,
+  DASHBOARD_SESSION_COOKIE,
+  DASHBOARD_SESSION_MAX_AGE,
+} from "@/src/lib/auth-session"
 
 const identityTokenSchema = z.string().trim().min(1)
 
@@ -17,7 +23,7 @@ export async function POST(request: Request) {
 
     const user = await syncUserWithRetry(profile)
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       onboardingRequired: user.onboardingCompletedAt === null,
       user: {
@@ -25,9 +31,25 @@ export async function POST(request: Request) {
         privyId: user.privyId,
         email: user.email,
         role: user.role,
-        userType: user.userType,
+        userType: getOnboardingUserType(user.userType),
       },
     })
+
+    response.cookies.set({
+      name: DASHBOARD_SESSION_COOKIE,
+      value: await createDashboardSession({
+        privyId: user.privyId,
+        role: user.role,
+        userType: getOnboardingUserType(user.userType),
+      }),
+      httpOnly: true,
+      maxAge: DASHBOARD_SESSION_MAX_AGE,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+
+    return response
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
