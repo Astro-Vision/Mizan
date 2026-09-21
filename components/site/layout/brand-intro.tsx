@@ -7,6 +7,8 @@ import { motion, useReducedMotion } from "framer-motion"
 const INTRO_DURATION = 3200
 const INTRO_EXIT_DURATION = 360
 
+let hasSeenIntroInSession = false
+
 type IntroTarget = {
   x: number
   y: number
@@ -17,8 +19,20 @@ export function BrandIntro() {
   const [visible, setVisible] = React.useState(true)
   const [exiting, setExiting] = React.useState(false)
   const [target, setTarget] = React.useState<IntroTarget | null>(null)
+  const [shouldPlay, setShouldPlay] = React.useState(false)
   const introLogoRef = React.useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
+
+  React.useLayoutEffect(() => {
+    if (hasSeenIntroInSession) {
+      return
+    }
+
+    hasSeenIntroInSession = true
+
+    const frame = window.requestAnimationFrame(() => setShouldPlay(true))
+    return () => window.cancelAnimationFrame(frame)
+  }, [])
 
   const measureTarget = React.useCallback(() => {
     const introLogo = introLogoRef.current
@@ -46,6 +60,8 @@ export function BrandIntro() {
   }, [])
 
   React.useLayoutEffect(() => {
+    if (!shouldPlay) return
+
     const frame = window.requestAnimationFrame(measureTarget)
     const targetLogo = document.querySelector<HTMLElement>(
       "[data-mz-logo-anchor]"
@@ -65,10 +81,10 @@ export function BrandIntro() {
       window.removeEventListener("resize", measureTarget)
       observer?.disconnect()
     }
-  }, [measureTarget])
+  }, [measureTarget, shouldPlay])
 
   React.useEffect(() => {
-    if (reducedMotion) return
+    if (!shouldPlay || reducedMotion) return
 
     const exitTimeout = window.setTimeout(
       () => setExiting(true),
@@ -76,10 +92,10 @@ export function BrandIntro() {
     )
 
     return () => window.clearTimeout(exitTimeout)
-  }, [reducedMotion])
+  }, [reducedMotion, shouldPlay])
 
   React.useEffect(() => {
-    if (!exiting) return
+    if (!shouldPlay || !exiting) return
 
     const removeTimeout = window.setTimeout(
       () => setVisible(false),
@@ -87,9 +103,9 @@ export function BrandIntro() {
     )
 
     return () => window.clearTimeout(removeTimeout)
-  }, [exiting])
+  }, [exiting, shouldPlay])
 
-  if (!visible || reducedMotion) return null
+  if (!shouldPlay || !visible || reducedMotion) return null
 
   return (
     <motion.div

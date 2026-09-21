@@ -2,6 +2,7 @@
 
 import { useLogin, useLogout, usePrivy } from "@privy-io/react-auth"
 import { LogOut, Wallet } from "lucide-react"
+import Link from "next/link"
 
 import { mzBtn } from "@/components/site/ui/mz-button"
 import { useLanguage } from "@/components/site/language-provider"
@@ -14,6 +15,14 @@ export function AuthMenu({ mobile = false }: { mobile?: boolean }) {
   const { t } = useLanguage()
   const { login } = useLogin()
   const { logout } = useLogout()
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" })
+    } finally {
+      await logout()
+    }
+  }
 
   if (!ready) {
     return (
@@ -59,9 +68,15 @@ export function AuthMenu({ mobile = false }: { mobile?: boolean }) {
       >
         {visibleLabel}
       </span>
+      <Link
+        href="/dashboard"
+        className={mzBtn("outline", "sm", mobile ? "w-full" : undefined)}
+      >
+        {t("Dashboard")}
+      </Link>
       <button
         type="button"
-        onClick={() => void logout()}
+        onClick={() => void handleLogout()}
         className={mzBtn("ghost", "sm", mobile ? "w-full" : undefined)}
       >
         <LogOut className="size-4" strokeWidth={1.5} aria-hidden="true" />

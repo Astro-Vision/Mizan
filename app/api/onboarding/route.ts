@@ -7,10 +7,16 @@ import {
 import { getPrivyUserFromIdentityToken } from "@/src/lib/privy/server"
 import { getPrivyProfile } from "@/src/lib/privy/user-data"
 import {
+  getOnboardingUserType,
   getRoleForOnboardingUserType,
   type UserRole,
 } from "@/src/lib/role-dashboard"
 import { db } from "@/src/prisma/db"
+import {
+  createDashboardSession,
+  DASHBOARD_SESSION_COOKIE,
+  DASHBOARD_SESSION_MAX_AGE,
+} from "@/src/lib/auth-session"
 
 const identityTokenFromRequest = (request: Request) =>
   request.headers.get("privy-id-token")
@@ -74,7 +80,7 @@ export async function POST(request: Request) {
       )
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       onboardingRequired: false,
       user: {
@@ -84,6 +90,22 @@ export async function POST(request: Request) {
         role: updatedUser.role,
       },
     })
+
+    response.cookies.set({
+      name: DASHBOARD_SESSION_COOKIE,
+      value: await createDashboardSession({
+        privyId: updatedUser.privyId,
+        role: updatedUser.role,
+        userType: getOnboardingUserType(updatedUser.userType),
+      }),
+      httpOnly: true,
+      maxAge: DASHBOARD_SESSION_MAX_AGE,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    })
+
+    return response
   } catch (error) {
     console.error("Onboarding submission failed", error)
 

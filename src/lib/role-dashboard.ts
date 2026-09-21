@@ -10,15 +10,10 @@ export function getDashboardPath(
   role?: string | null,
   userType?: string | null,
 ): string {
-  switch (role) {
-    case "ADMIN":
-      return "/admin"
-    case "BENEFACTOR":
-      return "/donatur"
-    case "BENEFACTORY":
-      return "/penerima"
-    case "USER":
-      break
+  const roleDashboardPath = getRoleDashboardPath(role)
+
+  if (roleDashboardPath) {
+    return roleDashboardPath
   }
 
   switch (userType) {
@@ -28,6 +23,32 @@ export function getDashboardPath(
     case "DONOR":
     default:
       return "/donatur"
+  }
+}
+
+export function getRoleDashboardPath(role?: string | null): string | null {
+  switch (role) {
+    case "ADMIN":
+      return "/admin"
+    case "BENEFACTOR":
+      return "/donatur"
+    case "BENEFACTORY":
+      return "/penerima"
+    default:
+      return null
+  }
+}
+
+export function getOnboardingUserType(
+  userType?: string | null
+): OnboardingUserType | null {
+  switch (userType) {
+    case "DONOR":
+    case "BENEFICIARY":
+    case "ORGANIZATION":
+      return userType
+    default:
+      return null
   }
 }
 
