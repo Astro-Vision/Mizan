@@ -38,9 +38,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7f4a00b82c26ff4dc02484d0d7bdb452a92a5b9558db2d6c90c9c2accca7f57d'>;
+  StorageHashBase<'7036377a389f83a4c2b8286346fca85693937a3b0a9a04e7c00dd97e89e85a81'>;
 export type ExecutionHash =
-  ExecutionHashBase<'4ffa87f2c088183e5b4ebc621f28379390ccf0b1dd99b66742da4a48d85eb564'>;
+  ExecutionHashBase<'96eed982e8f3204899cb79bab41a43fda13ccba682660a0b5845cd3c237741bd'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -370,6 +370,18 @@ export type FieldOutputTypes = {
       readonly contentHash: CodecTypes['pg/text@1']['output'];
       readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
+    readonly Scheduler: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly name: CodecTypes['pg/text@1']['output'];
+      readonly jobType: CodecTypes['pg/text@1']['output'];
+      readonly cron: CodecTypes['pg/text@1']['output'];
+      readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
     readonly ScrapeJob: {
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly startDate: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -549,6 +561,18 @@ export type FieldInputTypes = {
       readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly contentHash: CodecTypes['pg/text@1']['input'];
       readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
+    readonly Scheduler: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly name: CodecTypes['pg/text@1']['input'];
+      readonly jobType: CodecTypes['pg/text@1']['input'];
+      readonly cron: CodecTypes['pg/text@1']['input'];
+      readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly ScrapeJob: {
       readonly id: CodecTypes['pg/text@1']['input'];
@@ -730,6 +754,18 @@ export type StorageColumnTypes = {
       readonly sourceId: CodecTypes['pg/text@1']['output'];
       readonly url: CodecTypes['pg/text@1']['output'] | null;
     };
+    readonly scheduler: {
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly cron: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly jobType: CodecTypes['pg/text@1']['output'];
+      readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly name: CodecTypes['pg/text@1']['output'];
+      readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
     readonly scrapeJob: {
       readonly completedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -909,6 +945,18 @@ export type StorageColumnInputTypes = {
       readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly sourceId: CodecTypes['pg/text@1']['input'];
       readonly url: CodecTypes['pg/text@1']['input'] | null;
+    };
+    readonly scheduler: {
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly cron: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly jobType: CodecTypes['pg/text@1']['input'];
+      readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly name: CodecTypes['pg/text@1']['input'];
+      readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly scrapeJob: {
       readonly completedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
@@ -1760,6 +1808,82 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly scheduler: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly name: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly jobType: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly cron: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly isActive: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
+                  };
+                };
+                readonly lastRunAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
+                readonly lastFinishedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
+                readonly nextRunAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly updatedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['name'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'scheduler_isActive_idx_77fe3ba1';
+                  readonly prefix: 'scheduler_isActive_idx';
+                  readonly columns: readonly ['isActive'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'scheduler_jobType_idx_65878b3e';
+                  readonly prefix: 'scheduler_jobType_idx';
+                  readonly columns: readonly ['jobType'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [];
+            };
             readonly scrapeJob: {
               columns: {
                 readonly id: {
@@ -2209,6 +2333,7 @@ type ContractBase = Omit<
       readonly model: 'CampaignPayment';
     };
     readonly source: { readonly namespace: 'public' & NamespaceId; readonly model: 'Source' };
+    readonly scheduler: { readonly namespace: 'public' & NamespaceId; readonly model: 'Scheduler' };
     readonly rawCapture: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'RawCapture';
@@ -2944,6 +3069,82 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly Scheduler: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly name: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly jobType: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly cron: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly isActive: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly lastRunAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly lastFinishedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly nextRunAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: {
+              readonly table: 'scheduler';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly name: { readonly column: 'name' };
+                readonly jobType: { readonly column: 'jobType' };
+                readonly cron: { readonly column: 'cron' };
+                readonly isActive: { readonly column: 'isActive' };
+                readonly lastRunAt: { readonly column: 'lastRunAt' };
+                readonly lastFinishedAt: { readonly column: 'lastFinishedAt' };
+                readonly nextRunAt: { readonly column: 'nextRunAt' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
           readonly ScrapeJob: {
             readonly fields: {
               readonly id: {
@@ -3598,6 +3799,23 @@ type ContractBase = Omit<
             readonly column: 'id';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'scheduler';
+            readonly column: 'id';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
+        },
+        {
+          readonly ref: {
+            readonly namespace: 'public';
+            readonly table: 'scheduler';
+            readonly column: 'updatedAt';
+          };
+          readonly onCreate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
+          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'timestampNow' };
         },
         {
           readonly ref: {

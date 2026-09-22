@@ -195,9 +195,6 @@ enum PaymentStatus {
   FAILED
 }
 
-// =================================
-// DISASTER INTELLIGENCE (AI agent — Alpin)
-// =================================
 
 model Source {
   id              String      @id @default(uuid())
@@ -214,6 +211,28 @@ model Source {
 
   @@index([sourceType])
 }
+
+model Scheduler {
+  id          String   @id @default(uuid())
+
+  name        String @unique
+  jobType     String
+
+  cron        String
+
+  isActive    Boolean  @default(true)
+
+  lastRunAt     TimestamptzString?
+  lastFinishedAt TimestamptzString?
+  nextRunAt   TimestamptzString?
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([isActive])
+  @@index([jobType])
+}
+
 
 enum SourceType {
   OFFICIAL // BNPB, BMKG, etc.

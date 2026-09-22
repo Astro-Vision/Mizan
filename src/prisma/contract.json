@@ -36,6 +36,10 @@
       "model": "RawCapture",
       "namespace": "public"
     },
+    "scheduler": {
+      "model": "Scheduler",
+      "namespace": "public"
+    },
     "scrapeJob": {
       "model": "ScrapeJob",
       "namespace": "public"
@@ -1554,6 +1558,117 @@
               },
               "namespaceId": "public",
               "table": "rawCapture"
+            }
+          },
+          "Scheduler": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "cron": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "isActive": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "jobType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "lastFinishedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "lastRunAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "name": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "nextRunAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "cron": {
+                  "column": "cron"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "isActive": {
+                  "column": "isActive"
+                },
+                "jobType": {
+                  "column": "jobType"
+                },
+                "lastFinishedAt": {
+                  "column": "lastFinishedAt"
+                },
+                "lastRunAt": {
+                  "column": "lastRunAt"
+                },
+                "name": {
+                  "column": "name"
+                },
+                "nextRunAt": {
+                  "column": "nextRunAt"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "scheduler"
             }
           },
           "ScrapeJob": {
@@ -3250,6 +3365,99 @@
                 }
               ]
             },
+            "scheduler": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "cron": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "isActive": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": true
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "jobType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "lastFinishedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "lastRunAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "name": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "nextRunAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "isActive"
+                  ],
+                  "name": "scheduler_isActive_idx_77fe3ba1",
+                  "prefix": "scheduler_isActive_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "jobType"
+                  ],
+                  "name": "scheduler_jobType_idx_65878b3e",
+                  "prefix": "scheduler_jobType_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "name"
+                  ]
+                }
+              ]
+            },
             "scrapeJob": {
               "checks": [
                 {
@@ -3822,7 +4030,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7f4a00b82c26ff4dc02484d0d7bdb452a92a5b9558db2d6c90c9c2accca7f57d",
+    "storageHash": "7036377a389f83a4c2b8286346fca85693937a3b0a9a04e7c00dd97e89e85a81",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
@@ -3835,7 +4043,7 @@
     }
   },
   "execution": {
-    "executionHash": "4ffa87f2c088183e5b4ebc621f28379390ccf0b1dd99b66742da4a48d85eb564",
+    "executionHash": "96eed982e8f3204899cb79bab41a43fda13ccba682660a0b5845cd3c237741bd",
     "mutations": {
       "defaults": [
         {
@@ -3970,6 +4178,32 @@
             "column": "id",
             "namespace": "public",
             "table": "rawCapture"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "scheduler"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "scheduler"
           }
         },
         {

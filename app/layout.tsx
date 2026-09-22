@@ -2,18 +2,9 @@ import type { Metadata, Viewport } from "next"
 import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
 
 import "./globals.css"
-<<<<<<< HEAD
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/src/lib/utils";
-=======
 import { cn } from "../src/lib/utils"
 import PrivyProviderWrapper from "../components/providers/privy-provider"
-<<<<<<< HEAD
-import { ThemeProvider } from "../components/theme-provider"
->>>>>>> 18c36dd28752ce7a0e1f6f434b25d21a0a04f8ce
-=======
 import { LanguageProvider } from "../components/site/language-provider"
->>>>>>> 1e33f0656f1a2f082083cc26ce8ab3657b3c89f3
 
 /**
  * Plus Jakarta Sans — teks.
