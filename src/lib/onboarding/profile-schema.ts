@@ -19,7 +19,7 @@ export const onboardingProfileSchema = z
       .max(30)
       .regex(/^[a-z0-9_-]+$/, 'Username hanya boleh berisi huruf, angka, _ dan -'),
     domicile: z.string().trim().min(2).max(120),
-    userType: z.enum(['DONOR', 'BENEFICIARY', 'ORGANIZATION']),
+    userType: z.enum(['BENEFACTOR', 'BENEFICIARY', 'DONOR']),
     whatsappNumber: z
       .string()
       .trim()

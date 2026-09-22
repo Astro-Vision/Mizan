@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         return {
           id: payment.id,
           campaignId: payment.campaignId,
-          campaignTitle: campaign?.judul ?? `Campaign #${payment.campaignId}`,
+          campaignTitle: campaign?.title ?? `Campaign #${payment.campaignId}`,
           amountWei: payment.amountWei,
           mode: payment.mode,
           status: payment.status,

@@ -25,20 +25,26 @@ export type ActivityItem = {
 
 export type CampaignReview = {
   id: string
-  judul: string
-  penyelenggara: string
-  terkumpul: number
-  target: number
-  satuan: "BNB" | "USDT"
-  donatur: number
-  status: "menunggu" | "aktif" | "selesai"
+  title: string
+  organizerName: string
+  targetAmountWei: string
+  raisedAmountWei: string
+  currency: string
+  donorCount: number
+  status: "ACTIVE" | "COMPLETED" | "CLOSED"
   reviewStatus?: "AI_DRAFT" | "PENDING_REVIEW" | "APPROVED" | "REJECTED"
   source?: "AI_MOCK"
   aiDraft?: unknown | null
   aiReference?: string | null
   aiConfidence?: number | null
   recipientWallet?: string | null
-  targetAmountWei?: string
+  // Backward compatibility fields
+  judul?: string
+  penyelenggara?: string
+  terkumpul?: number
+  target?: number
+  satuan?: "BNB" | "USDT" | string
+  donatur?: number
 }
 
 // ── Konstanta ──────────────────────────────────────────────────────────────

@@ -9,9 +9,24 @@ type CampaignRowProps = {
 }
 
 const STATUS_STYLES: Record<
-  CampaignReview["status"],
+  string,
   { bg: string; text: string; label: string }
 > = {
+  ACTIVE: {
+    bg: "bg-brand-50 dark:bg-brand-950",
+    text: "text-brand-700 dark:text-brand-300",
+    label: "Aktif",
+  },
+  COMPLETED: {
+    bg: "bg-surface-sunken dark:bg-surface-sunken",
+    text: "text-ink-muted",
+    label: "Selesai",
+  },
+  CLOSED: {
+    bg: "bg-accent-200 dark:bg-accent-200/20",
+    text: "text-ink dark:text-accent-text",
+    label: "Ditutup",
+  },
   menunggu: {
     bg: "bg-accent-200 dark:bg-accent-200/20",
     text: "text-ink dark:text-accent-text",
@@ -39,10 +54,15 @@ const STATUS_STYLES: Record<
  * §7  — Nol bayangan, nol hover scale.
  */
 export function CampaignRow({ campaign, className }: CampaignRowProps) {
-  const pct = campaign.target > 0
-    ? Math.min(100, Math.round((campaign.terkumpul / campaign.target) * 100))
+  const target = campaign.target ?? 0
+  const terkumpul = campaign.terkumpul ?? 0
+  const pct = target > 0
+    ? Math.min(100, Math.round((terkumpul / target) * 100))
     : 0
-  const style = STATUS_STYLES[campaign.status]
+  const style = STATUS_STYLES[campaign.status] ?? STATUS_STYLES.ACTIVE
+  const title = campaign.title ?? campaign.judul
+  const organizerName = campaign.organizerName ?? campaign.penyelenggara
+  const currency = campaign.currency ?? campaign.satuan ?? "BNB"
 
   return (
     <div
@@ -54,9 +74,9 @@ export function CampaignRow({ campaign, className }: CampaignRowProps) {
       {/* Info kampanye */}
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold leading-[1.3] text-ink">
-          {campaign.judul}
+          {title}
         </p>
-        <p className="mt-1 text-xs text-ink-muted">{campaign.penyelenggara}</p>
+        <p className="mt-1 text-xs text-ink-muted">{organizerName}</p>
       </div>
 
       {/* Progress bar */}
@@ -74,9 +94,9 @@ export function CampaignRow({ campaign, className }: CampaignRowProps) {
 
       {/* Nominal */}
       <p className="shrink-0 text-right font-mono text-sm tabular-nums text-ink sm:w-32">
-        {formatAngka(campaign.terkumpul)}
-        <span className="text-ink-muted"> / {formatAngka(campaign.target)}</span>
-        <span className="ml-1 text-xs text-ink-muted">{campaign.satuan}</span>
+        {formatAngka(terkumpul)}
+        <span className="text-ink-muted"> / {formatAngka(target)}</span>
+        <span className="ml-1 text-xs text-ink-muted">{currency}</span>
       </p>
 
       {/* Badge status */}
@@ -92,3 +112,4 @@ export function CampaignRow({ campaign, className }: CampaignRowProps) {
     </div>
   )
 }
+

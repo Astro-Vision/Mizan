@@ -14,8 +14,8 @@ export default async function DonaturPage() {
   const campaigns = await getLiveCampaignSnapshots()
   const activeCampaigns: PaymentCampaign[] = campaigns.map((campaign) => ({
     id: campaign.id,
-    judul: campaign.judul,
-    penyelenggara: campaign.penyelenggara,
+    title: campaign.title,
+    organizerName: campaign.organizerName,
     targetAmountWei: campaign.targetAmountWei,
     recipientWallet: campaign.recipientWallet,
   }))
@@ -66,8 +66,8 @@ export default async function DonaturPage() {
 
             return (
               <div key={campaign.id} className="rounded-2xl border border-line-soft bg-surface p-5">
-                <p className="text-sm font-semibold leading-[1.3] text-ink">{campaign.judul}</p>
-                <p className="mt-1 text-xs text-ink-muted">{campaign.penyelenggara}</p>
+                <p className="text-sm font-semibold leading-[1.3] text-ink">{campaign.title}</p>
+                <p className="mt-1 text-xs text-ink-muted">{campaign.organizerName}</p>
                 <div className="mt-4 flex items-center gap-3">
                   <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-brand-100 dark:bg-brand-900">
                     <div className="h-full rounded-full bg-brand-700" style={{ width: `${percent}%` }} />

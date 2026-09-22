@@ -3,10 +3,10 @@ export type DisasterCandidateType = {
     id: string;
     name: string;
     description: string;
-    disasterType : "GEMPA_BUMI" | "BANJIR" | "TANAH_LONGSOR" | "KEBAKARAN" | "TSUNAMI" | "ERUPSI_GUNUNG_API" | "ANGIN_PUTING_BELIUNG" | "KEKERINGAN" | "LAINNYA";
+    disasterType: "GEMPA_BUMI" | "BANJIR" | "TANAH_LONGSOR" | "KARHUTLA" | "TSUNAMI" | "ERUPSI_GUNUNG_API" | "KEKERINGAN" | "LAINNYA";
     locationName: string;
     province: string;
-    capitalCity: string;
+    city?: string;
     eventDate: string;
     sourceUrl: string;
     sourceName: string;

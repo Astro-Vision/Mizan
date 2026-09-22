@@ -1,11 +1,29 @@
 "use client"
 
 import { FormEvent, useState } from "react"
+import { Info } from "lucide-react"
 
 import {
   onboardingProfileSchema,
   type OnboardingProfileInput,
 } from "@/src/lib/onboarding/profile-schema"
+
+const ROLE_OPTIONS = [
+  {
+    value: "BENEFACTOR",
+    label: "Donatur",
+    sublabel: "Pemberi Bantuan",
+    description:
+      "Berperan sebagai donatur untuk menyalurkan dana bantuan langsung ke kampanye terverifikasi, memantau transparansi real-time on-chain, dan melacak riwayat kontribusi.",
+  },
+  {
+    value: "BENEFICIARY",
+    label: "Penerima Manfaat",
+    sublabel: "Komunitas / Lembaga",
+    description:
+      "Berperan sebagai perwakilan komunitas atau yayasan untuk mengajukan kebutuhan, mengelola kampanye penyaluran, dan menerima alokasi dana bantuan.",
+  },
+] as const
 
 type OnboardingFormValues = {
   username: string
@@ -26,7 +44,7 @@ type OnboardingModalProps = {
 const initialValues: OnboardingFormValues = {
   username: "",
   domicile: "",
-  userType: "DONOR",
+  userType: "BENEFACTOR",
   whatsappNumber: "",
   whatsappNotificationConsent: false,
   referralSource: "SOCIAL_MEDIA",
@@ -144,31 +162,66 @@ export function OnboardingModal({
             <legend className="text-sm font-medium text-ink">
               Tipe pengguna
             </legend>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                ["DONOR", "Donatur"],
-                ["BENEFICIARY", "Penerima manfaat"],
-                ["ORGANIZATION", "Organisasi"],
-              ].map(([value, label]) => (
-                <label
-                  key={value}
-                  className="flex cursor-pointer items-center gap-2 rounded-md border border-line-soft px-3 py-3 text-sm text-ink-body"
-                >
-                  <input
-                    type="radio"
-                    name="userType"
-                    value={value}
-                    checked={values.userType === value}
-                    onChange={() =>
-                      updateValue(
-                        "userType",
-                        value as OnboardingFormValues["userType"]
-                      )
-                    }
-                  />
-                  {label}
-                </label>
-              ))}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {ROLE_OPTIONS.map((role) => {
+                const isSelected = values.userType === role.value
+                return (
+                  <label
+                    key={role.value}
+                    className={`relative flex cursor-pointer items-center justify-between gap-3 rounded-lg border p-3.5 text-sm transition-all duration-150 ${isSelected
+                        ? "border-brand-700 bg-brand-50/50 dark:border-brand-500 dark:bg-brand-950/40"
+                        : "border-line-soft bg-surface hover:border-brand-700/60"
+                      }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <input
+                        type="radio"
+                        name="userType"
+                        value={role.value}
+                        checked={isSelected}
+                        onChange={() =>
+                          updateValue(
+                            "userType",
+                            role.value as OnboardingFormValues["userType"]
+                          )
+                        }
+                        className="size-4 text-brand-700 focus:ring-brand-700"
+                      />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-ink leading-tight">
+                          {role.label}
+                        </p>
+                        <p className="text-xs text-ink-muted leading-tight mt-0.5">
+                          {role.sublabel}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Tooltip info icon */}
+                    <div
+                      className="group/info relative shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        aria-label={`Informasi role ${role.label}`}
+                        className="flex size-6 items-center justify-center rounded-full text-ink-muted hover:text-brand-700 hover:bg-brand-100/60 dark:hover:bg-brand-900/60 focus:outline-none focus:ring-1 focus:ring-brand-700 transition-colors"
+                      >
+                        <Info className="size-4" strokeWidth={1.75} />
+                      </button>
+
+                      <div className="pointer-events-none absolute bottom-full right-0 mb-2 w-64 sm:w-72 rounded-xl border border-line-soft bg-white p-3.5 text-xs font-normal leading-relaxed text-ink shadow-2xl opacity-0 transition-opacity duration-200 group-hover/info:pointer-events-auto group-hover/info:opacity-100 group-focus-within/info:pointer-events-auto group-focus-within/info:opacity-100 z-50 dark:bg-zinc-900 dark:border-zinc-700">
+                        <p className="font-semibold text-brand-700 dark:text-brand-300 mb-1">
+                          Role: {role.label}
+                        </p>
+                        <p className="text-ink-muted leading-relaxed">
+                          {role.description}
+                        </p>
+                      </div>
+                    </div>
+                  </label>
+                )
+              })}
             </div>
           </fieldset>
 

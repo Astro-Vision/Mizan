@@ -9,7 +9,7 @@
       "namespace": "public"
     },
     "audit_logs": {
-      "model": "AuditLogs",
+      "model": "AuditLog",
       "namespace": "public"
     },
     "campaign": {
@@ -84,6 +84,23 @@
               {
                 "name": "AI_MOCK",
                 "value": "AI_MOCK"
+              }
+            ]
+          },
+          "CampaignStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "ACTIVE",
+                "value": "ACTIVE"
+              },
+              {
+                "name": "COMPLETED",
+                "value": "COMPLETED"
+              },
+              {
+                "name": "CLOSED",
+                "value": "CLOSED"
               }
             ]
           },
@@ -196,20 +213,16 @@
             "codecId": "pg/text@1",
             "members": [
               {
-                "name": "USER",
-                "value": "USER"
-              },
-              {
-                "name": "ADMIN",
-                "value": "ADMIN"
-              },
-              {
                 "name": "BENEFACTOR",
                 "value": "BENEFACTOR"
               },
               {
-                "name": "BENEFACTORY",
-                "value": "BENEFACTORY"
+                "name": "BENEFICIARY",
+                "value": "BENEFICIARY"
+              },
+              {
+                "name": "ADMIN",
+                "value": "ADMIN"
               }
             ]
           },
@@ -441,8 +454,15 @@
               "table": "analysis"
             }
           },
-          "AuditLogs": {
+          "AuditLog": {
             "fields": {
+              "campaignId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "content": {
                 "nullable": true,
                 "type": {
@@ -450,7 +470,7 @@
                   "kind": "scalar"
                 }
               },
-              "created_at": {
+              "createdAt": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/timestamptz-string@1",
@@ -478,14 +498,7 @@
                   "kind": "scalar"
                 }
               },
-              "nota_number": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                }
-              },
-              "panti_id": {
+              "notaNumber": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -506,7 +519,7 @@
                   "kind": "scalar"
                 }
               },
-              "total_amount": {
+              "totalAmount": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/numeric@1",
@@ -517,11 +530,14 @@
             "relations": {},
             "storage": {
               "fields": {
+                "campaignId": {
+                  "column": "campaignId"
+                },
                 "content": {
                   "column": "content"
                 },
-                "created_at": {
-                  "column": "created_at"
+                "createdAt": {
+                  "column": "createdAt"
                 },
                 "embedding": {
                   "column": "embedding"
@@ -532,11 +548,8 @@
                 "metadata": {
                   "column": "metadata"
                 },
-                "nota_number": {
-                  "column": "nota_number"
-                },
-                "panti_id": {
-                  "column": "panti_id"
+                "notaNumber": {
+                  "column": "notaNumber"
                 },
                 "reason": {
                   "column": "reason"
@@ -544,8 +557,8 @@
                 "status": {
                   "column": "status"
                 },
-                "total_amount": {
-                  "column": "total_amount"
+                "totalAmount": {
+                  "column": "totalAmount"
                 }
               },
               "namespaceId": "public",
@@ -617,7 +630,14 @@
                   "kind": "scalar"
                 }
               },
-              "donatur": {
+              "currency": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "donorCount": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -631,14 +651,14 @@
                   "kind": "scalar"
                 }
               },
-              "judul": {
+              "organizerName": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
-              "penyelenggara": {
+              "raisedAmountWei": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -672,13 +692,6 @@
                   "plane": "domain"
                 }
               },
-              "satuan": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                }
-              },
               "source": {
                 "nullable": false,
                 "type": {
@@ -697,13 +710,12 @@
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
-                }
-              },
-              "target": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/float8@1",
-                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CampaignStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
                 }
               },
               "targetAmountWei": {
@@ -713,10 +725,10 @@
                   "kind": "scalar"
                 }
               },
-              "terkumpul": {
+              "title": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/float8@1",
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -804,17 +816,20 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
-                "donatur": {
-                  "column": "donatur"
+                "currency": {
+                  "column": "currency"
+                },
+                "donorCount": {
+                  "column": "donorCount"
                 },
                 "id": {
                   "column": "id"
                 },
-                "judul": {
-                  "column": "judul"
+                "organizerName": {
+                  "column": "organizerName"
                 },
-                "penyelenggara": {
-                  "column": "penyelenggara"
+                "raisedAmountWei": {
+                  "column": "raisedAmountWei"
                 },
                 "recipientWallet": {
                   "column": "recipientWallet"
@@ -825,23 +840,17 @@
                 "reviewStatus": {
                   "column": "reviewStatus"
                 },
-                "satuan": {
-                  "column": "satuan"
-                },
                 "source": {
                   "column": "source"
                 },
                 "status": {
                   "column": "status"
                 },
-                "target": {
-                  "column": "target"
-                },
                 "targetAmountWei": {
                   "column": "targetAmountWei"
                 },
-                "terkumpul": {
-                  "column": "terkumpul"
+                "title": {
+                  "column": "title"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -1145,7 +1154,7 @@
           },
           "DisasterEvent": {
             "fields": {
-              "capitalCity": {
+              "city": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -1214,6 +1223,19 @@
                   "kind": "scalar"
                 }
               },
+              "severityLevel": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "SeverityLevel",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "title": {
                 "nullable": false,
                 "type": {
@@ -1254,8 +1276,8 @@
             },
             "storage": {
               "fields": {
-                "capitalCity": {
-                  "column": "capitalCity"
+                "city": {
+                  "column": "city"
                 },
                 "description": {
                   "column": "description"
@@ -1280,6 +1302,9 @@
                 },
                 "province": {
                   "column": "province"
+                },
+                "severityLevel": {
+                  "column": "severityLevel"
                 },
                 "title": {
                   "column": "title"
@@ -2312,12 +2337,17 @@
             },
             "audit_logs": {
               "columns": {
+                "campaignId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "content": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
                 },
-                "created_at": {
+                "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
                     "expression": "now()",
@@ -2342,12 +2372,7 @@
                   "nativeType": "jsonb",
                   "nullable": true
                 },
-                "nota_number": {
-                  "codecId": "pg/text@1",
-                  "nativeType": "text",
-                  "nullable": true
-                },
-                "panti_id": {
+                "notaNumber": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -2362,7 +2387,7 @@
                   "nativeType": "text",
                   "nullable": true
                 },
-                "total_amount": {
+                "totalAmount": {
                   "codecId": "pg/numeric@1",
                   "nativeType": "numeric",
                   "nullable": true
@@ -2389,6 +2414,11 @@
                   "expression": "\"source\" IN ('AI_MOCK')",
                   "name": "campaign_source_check_49f4562b",
                   "prefix": "campaign_source_check"
+                },
+                {
+                  "expression": "\"status\" IN ('ACTIVE', 'COMPLETED', 'CLOSED')",
+                  "name": "campaign_status_check_ce20f2be",
+                  "prefix": "campaign_status_check"
                 }
               ],
               "columns": {
@@ -2441,7 +2471,16 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
-                "donatur": {
+                "currency": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "BNB"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "donorCount": {
                   "codecId": "pg/int4@1",
                   "default": {
                     "kind": "literal",
@@ -2459,13 +2498,17 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
-                "judul": {
+                "organizerName": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
                 },
-                "penyelenggara": {
+                "raisedAmountWei": {
                   "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "0"
+                  },
                   "nativeType": "text",
                   "nullable": false
                 },
@@ -2494,15 +2537,6 @@
                     "plane": "storage"
                   }
                 },
-                "satuan": {
-                  "codecId": "pg/text@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": "BNB"
-                  },
-                  "nativeType": "text",
-                  "nullable": false
-                },
                 "source": {
                   "codecId": "pg/text@1",
                   "default": {
@@ -2522,15 +2556,16 @@
                   "codecId": "pg/text@1",
                   "default": {
                     "kind": "literal",
-                    "value": "menunggu"
+                    "value": "ACTIVE"
                   },
                   "nativeType": "text",
-                  "nullable": false
-                },
-                "target": {
-                  "codecId": "pg/float8@1",
-                  "nativeType": "float8",
-                  "nullable": false
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CampaignStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "targetAmountWei": {
                   "codecId": "pg/text@1",
@@ -2541,13 +2576,9 @@
                   "nativeType": "text",
                   "nullable": false
                 },
-                "terkumpul": {
-                  "codecId": "pg/float8@1",
-                  "default": {
-                    "kind": "literal",
-                    "value": 0
-                  },
-                  "nativeType": "float8",
+                "title": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
                   "nullable": false
                 },
                 "updatedAt": {
@@ -2900,13 +2931,18 @@
                   "prefix": "disasterEvent_disasterType_check"
                 },
                 {
+                  "expression": "\"severityLevel\" IN ('RENDAH', 'SEDANG', 'TINGGI', 'KRITIS')",
+                  "name": "disasterEvent_severityLevel_check_62b7cb66",
+                  "prefix": "disasterEvent_severityLevel_check"
+                },
+                {
                   "expression": "\"validationStatus\" IN ('UNVERIFIED', 'CORROBORATED', 'OFFICIAL_CONFIRMED', 'REJECTED')",
                   "name": "disasterEvent_validationStatus_check_a271e93d",
                   "prefix": "disasterEvent_validationStatus_check"
                 }
               ],
               "columns": {
-                "capitalCity": {
+                "city": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -2964,6 +3000,17 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
+                },
+                "severityLevel": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "SeverityLevel",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "title": {
                   "codecId": "pg/text@1",
@@ -3403,8 +3450,8 @@
             "user": {
               "checks": [
                 {
-                  "expression": "\"role\" IN ('USER', 'ADMIN', 'BENEFACTOR', 'BENEFACTORY')",
-                  "name": "user_role_check_758453b1",
+                  "expression": "\"role\" IN ('BENEFACTOR', 'BENEFICIARY', 'ADMIN')",
+                  "name": "user_role_check_07b2d93b",
                   "prefix": "user_role_check"
                 }
               ],
@@ -3490,7 +3537,7 @@
                   "codecId": "pg/text@1",
                   "default": {
                     "kind": "literal",
-                    "value": "USER"
+                    "value": "BENEFACTOR"
                   },
                   "nativeType": "text",
                   "nullable": false,
@@ -3671,6 +3718,14 @@
                 "AI_MOCK"
               ]
             },
+            "CampaignStatus": {
+              "kind": "valueSet",
+              "values": [
+                "ACTIVE",
+                "COMPLETED",
+                "CLOSED"
+              ]
+            },
             "CommunityVerificationStatus": {
               "kind": "valueSet",
               "values": [
@@ -3719,10 +3774,9 @@
             "Role": {
               "kind": "valueSet",
               "values": [
-                "USER",
-                "ADMIN",
                 "BENEFACTOR",
-                "BENEFACTORY"
+                "BENEFICIARY",
+                "ADMIN"
               ]
             },
             "ScrapeJobStatus": {
@@ -3768,7 +3822,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "471c3375a45c5c83a01aeaf1cf75090b29197abbf13fb1c1b3aff699e5de8b80",
+    "storageHash": "7f4a00b82c26ff4dc02484d0d7bdb452a92a5b9558db2d6c90c9c2accca7f57d",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
