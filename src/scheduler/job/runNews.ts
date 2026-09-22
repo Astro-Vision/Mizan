@@ -5,6 +5,7 @@ import {
   failScrapeJob,
   startScrapeJob,
 } from "@/src/lib/scrapeHelper"
+import { db } from "@/src/prisma/db"
 import { createRawCapture } from "@/src/service/rawCapturedService"
 import { createScrapeJob } from "@/src/service/scrapeServices"
 
@@ -23,11 +24,25 @@ export async function runNews() {
     const results = await searchNews({ startDate: today, endDate: today })
 
     let created = 0
+    let duplicates = 0
 
     for (const item of results) {
       const content = JSON.stringify(item)
+      const contentHash = createContentHash(content)
 
       try {
+        const existingHash = await db.orm.public.RawCapture.where({
+          contentHash,
+        })
+        
+        if(existingHash) {
+          duplicates++
+
+          console.log(`[News job] Duplicate contentHash: ${contentHash}`)
+
+          continue
+        }
+
         await createRawCapture({
           sourceId: item.sourceId,
           url: item.url,
