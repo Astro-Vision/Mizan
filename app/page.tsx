@@ -8,8 +8,17 @@ import { Hero } from "@/components/site/sections/hero"
 import { ProofBar } from "@/components/site/sections/proof-bar"
 import { Story } from "@/components/site/sections/story"
 import { TransparencyJourney } from "@/components/site/sections/transparency-journey"
+import { getPublicCampaigns } from "@/src/lib/campaigns-server"
+import type { Campaign } from "@/src/lib/site-data"
 
-export default function Home() {
+export default async function Home() {
+  let campaigns: Campaign[] = []
+  try {
+    campaigns = await getPublicCampaigns()
+  } catch {
+    campaigns = []
+  }
+
   return (
     <>
       <BrandIntro />
@@ -19,7 +28,7 @@ export default function Home() {
         <Hero />
         <ProofBar />
         <Categories />
-        <Campaigns />
+        <Campaigns campaigns={campaigns} />
         <TransparencyJourney />
         <Story />
         <Faq />

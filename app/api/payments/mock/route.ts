@@ -21,16 +21,21 @@ export async function POST(request: Request) {
     const profile = getPrivyProfile(privyUser)
     const donorWallet = input.donorWallet.toLowerCase()
     const linkedWallet = profile.wallets.some(
-      (wallet) => wallet.chainType === "ethereum" && wallet.address === donorWallet,
+      (wallet) =>
+        wallet.chainType === "ethereum" && wallet.address === donorWallet
     )
     if (!linkedWallet) return error("WALLET_NOT_LINKED", 403)
 
-    const user = await db.orm.public.User.where({ privyId: profile.privyId }).first()
+    const user = await db.orm.public.User.where({
+      privyId: profile.privyId,
+    }).first()
     if (!user) return error("USER_NOT_SYNCED", 404)
 
-    const campaign = await db.orm.public.Campaign.first({ id: input.campaignId })
+    const campaign = await db.orm.public.Campaign.first({
+      id: input.campaignId,
+    })
     if (!campaign) return error("CAMPAIGN_NOT_FOUND", 404)
-    if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "aktif") {
+    if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "ACTIVE") {
       return error("CAMPAIGN_NOT_ACTIVE", 409)
     }
 
@@ -45,7 +50,11 @@ export async function POST(request: Request) {
       ) {
         return error("IDEMPOTENCY_KEY_REUSED", 409)
       }
-      return NextResponse.json({ ok: true, payment: serializePayment(existing), idempotent: true })
+      return NextResponse.json({
+        ok: true,
+        payment: serializePayment(existing),
+        idempotent: true,
+      })
     }
 
     const wallet = await db.orm.public.UserWallet.where({
@@ -73,14 +82,17 @@ export async function POST(request: Request) {
       totalFundedWei,
     })
   } catch (error) {
-    if (error instanceof z.ZodError) return errorResponse("INVALID_PAYMENT", 422)
+    if (error instanceof z.ZodError)
+      return errorResponse("INVALID_PAYMENT", 422)
     console.error("Mock payment failed", error)
     return errorResponse("MOCK_PAYMENT_FAILED", 500)
   }
 }
 
 async function getCampaignTotalWei(campaignId: number) {
-  const payments = await db.orm.public.CampaignPayment.where({ campaignId }).all()
+  const payments = await db.orm.public.CampaignPayment.where({
+    campaignId,
+  }).all()
   return payments
     .filter((payment) => payment.status === "CONFIRMED")
     .reduce((total, payment) => total + BigInt(payment.amountWei), BigInt(0))

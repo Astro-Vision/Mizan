@@ -15,19 +15,46 @@ function shortText(value: FormDataEntryValue | null, max = 500) {
   return typeof value === "string" ? value.trim().slice(0, max) : ""
 }
 
+// wei (18-decimal string) <-> BNB number, for the admin presentation type.
+const WEI = BigInt("1000000000000000000")
+
+function weiToBnb(value: string | null | undefined): number {
+  if (!value) return 0
+  try {
+    return Number((BigInt(value) * BigInt(1_000_000)) / WEI) / 1_000_000
+  } catch {
+    return 0
+  }
+}
+
+// DB status (CampaignStatus enum) <-> the Indonesian labels the admin UI uses.
+type DbCampaignStatus = "ACTIVE" | "COMPLETED" | "CLOSED"
+type UiCampaignStatus = "menunggu" | "aktif" | "selesai"
+
+function dbStatusToUi(
+  status: string,
+  reviewStatus: CampaignReviewStatus
+): UiCampaignStatus {
+  // A campaign that isn't approved yet reads as "menunggu" regardless of status.
+  if (reviewStatus !== "APPROVED") return "menunggu"
+  if (status === "COMPLETED" || status === "CLOSED") return "selesai"
+  return "aktif"
+}
+
 function validateCampaignForm(formData: FormData) {
   const errors: Record<string, string> = {}
-  const judul = shortText(formData.get("judul"), 160)
-  const penyelenggara = shortText(formData.get("penyelenggara"), 160)
+  const title = shortText(formData.get("judul"), 160)
+  const organizerName = shortText(formData.get("penyelenggara"), 160)
   const targetInput = shortText(formData.get("target"), 40)
   const recipientWallet = shortText(formData.get("recipientWallet"), 42)
   const aiReference = shortText(formData.get("aiReference"), 500)
   const targetAmountWei = decimalBnbToWei(targetInput)
 
-  if (!judul) errors.judul = "Judul kampanye wajib diisi."
-  if (!penyelenggara) errors.penyelenggara = "Nama penyelenggara wajib diisi."
+  if (!title) errors.judul = "Judul kampanye wajib diisi."
+  if (!organizerName) errors.penyelenggara = "Nama penyelenggara wajib diisi."
   if (!targetAmountWei || targetAmountWei === "0") {
-    errors.target = "Target BNB harus lebih besar dari nol dan maksimal 18 desimal."
+    errors.target =
+      "Target BNB harus lebih besar dari nol dan maksimal 18 desimal."
   }
   if (!/^0x[a-fA-F0-9]{40}$/.test(recipientWallet)) {
     errors.recipientWallet = "Wallet recipient harus address EVM yang valid."
@@ -37,10 +64,9 @@ function validateCampaignForm(formData: FormData) {
   return {
     errors,
     data: {
-      judul,
-      penyelenggara,
+      title,
+      organizerName,
       targetAmountWei: targetAmountWei ?? "0",
-      target: Number(targetInput) || 0,
       recipientWallet,
       aiReference,
     },
@@ -49,12 +75,12 @@ function validateCampaignForm(formData: FormData) {
 
 function toReview(row: {
   id: number
-  judul: string
-  penyelenggara: string
-  terkumpul: number
-  target: number
-  satuan: string
-  donatur: number
+  title: string
+  organizerName: string
+  raisedAmountWei: string
+  targetAmountWei: string
+  currency: string
+  donorCount: number
   status: string
   reviewStatus: CampaignReviewStatus
   source: "AI_MOCK"
@@ -62,17 +88,17 @@ function toReview(row: {
   aiReference: string | null
   aiConfidence: number | null
   recipientWallet: string | null
-  targetAmountWei: string
 }): CampaignReview {
   return {
     id: String(row.id),
-    judul: row.judul,
-    penyelenggara: row.penyelenggara,
-    terkumpul: row.terkumpul,
-    target: row.target,
-    satuan: row.satuan as "BNB" | "USDT",
-    donatur: row.donatur,
-    status: row.status as "menunggu" | "aktif" | "selesai",
+    judul: row.title,
+    penyelenggara: row.organizerName,
+    terkumpul: weiToBnb(row.raisedAmountWei),
+    target: weiToBnb(row.targetAmountWei),
+    satuan: (row.currency?.toUpperCase() === "USDT" ? "USDT" : "BNB") as
+      "BNB" | "USDT",
+    donatur: row.donorCount,
+    status: dbStatusToUi(row.status, row.reviewStatus),
     reviewStatus: row.reviewStatus,
     source: row.source,
     aiDraft: row.aiDraft,
@@ -84,11 +110,15 @@ function toReview(row: {
 }
 
 export async function getCampaigns(): Promise<CampaignReview[]> {
-  const rows = await db.orm.public.Campaign.orderBy((c) => c.createdAt.desc()).all()
+  const rows = await db.orm.public.Campaign.orderBy((c) =>
+    c.createdAt.desc()
+  ).all()
   return rows.map(toReview)
 }
 
-export async function getCampaignById(id: string): Promise<CampaignReview | null> {
+export async function getCampaignById(
+  id: string
+): Promise<CampaignReview | null> {
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0) return null
   const row = await db.orm.public.Campaign.first({ id: numId })
@@ -97,7 +127,7 @@ export async function getCampaignById(id: string): Promise<CampaignReview | null
 
 export async function createMockAiCampaign(
   _prevState: CampaignFormState,
-  formData: FormData,
+  formData: FormData
 ): Promise<CampaignFormState> {
   const { errors, data } = validateCampaignForm(formData)
   if (Object.keys(errors).length > 0) {
@@ -105,18 +135,19 @@ export async function createMockAiCampaign(
   }
 
   await db.orm.public.Campaign.create({
-    judul: data.judul,
-    penyelenggara: data.penyelenggara,
-    terkumpul: 0,
-    target: data.target,
-    satuan: "BNB",
-    donatur: 0,
-    status: "menunggu",
+    title: data.title,
+    organizerName: data.organizerName,
+    raisedAmountWei: "0",
+    targetAmountWei: data.targetAmountWei,
+    currency: "BNB",
+    donorCount: 0,
+    // status stays ACTIVE (DB enum); "not yet published" is tracked via reviewStatus.
+    status: "ACTIVE",
     source: "AI_MOCK",
     aiDraft: {
-      title: data.judul,
-      organizer: data.penyelenggara,
-      targetBnb: data.target,
+      title: data.title,
+      organizer: data.organizerName,
+      targetWei: data.targetAmountWei,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
     },
@@ -124,7 +155,6 @@ export async function createMockAiCampaign(
     aiConfidence: 0.85,
     reviewStatus: transitionCampaignReviewStatus("AI_DRAFT", "PENDING_REVIEW"),
     recipientWallet: data.recipientWallet.toLowerCase(),
-    targetAmountWei: data.targetAmountWei,
   })
 
   revalidatePath("/admin/kampanye")
@@ -134,7 +164,7 @@ export async function createMockAiCampaign(
 export async function updateCampaign(
   id: string,
   _prevState: CampaignFormState,
-  formData: FormData,
+  formData: FormData
 ): Promise<CampaignFormState> {
   const { errors, data } = validateCampaignForm(formData)
   if (Object.keys(errors).length > 0) {
@@ -150,23 +180,22 @@ export async function updateCampaign(
   if (!existing) return { success: false, message: "Kampanye tidak ditemukan." }
 
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
-    judul: data.judul,
-    penyelenggara: data.penyelenggara,
-    target: data.target,
-    satuan: "BNB",
+    title: data.title,
+    organizerName: data.organizerName,
+    currency: "BNB",
     recipientWallet: data.recipientWallet.toLowerCase(),
     targetAmountWei: data.targetAmountWei,
     aiReference: data.aiReference,
     aiDraft: {
-      title: data.judul,
-      organizer: data.penyelenggara,
-      targetBnb: data.target,
+      title: data.title,
+      organizer: data.organizerName,
+      targetWei: data.targetAmountWei,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
     },
     aiConfidence: 0.85,
     reviewStatus: "PENDING_REVIEW",
-    status: "menunggu",
+    status: "ACTIVE",
     rejectionReason: null,
   })
 
@@ -184,7 +213,10 @@ export async function approveCampaign(id: string): Promise<CampaignFormState> {
   try {
     transitionCampaignReviewStatus(campaign.reviewStatus, "APPROVED")
   } catch {
-    return { success: false, message: "Hanya campaign pending review yang dapat di-approve." }
+    return {
+      success: false,
+      message: "Hanya campaign pending review yang dapat di-approve.",
+    }
   }
 
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
@@ -198,7 +230,7 @@ export async function approveCampaign(id: string): Promise<CampaignFormState> {
 
 export async function rejectCampaign(
   id: string,
-  formData?: FormData,
+  formData?: FormData
 ): Promise<CampaignFormState> {
   const numId = Number(id)
   const campaign = Number.isInteger(numId)
@@ -209,14 +241,17 @@ export async function rejectCampaign(
   try {
     transitionCampaignReviewStatus(campaign.reviewStatus, "REJECTED")
   } catch {
-    return { success: false, message: "Hanya campaign pending review yang dapat ditolak." }
+    return {
+      success: false,
+      message: "Hanya campaign pending review yang dapat ditolak.",
+    }
   }
 
   const reason = shortText(formData?.get("reason") ?? null, 500) || null
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
     reviewStatus: "REJECTED",
     rejectionReason: reason,
-    status: "menunggu",
+    status: "CLOSED",
   })
   revalidatePath("/admin/kampanye")
   return { success: true, message: "Campaign ditolak." }
@@ -229,13 +264,21 @@ export async function publishCampaign(id: string): Promise<CampaignFormState> {
     : null
   if (!campaign) return { success: false, message: "Kampanye tidak ditemukan." }
   if (campaign.reviewStatus !== "APPROVED") {
-    return { success: false, message: "Campaign harus approved sebelum dipublish." }
+    return {
+      success: false,
+      message: "Campaign harus approved sebelum dipublish.",
+    }
   }
 
   // Scope 3 only exposes the approved state to the next publishing step.
-  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({ status: "aktif" })
+  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
+    status: "ACTIVE",
+  })
   revalidatePath("/admin/kampanye")
-  return { success: true, message: "Campaign aktif dan siap menerima pembayaran." }
+  return {
+    success: true,
+    message: "Campaign aktif dan siap menerima pembayaran.",
+  }
 }
 
 export async function deleteCampaign(id: string): Promise<CampaignFormState> {
