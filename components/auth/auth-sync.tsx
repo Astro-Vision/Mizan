@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useIdentityToken, usePrivy } from "@privy-io/react-auth"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 import { OnboardingModal } from "@/components/auth/onboarding-modal"
 import {
@@ -26,7 +26,6 @@ const MAX_SYNC_RETRIES = 10
 export function AuthSync() {
   const { authenticated, ready, user } = usePrivy()
   const { identityToken } = useIdentityToken()
-  const pathname = usePathname()
   const router = useRouter()
   const [syncError, setSyncError] = useState<string | null>(null)
   const [onboardingRequired, setOnboardingRequired] = useState(false)
@@ -95,16 +94,16 @@ export function AuthSync() {
           return
         }
 
-        if (!needsOnboarding && body?.user?.role) {
-          const dashboardPath = getDashboardPath(
-            body.user.role,
-            body.user.userType
-          )
+        const nextPath = new URLSearchParams(window.location.search).get("next")
 
-          if (pathname !== dashboardPath) {
-            router.replace(dashboardPath)
-          }
+        if (
+          !needsOnboarding &&
+          nextPath &&
+          /^\/(admin|donatur|penerima)(?:\/|$)/.test(nextPath)
+        ) {
+          router.replace(nextPath)
         }
+
       } catch {
         // Sync is optional for the public page. A missing local database must
         // not cover the landing page with an error banner.
@@ -125,7 +124,6 @@ export function AuthSync() {
     authenticated,
     identityToken,
     linkedAccountSignature,
-    pathname,
     ready,
     router,
     syncRetryCount,
