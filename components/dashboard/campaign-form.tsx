@@ -37,16 +37,16 @@ export function CampaignForm({
       <Field
         id="judul"
         label="Judul kampanye"
-        defaultValue={initialData?.judul ?? ""}
+        defaultValue={initialData?.title ?? initialData?.judul ?? ""}
         placeholder="Contoh: Bantuan pendidikan untuk 40 anak yatim"
-        error={state.errors?.judul}
+        error={state.errors?.title ?? state.errors?.judul}
       />
       <Field
         id="penyelenggara"
         label="Penyelenggara"
-        defaultValue={initialData?.penyelenggara ?? ""}
+        defaultValue={initialData?.organizerName ?? initialData?.penyelenggara ?? ""}
         placeholder="Contoh: Yayasan Nurul Iman"
-        error={state.errors?.penyelenggara}
+        error={state.errors?.organizerName ?? state.errors?.penyelenggara}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

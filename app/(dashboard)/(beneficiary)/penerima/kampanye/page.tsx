@@ -1,0 +1,57 @@
+import type { Metadata } from "next"
+import Link from "next/link"
+import { Plus } from "lucide-react"
+
+import {
+  BeneficiaryCampaignTable,
+  BeneficiaryCampaignError,
+} from "@/components/dashboard/beneficiary-campaign-table"
+import { getBeneficiaryCampaigns, type BeneficiaryCampaign } from "./actions"
+
+export const metadata: Metadata = {
+  title: "Kampanye Saya — Penerima Manfaat",
+}
+
+export default async function KampanyeSayaPage() {
+  let campaigns: BeneficiaryCampaign[] = []
+  let error: string | null = null
+
+  try {
+    campaigns = await getBeneficiaryCampaigns()
+  } catch (err) {
+    campaigns = []
+    error =
+      err instanceof Error
+        ? err.message
+        : "Terjadi kesalahan tidak diketahui saat memuat kampanye."
+  }
+
+  return (
+    <div className="mx-auto max-w-[1240px]">
+      {/* Header */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="mz-overline">Penerima Manfaat</p>
+          <h1 className="mt-3 text-h1 text-ink">Kampanye Saya</h1>
+          <p className="mt-2 text-sm text-ink-muted">
+            Kelola kampanye, milestone, bukti penggunaan dana, dan pencairan.
+          </p>
+        </div>
+        <Link
+          href="/penerima/kampanye/buat"
+          className="inline-flex h-12 shrink-0 items-center gap-2 rounded-[10px] bg-brand-700 px-6 text-sm font-medium text-white transition-colors duration-150 hover:bg-brand-600 active:bg-brand-800"
+        >
+          <Plus className="size-4" strokeWidth={1.5} aria-hidden="true" />
+          Buat Kampanye Baru
+        </Link>
+      </div>
+
+      {/* Content */}
+      {error ? (
+        <BeneficiaryCampaignError message={error} />
+      ) : (
+        <BeneficiaryCampaignTable campaigns={campaigns} />
+      )}
+    </div>
+  )
+}

@@ -1,5 +1,5 @@
 export type UserRole = "BENEFACTOR" | "BENEFICIARY" | "ADMIN"
-export type OnboardingUserType = "DONOR" | "BENEFICIARY" | "ORGANIZATION"
+export type OnboardingUserType = "BENEFACTOR" | "BENEFICIARY" | "DONOR"
 
 /**
  * Menentukan halaman awal setelah autentikasi selesai.
@@ -20,8 +20,8 @@ export function getDashboardPath(
 
   switch (userType) {
     case "BENEFICIARY":
-    case "ORGANIZATION":
       return "/penerima"
+    case "BENEFACTOR":
     case "DONOR":
     default:
       return "/donatur"
@@ -31,5 +31,5 @@ export function getDashboardPath(
 export function getRoleForOnboardingUserType(
   userType: OnboardingUserType,
 ): Exclude<UserRole, "ADMIN"> {
-  return userType === "DONOR" ? "BENEFACTOR" : "BENEFICIARY"
+  return userType === "BENEFICIARY" ? "BENEFICIARY" : "BENEFACTOR"
 }

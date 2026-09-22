@@ -7,22 +7,23 @@ describe("role dashboard routing", () => {
     ["ADMIN", undefined, "/admin"],
     ["BENEFACTOR", undefined, "/donatur"],
     ["BENEFICIARY", undefined, "/penerima"],
+    ["BENEFACTOR", "BENEFACTOR", "/donatur"],
     ["BENEFACTOR", "DONOR", "/donatur"],
     ["BENEFICIARY", "BENEFICIARY", "/penerima"],
-    ["BENEFICIARY", "ORGANIZATION", "/penerima"],
   ])("routes %s/%s to %s", (role, userType, expectedPath) => {
     expect(getDashboardPath(role, userType)).toBe(expectedPath)
   })
 
   it("keeps an incomplete account on a dashboard using its user type", () => {
+    expect(getDashboardPath(undefined, "BENEFACTOR")).toBe("/donatur")
     expect(getDashboardPath(undefined, "DONOR")).toBe("/donatur")
     expect(getDashboardPath(undefined, "BENEFICIARY")).toBe("/penerima")
     expect(getDashboardPath(null, null)).toBe("/donatur")
   })
 
   it("maps onboarding choices to non-admin application roles", () => {
+    expect(getRoleForOnboardingUserType("BENEFACTOR")).toBe("BENEFACTOR")
     expect(getRoleForOnboardingUserType("DONOR")).toBe("BENEFACTOR")
     expect(getRoleForOnboardingUserType("BENEFICIARY")).toBe("BENEFICIARY")
-    expect(getRoleForOnboardingUserType("ORGANIZATION")).toBe("BENEFICIARY")
   })
 })

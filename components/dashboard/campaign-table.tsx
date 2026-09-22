@@ -79,6 +79,8 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
   const [busy, setBusy] = React.useState(false)
   const reviewStatus = campaign.reviewStatus ?? "AI_DRAFT"
   const style = STATUS_STYLES[reviewStatus]
+  const title = campaign.title ?? campaign.judul
+  const organizerName = campaign.organizerName ?? campaign.penyelenggara
 
   async function run(action: (id: string) => Promise<unknown>) {
     setBusy(true)
@@ -94,9 +96,9 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
     <div className="flex flex-col gap-3 border-b border-line-soft px-6 py-4 last:border-b-0 sm:flex-row sm:items-center sm:gap-4">
       <div className="min-w-0 flex-1">
         <p className="text-sm leading-[1.3] font-semibold text-ink">
-          {campaign.judul}
+          {title}
         </p>
-        <p className="mt-1 text-xs text-ink-muted">{campaign.penyelenggara}</p>
+        <p className="mt-1 text-xs text-ink-muted">{organizerName}</p>
         <p className="mt-2 text-xs text-ink-muted">
           Confidence AI:{" "}
           {campaign.aiConfidence == null
@@ -112,8 +114,8 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
       </div>
 
       <p className="shrink-0 text-right font-mono text-sm text-ink tabular-nums sm:w-32">
-        {formatAngka(campaign.target)}{" "}
-        <span className="text-xs text-ink-muted">BNB</span>
+        {formatAngka(campaign.target ?? 0)}{" "}
+        <span className="text-xs text-ink-muted">{campaign.currency ?? campaign.satuan ?? "BNB"}</span>
       </p>
 
       <div className="sm:w-32 sm:text-center">
@@ -165,7 +167,7 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
         <Link
           href={`/admin/kampanye/${campaign.id}/edit`}
           className="flex size-8 items-center justify-center rounded-[6px] text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
-          aria-label={`Edit kampanye ${campaign.judul}`}
+          aria-label={`Edit kampanye ${title}`}
         >
           <Pencil className="size-4" strokeWidth={1.5} aria-hidden="true" />
         </Link>

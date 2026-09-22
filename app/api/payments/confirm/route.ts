@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     const campaign = await db.orm.public.Campaign.first({ id: input.campaignId })
     if (!campaign) return error("CAMPAIGN_NOT_FOUND", 404)
-    if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "aktif") {
+    if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "ACTIVE") {
       return error("CAMPAIGN_NOT_ACTIVE", 409)
     }
 

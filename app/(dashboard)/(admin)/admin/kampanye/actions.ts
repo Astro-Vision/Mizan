@@ -17,15 +17,24 @@ function shortText(value: FormDataEntryValue | null, max = 500) {
 
 function validateCampaignForm(formData: FormData) {
   const errors: Record<string, string> = {}
-  const judul = shortText(formData.get("judul"), 160)
-  const penyelenggara = shortText(formData.get("penyelenggara"), 160)
+  const title = shortText(formData.get("title") ?? formData.get("judul"), 160)
+  const organizerName = shortText(
+    formData.get("organizerName") ?? formData.get("penyelenggara"),
+    160,
+  )
   const targetInput = shortText(formData.get("target"), 40)
   const recipientWallet = shortText(formData.get("recipientWallet"), 42)
   const aiReference = shortText(formData.get("aiReference"), 500)
   const targetAmountWei = decimalBnbToWei(targetInput)
 
-  if (!judul) errors.judul = "Judul kampanye wajib diisi."
-  if (!penyelenggara) errors.penyelenggara = "Nama penyelenggara wajib diisi."
+  if (!title) {
+    errors.title = "Judul kampanye wajib diisi."
+    errors.judul = "Judul kampanye wajib diisi."
+  }
+  if (!organizerName) {
+    errors.organizerName = "Nama penyelenggara wajib diisi."
+    errors.penyelenggara = "Nama penyelenggara wajib diisi."
+  }
   if (!targetAmountWei || targetAmountWei === "0") {
     errors.target = "Target BNB harus lebih besar dari nol dan maksimal 18 desimal."
   }
@@ -37,8 +46,8 @@ function validateCampaignForm(formData: FormData) {
   return {
     errors,
     data: {
-      judul,
-      penyelenggara,
+      title,
+      organizerName,
       targetAmountWei: targetAmountWei ?? "0",
       target: Number(targetInput) || 0,
       recipientWallet,
@@ -49,37 +58,41 @@ function validateCampaignForm(formData: FormData) {
 
 function toReview(row: {
   id: number
-  judul: string
-  penyelenggara: string
-  terkumpul: number
-  target: number
-  satuan: string
-  donatur: number
-  status: string
+  title: string
+  organizerName: string
+  raisedAmountWei: string
+  targetAmountWei: string
+  currency: string
+  donorCount: number
+  status: "ACTIVE" | "COMPLETED" | "CLOSED"
   reviewStatus: CampaignReviewStatus
   source: "AI_MOCK"
   aiDraft: unknown | null
   aiReference: string | null
   aiConfidence: number | null
   recipientWallet: string | null
-  targetAmountWei: string
 }): CampaignReview {
   return {
     id: String(row.id),
-    judul: row.judul,
-    penyelenggara: row.penyelenggara,
-    terkumpul: row.terkumpul,
-    target: row.target,
-    satuan: row.satuan as "BNB" | "USDT",
-    donatur: row.donatur,
-    status: row.status as "menunggu" | "aktif" | "selesai",
+    title: row.title,
+    organizerName: row.organizerName,
+    raisedAmountWei: row.raisedAmountWei,
+    targetAmountWei: row.targetAmountWei,
+    currency: row.currency,
+    donorCount: row.donorCount,
+    status: row.status,
     reviewStatus: row.reviewStatus,
     source: row.source,
     aiDraft: row.aiDraft,
     aiReference: row.aiReference,
     aiConfidence: row.aiConfidence,
     recipientWallet: row.recipientWallet,
-    targetAmountWei: row.targetAmountWei,
+    judul: row.title,
+    penyelenggara: row.organizerName,
+    terkumpul: 0,
+    target: 0,
+    satuan: row.currency,
+    donatur: row.donorCount,
   }
 }
 
@@ -105,17 +118,17 @@ export async function createMockAiCampaign(
   }
 
   await db.orm.public.Campaign.create({
-    judul: data.judul,
-    penyelenggara: data.penyelenggara,
-    terkumpul: 0,
-    target: data.target,
-    satuan: "BNB",
-    donatur: 0,
-    status: "menunggu",
+    title: data.title,
+    organizerName: data.organizerName,
+    raisedAmountWei: "0",
+    targetAmountWei: data.targetAmountWei,
+    currency: "BNB",
+    donorCount: 0,
+    status: "ACTIVE",
     source: "AI_MOCK",
     aiDraft: {
-      title: data.judul,
-      organizer: data.penyelenggara,
+      title: data.title,
+      organizer: data.organizerName,
       targetBnb: data.target,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
@@ -124,7 +137,6 @@ export async function createMockAiCampaign(
     aiConfidence: 0.85,
     reviewStatus: transitionCampaignReviewStatus("AI_DRAFT", "PENDING_REVIEW"),
     recipientWallet: data.recipientWallet.toLowerCase(),
-    targetAmountWei: data.targetAmountWei,
   })
 
   revalidatePath("/admin/kampanye")
@@ -150,23 +162,22 @@ export async function updateCampaign(
   if (!existing) return { success: false, message: "Kampanye tidak ditemukan." }
 
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
-    judul: data.judul,
-    penyelenggara: data.penyelenggara,
-    target: data.target,
-    satuan: "BNB",
+    title: data.title,
+    organizerName: data.organizerName,
+    currency: "BNB",
     recipientWallet: data.recipientWallet.toLowerCase(),
     targetAmountWei: data.targetAmountWei,
     aiReference: data.aiReference,
     aiDraft: {
-      title: data.judul,
-      organizer: data.penyelenggara,
+      title: data.title,
+      organizer: data.organizerName,
       targetBnb: data.target,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
     },
     aiConfidence: 0.85,
     reviewStatus: "PENDING_REVIEW",
-    status: "menunggu",
+    status: "ACTIVE",
     rejectionReason: null,
   })
 
@@ -216,7 +227,7 @@ export async function rejectCampaign(
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
     reviewStatus: "REJECTED",
     rejectionReason: reason,
-    status: "menunggu",
+    status: "CLOSED",
   })
   revalidatePath("/admin/kampanye")
   return { success: true, message: "Campaign ditolak." }
@@ -233,7 +244,7 @@ export async function publishCampaign(id: string): Promise<CampaignFormState> {
   }
 
   // Scope 3 only exposes the approved state to the next publishing step.
-  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({ status: "aktif" })
+  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({ status: "ACTIVE" })
   revalidatePath("/admin/kampanye")
   return { success: true, message: "Campaign aktif dan siap menerima pembayaran." }
 }
