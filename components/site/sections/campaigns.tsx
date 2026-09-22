@@ -37,7 +37,7 @@ export function Campaigns({ campaigns = [] }: { campaigns?: Campaign[] }) {
           align="between"
           action={
             <Link
-              href="/kampanye"
+              href="/campaigns"
               className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-brand-700 transition-colors duration-150 hover:text-brand-600 dark:text-brand-300"
             >
               {t("Lihat semua kampanye")}

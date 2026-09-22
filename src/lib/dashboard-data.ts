@@ -1,4 +1,3 @@
-
 /* =========================================================================
    Shared dashboard types, navigation, and legacy admin presentation data.
    Donor/beneficiary totals are loaded from CampaignPayment at runtime.
@@ -25,20 +24,32 @@ export type ActivityItem = {
 
 export type CampaignReview = {
   id: string
-  judul: string
-  penyelenggara: string
-  terkumpul: number
-  target: number
-  satuan: "BNB" | "USDT"
-  donatur: number
-  status: "menunggu" | "aktif" | "selesai"
+  title: string
+  organizerName: string
+  targetAmountWei: string
+  raisedAmountWei: string
+  currency: string
+  donorCount: number
+  status: "ACTIVE" | "COMPLETED" | "CLOSED"
   reviewStatus?: "AI_DRAFT" | "PENDING_REVIEW" | "APPROVED" | "REJECTED"
-  source?: "AI_MOCK"
+  source?: "AI_MOCK" | "MANUAL"
   aiDraft?: unknown | null
   aiReference?: string | null
   aiConfidence?: number | null
   recipientWallet?: string | null
-  targetAmountWei?: string
+  // Presentation fields shown on the public card / detail page.
+  category?: string
+  image?: string | null
+  location?: string | null
+  summary?: string | null
+  daysLeft?: number
+  // Backward compatibility fields
+  judul?: string
+  penyelenggara?: string
+  terkumpul?: number
+  target?: number
+  satuan?: "BNB" | "USDT" | string
+  donatur?: number
 }
 
 // ── Konstanta ──────────────────────────────────────────────────────────────
@@ -77,7 +88,6 @@ export const ADMIN_STATS: StatItem[] = [
     icon: "Users",
   },
 ]
-
 
 export const ADMIN_ACTIVITIES: ActivityItem[] = [
   {
@@ -138,24 +148,28 @@ export type NavItem = {
 
 export const ADMIN_NAV: NavItem[] = [
   { label: "Ringkasan", href: "/admin", icon: "LayoutDashboard" },
-  { label: "Kampanye", href: "/admin/kampanye", icon: "Megaphone", badge: 2 },
+  { label: "Kampanye", href: "/admin/campaigns", icon: "Megaphone", badge: 2 },
   { label: "Penyaluran", href: "/admin/penyaluran", icon: "ArrowUpRight" },
   { label: "Donatur", href: "/admin/donatur", icon: "Users" },
   { label: "Pengaturan", href: "/admin/pengaturan", icon: "Settings" },
 ]
 
 export const BENEFACTOR_NAV: NavItem[] = [
-  { label: "Ringkasan", href: "/donatur", icon: "LayoutDashboard" },
-  { label: "Donasi Saya", href: "/donatur/riwayat", icon: "History" },
-  { label: "Jelajahi Kampanye", href: "/donatur/jelajahi", icon: "Search" },
-  { label: "Pengaturan", href: "/donatur/pengaturan", icon: "Settings" },
+  { label: "Ringkasan", href: "/benefactor", icon: "LayoutDashboard" },
+  { label: "Donasi Saya", href: "/benefactor/riwayat", icon: "History" },
+  { label: "Jelajahi Kampanye", href: "/benefactor/jelajahi", icon: "Search" },
+  { label: "Pengaturan", href: "/benefactor/pengaturan", icon: "Settings" },
 ]
 
 export const BENEFICIARY_NAV: NavItem[] = [
-  { label: "Ringkasan", href: "/penerima", icon: "LayoutDashboard" },
-  { label: "Penyaluran", href: "/penerima/penyaluran", icon: "ArrowDownLeft" },
-  { label: "Kampanye Saya", href: "/penerima/kampanye", icon: "Megaphone" },
-  { label: "Pengaturan", href: "/penerima/pengaturan", icon: "Settings" },
+  { label: "Ringkasan", href: "/beneficiary", icon: "LayoutDashboard" },
+  {
+    label: "Penyaluran",
+    href: "/beneficiary/penyaluran",
+    icon: "ArrowDownLeft",
+  },
+  { label: "Kampanye Saya", href: "/beneficiary/campaigns", icon: "Megaphone" },
+  { label: "Pengaturan", href: "/beneficiary/pengaturan", icon: "Settings" },
 ]
 
 // ── Benefactor (Donatur) ───────────────────────────────────────────────────

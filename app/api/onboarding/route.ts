@@ -126,9 +126,9 @@ const saveOnboardingProfile = async (
   return db.orm.public.User.where({ id: userId }).update({
     username: profile.username,
     role:
-      currentRole === "USER"
-        ? getRoleForOnboardingUserType(profile.userType)
-        : currentRole,
+      currentRole === "ADMIN"
+        ? currentRole
+        : getRoleForOnboardingUserType(profile.userType),
     userType: profile.userType,
     domicile: profile.domicile,
     whatsappNumber: profile.whatsappNumber,

@@ -8,8 +8,8 @@ import { getRoleDashboardPath } from "./src/lib/role-dashboard"
 
 const requiredRoleByPrefix = [
   ["/admin", "ADMIN"],
-  ["/donatur", "BENEFACTOR"],
-  ["/penerima", "BENEFACTORY"],
+  ["/benefactor", "BENEFACTOR"],
+  ["/beneficiary", "BENEFICIARY"],
 ] as const
 
 const redirectToHome = (request: NextRequest) => {
@@ -49,6 +49,10 @@ export async function proxy(request: NextRequest) {
     return redirectToHome(request)
   }
 
+  if (session.role === "ADMIN") {
+    return NextResponse.next()
+  }
+
   if (session.role !== requiredRole) {
     const url = request.nextUrl.clone()
     url.pathname = dashboardPath
@@ -62,8 +66,8 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/donatur/:path*",
-    "/penerima/:path*",
+    "/benefactor/:path*",
+    "/beneficiary/:path*",
     "/dashboard/:path*",
   ],
 }

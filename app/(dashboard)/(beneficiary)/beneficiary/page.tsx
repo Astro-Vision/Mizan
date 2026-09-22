@@ -51,8 +51,8 @@ export default async function PenerimaPage() {
             <div key={campaign.id} className="rounded-2xl border border-line-soft bg-surface p-5 sm:p-6">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold leading-[1.3] text-ink">{campaign.judul}</p>
-                  <p className="mt-1 text-xs text-ink-muted">{campaign.penyelenggara}</p>
+                  <p className="text-sm font-semibold leading-[1.3] text-ink">{campaign.title}</p>
+                  <p className="mt-1 text-xs text-ink-muted">{campaign.organizerName}</p>
                 </div>
                 <p className="font-mono text-sm tabular-nums text-ink">
                   {formatWeiBnb(campaign.fundedAmountWei).replace(".", ",")} BNB

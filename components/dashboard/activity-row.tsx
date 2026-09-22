@@ -24,35 +24,40 @@ export function ActivityRow({ item, className }: ActivityRowProps) {
     <div
       className={cn(
         "flex items-center gap-4 border-b border-line-soft py-4 last:border-b-0",
-        className,
+        className
       )}
     >
       {/* Deskripsi + hash */}
       <div className="min-w-0 flex-1">
         <p className="text-sm leading-[1.55] text-ink">{item.deskripsi}</p>
         <div className="mt-1 flex items-center gap-2">
-          <a
-            href={`${EXPLORER_URL}/tx/${item.hash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-mono text-xs text-brand-700 transition-colors duration-150 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200"
-          >
-            {item.hashShort}
-            <ArrowUpRight
-              className="size-3"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            />
-          </a>
+          {item.hash ? (
+            <a
+              href={`${EXPLORER_URL}/tx/${item.hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-mono text-xs text-brand-700 transition-colors duration-150 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200"
+            >
+              {item.hashShort}
+              <ArrowUpRight
+                className="size-3"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+            </a>
+          ) : (
+            <span className="font-mono text-xs text-ink-muted">
+              {item.hashShort}
+            </span>
+          )}
           <span className="text-xs text-ink-muted">{item.waktu}</span>
         </div>
       </div>
 
       {/* Nominal */}
       {item.nominal !== "—" ? (
-        <p className="shrink-0 text-right font-mono text-sm tabular-nums text-ink">
-          {item.nominal}{" "}
-          <span className="text-ink-muted">{item.satuan}</span>
+        <p className="shrink-0 text-right font-mono text-sm text-ink tabular-nums">
+          {item.nominal} <span className="text-ink-muted">{item.satuan}</span>
         </p>
       ) : (
         <p className="shrink-0 text-right font-mono text-sm text-ink-muted">

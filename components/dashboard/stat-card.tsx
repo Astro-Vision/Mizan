@@ -45,14 +45,18 @@ type StatCardProps = {
  * §5: Nominal uang selalu mono + tabular-nums.
  * §8: lucide-react, strokeWidth 1.5, 24px mandiri.
  */
-export function StatCard({ stat, isCurrency = false, className }: StatCardProps) {
+export function StatCard({
+  stat,
+  isCurrency = false,
+  className,
+}: StatCardProps) {
   const Icon = ICON_MAP[stat.icon]
 
   return (
     <div
       className={cn(
         "rounded-2xl border border-line-soft bg-surface p-6",
-        className,
+        className
       )}
     >
       <div className="flex items-start justify-between gap-4">
@@ -61,7 +65,7 @@ export function StatCard({ stat, isCurrency = false, className }: StatCardProps)
           <p
             className={cn(
               "mt-2 text-h2 text-ink",
-              isCurrency && "font-mono tabular-nums",
+              isCurrency && "font-mono tabular-nums"
             )}
           >
             {stat.value}
@@ -71,7 +75,7 @@ export function StatCard({ stat, isCurrency = false, className }: StatCardProps)
           </p>
         </div>
         {Icon ? (
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-50 dark:bg-brand-950">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-brand-50 dark:bg-brand-950">
             <Icon
               className="size-5 text-brand-700 dark:text-brand-300"
               strokeWidth={1.5}

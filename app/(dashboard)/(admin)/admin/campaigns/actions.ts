@@ -9,6 +9,10 @@ import {
   type CampaignReviewStatus,
 } from "@/src/lib/campaign-workflow"
 import { decimalBnbToWei } from "@/src/lib/payments/validation"
+import {
+  toCategoryCode,
+  type CampaignCategoryCode,
+} from "@/src/lib/campaign-category"
 import { db } from "@/src/prisma/db"
 
 function shortText(value: FormDataEntryValue | null, max = 500) {
@@ -41,17 +45,49 @@ function dbStatusToUi(
   return "aktif"
 }
 
+// Category is stored as an enum CODE in the DB (ZAKAT/DONASI_UMUM/WAKAF/BENCANA).
+// Accepts a code or a label from the form and returns a valid code.
+function normalizeCategoryCode(
+  value: FormDataEntryValue | null
+): CampaignCategoryCode {
+  return (
+    toCategoryCode(typeof value === "string" ? value : null) ?? "DONASI_UMUM"
+  )
+}
+
+function parseDaysLeft(value: FormDataEntryValue | null): number {
+  const parsed = Number(typeof value === "string" ? value.trim() : "")
+  if (!Number.isFinite(parsed) || parsed < 0) return 0
+  // Clamp to a sane upper bound (10 years) and drop fractional days.
+  return Math.min(3650, Math.floor(parsed))
+}
+
 function validateCampaignForm(formData: FormData) {
   const errors: Record<string, string> = {}
-  const title = shortText(formData.get("judul"), 160)
-  const organizerName = shortText(formData.get("penyelenggara"), 160)
+  const title = shortText(formData.get("title") ?? formData.get("judul"), 160)
+  const organizerName = shortText(
+    formData.get("organizerName") ?? formData.get("penyelenggara"),
+    160
+  )
   const targetInput = shortText(formData.get("target"), 40)
   const recipientWallet = shortText(formData.get("recipientWallet"), 42)
   const aiReference = shortText(formData.get("aiReference"), 500)
   const targetAmountWei = decimalBnbToWei(targetInput)
 
-  if (!title) errors.judul = "Judul kampanye wajib diisi."
-  if (!organizerName) errors.penyelenggara = "Nama penyelenggara wajib diisi."
+  const category = normalizeCategoryCode(formData.get("category"))
+  const location = shortText(formData.get("location"), 160)
+  const summary = shortText(formData.get("summary"), 600)
+  const image = shortText(formData.get("image"), 1000)
+  const daysLeft = parseDaysLeft(formData.get("daysLeft"))
+
+  if (!title) {
+    errors.title = "Judul kampanye wajib diisi."
+    errors.judul = "Judul kampanye wajib diisi."
+  }
+  if (!organizerName) {
+    errors.organizerName = "Nama penyelenggara wajib diisi."
+    errors.penyelenggara = "Nama penyelenggara wajib diisi."
+  }
   if (!targetAmountWei || targetAmountWei === "0") {
     errors.target =
       "Target BNB harus lebih besar dari nol dan maksimal 18 desimal."
@@ -60,6 +96,11 @@ function validateCampaignForm(formData: FormData) {
     errors.recipientWallet = "Wallet recipient harus address EVM yang valid."
   }
   if (!aiReference) errors.aiReference = "Referensi sumber wajib diisi."
+  // Image is optional, but if provided it must look like a URL or a local path.
+  if (image && !/^(https?:\/\/|\/)/i.test(image)) {
+    errors.image =
+      "Gambar harus berupa URL (http/https) atau path yang diawali /."
+  }
 
   return {
     errors,
@@ -69,6 +110,11 @@ function validateCampaignForm(formData: FormData) {
       targetAmountWei: targetAmountWei ?? "0",
       recipientWallet,
       aiReference,
+      category,
+      location: location || null,
+      summary: summary || null,
+      image: image || null,
+      daysLeft,
     },
   }
 }
@@ -81,31 +127,45 @@ function toReview(row: {
   targetAmountWei: string
   currency: string
   donorCount: number
-  status: string
+  status: "ACTIVE" | "COMPLETED" | "CLOSED"
   reviewStatus: CampaignReviewStatus
-  source: "AI_MOCK"
+  source: "AI_MOCK" | "MANUAL"
   aiDraft: unknown | null
   aiReference: string | null
   aiConfidence: number | null
   recipientWallet: string | null
+  category: CampaignCategoryCode | null
+  image: string | null
+  location: string | null
+  summary: string | null
+  daysLeft: number
 }): CampaignReview {
   return {
     id: String(row.id),
-    judul: row.title,
-    penyelenggara: row.organizerName,
-    terkumpul: weiToBnb(row.raisedAmountWei),
-    target: weiToBnb(row.targetAmountWei),
-    satuan: (row.currency?.toUpperCase() === "USDT" ? "USDT" : "BNB") as
-      "BNB" | "USDT",
-    donatur: row.donorCount,
-    status: dbStatusToUi(row.status, row.reviewStatus),
+    title: row.title,
+    organizerName: row.organizerName,
+    raisedAmountWei: row.raisedAmountWei,
+    targetAmountWei: row.targetAmountWei,
+    currency: row.currency,
+    donorCount: row.donorCount,
+    status: row.status,
     reviewStatus: row.reviewStatus,
     source: row.source,
     aiDraft: row.aiDraft,
     aiReference: row.aiReference,
     aiConfidence: row.aiConfidence,
     recipientWallet: row.recipientWallet,
-    targetAmountWei: row.targetAmountWei,
+    category: row.category ?? "DONASI_UMUM",
+    image: row.image,
+    location: row.location,
+    summary: row.summary,
+    daysLeft: row.daysLeft,
+    judul: row.title,
+    penyelenggara: row.organizerName,
+    terkumpul: weiToBnb(row.raisedAmountWei),
+    target: weiToBnb(row.targetAmountWei),
+    satuan: row.currency,
+    donatur: row.donorCount,
   }
 }
 
@@ -141,13 +201,17 @@ export async function createMockAiCampaign(
     targetAmountWei: data.targetAmountWei,
     currency: "BNB",
     donorCount: 0,
-    // status stays ACTIVE (DB enum); "not yet published" is tracked via reviewStatus.
     status: "ACTIVE",
     source: "AI_MOCK",
+    category: data.category,
+    location: data.location,
+    summary: data.summary,
+    image: data.image,
+    daysLeft: data.daysLeft,
     aiDraft: {
       title: data.title,
       organizer: data.organizerName,
-      targetWei: data.targetAmountWei,
+      targetBnb: data.targetAmountWei,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
     },
@@ -157,8 +221,8 @@ export async function createMockAiCampaign(
     recipientWallet: data.recipientWallet.toLowerCase(),
   })
 
-  revalidatePath("/admin/kampanye")
-  redirect("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
+  redirect("/admin/campaigns")
 }
 
 export async function updateCampaign(
@@ -185,11 +249,16 @@ export async function updateCampaign(
     currency: "BNB",
     recipientWallet: data.recipientWallet.toLowerCase(),
     targetAmountWei: data.targetAmountWei,
+    category: data.category,
+    location: data.location,
+    summary: data.summary,
+    image: data.image,
+    daysLeft: data.daysLeft,
     aiReference: data.aiReference,
     aiDraft: {
       title: data.title,
       organizer: data.organizerName,
-      targetWei: data.targetAmountWei,
+      targetBnb: data.targetAmountWei,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
     },
@@ -199,8 +268,8 @@ export async function updateCampaign(
     rejectionReason: null,
   })
 
-  revalidatePath("/admin/kampanye")
-  redirect("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
+  redirect("/admin/campaigns")
 }
 
 export async function approveCampaign(id: string): Promise<CampaignFormState> {
@@ -224,7 +293,7 @@ export async function approveCampaign(id: string): Promise<CampaignFormState> {
     approvedAt: new Date().toISOString(),
     rejectionReason: null,
   })
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return { success: true, message: "Campaign disetujui dan siap dipublish." }
 }
 
@@ -253,7 +322,7 @@ export async function rejectCampaign(
     rejectionReason: reason,
     status: "CLOSED",
   })
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return { success: true, message: "Campaign ditolak." }
 }
 
@@ -274,7 +343,7 @@ export async function publishCampaign(id: string): Promise<CampaignFormState> {
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
     status: "ACTIVE",
   })
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return {
     success: true,
     message: "Campaign aktif dan siap menerima pembayaran.",
@@ -291,6 +360,6 @@ export async function deleteCampaign(id: string): Promise<CampaignFormState> {
   if (!existing) return { success: false, message: "Kampanye tidak ditemukan." }
 
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).delete()
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return { success: true, message: "Kampanye berhasil dihapus." }
 }

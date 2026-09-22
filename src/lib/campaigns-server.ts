@@ -2,6 +2,7 @@ import "server-only"
 
 import { db } from "@/src/prisma/db"
 import type { Campaign } from "@/src/lib/site-data"
+import { toCategoryLabel } from "@/src/lib/campaign-category"
 
 /* =========================================================================
    Server data-access for the PUBLIC campaign pages (list + detail).
@@ -24,11 +25,10 @@ export const CAMPAIGN_CATEGORIES = [
 
 export type CampaignCategory = (typeof CAMPAIGN_CATEGORIES)[number]
 
+// The DB stores category as an enum CODE (ZAKAT/DONASI_UMUM/...); the card and
+// filter use Indonesian labels. Convert here.
 function normalizeCategory(value: string | null | undefined): CampaignCategory {
-  const found = CAMPAIGN_CATEGORIES.find(
-    (category) => category.toLowerCase() === (value ?? "").trim().toLowerCase(),
-  )
-  return found ?? "Donasi Umum"
+  return toCategoryLabel(value) as CampaignCategory
 }
 
 // wei (18-decimal string) -> a plain BNB number the card math can use.
@@ -38,7 +38,9 @@ function weiToBnbNumber(value: string | null | undefined): number {
   try {
     const wei = BigInt(value)
     // Scale by 1e6 first to keep 6 fractional digits, then divide back.
-    const scaled = Number((wei * BigInt(1_000_000)) / BigInt("1000000000000000000"))
+    const scaled = Number(
+      (wei * BigInt(1_000_000)) / BigInt("1000000000000000000")
+    )
     return scaled / 1_000_000
   } catch {
     return 0
@@ -122,8 +124,7 @@ const PUBLIC_SELECT = [
  * All publicly visible campaigns (APPROVED + ACTIVE), newest first.
  */
 export async function getPublicCampaigns(): Promise<Campaign[]> {
-  const rows = await db.orm.public.Campaign
-    .select(...PUBLIC_SELECT)
+  const rows = await db.orm.public.Campaign.select(...PUBLIC_SELECT)
     .where({ reviewStatus: "APPROVED", status: "ACTIVE" })
     .orderBy((campaign) => campaign.createdAt.desc())
     .all()
@@ -135,12 +136,13 @@ export async function getPublicCampaigns(): Promise<Campaign[]> {
  * A single public campaign by its numeric id. Returns null when the id is
  * invalid, the campaign does not exist, or it is not publicly visible.
  */
-export async function getPublicCampaignById(id: string): Promise<Campaign | null> {
+export async function getPublicCampaignById(
+  id: string
+): Promise<Campaign | null> {
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0) return null
 
-  const row = await db.orm.public.Campaign
-    .select(...PUBLIC_SELECT, "status")
+  const row = await db.orm.public.Campaign.select(...PUBLIC_SELECT, "status")
     .where({ id: numId })
     .first()
 

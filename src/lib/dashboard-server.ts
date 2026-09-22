@@ -4,8 +4,8 @@ import { db } from "@/src/prisma/db"
 
 export type LiveCampaignSnapshot = {
   id: string
-  judul: string
-  penyelenggara: string
+  title: string
+  organizerName: string
   targetAmountWei: string
   fundedAmountWei: string
   paymentCount: number
@@ -53,8 +53,8 @@ export async function getLiveCampaignSnapshots() {
 
       return {
         id: String(campaign.id),
-        judul: campaign.title,
-        penyelenggara: campaign.organizerName,
+        title: campaign.title,
+        organizerName: campaign.organizerName,
         targetAmountWei: campaign.targetAmountWei,
         fundedAmountWei,
         paymentCount: confirmed.length,

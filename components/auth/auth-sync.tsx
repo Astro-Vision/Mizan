@@ -5,7 +5,10 @@ import { useIdentityToken, usePrivy } from "@privy-io/react-auth"
 import { useRouter } from "next/navigation"
 
 import { OnboardingModal } from "@/components/auth/onboarding-modal"
-import { getDashboardPath } from "@/src/lib/role-dashboard"
+import {
+  getDashboardPath,
+  getRoleForOnboardingUserType,
+} from "@/src/lib/role-dashboard"
 
 type AuthSyncResponse = {
   onboardingRequired?: boolean
@@ -96,7 +99,7 @@ export function AuthSync() {
         if (
           !needsOnboarding &&
           nextPath &&
-          /^\/(admin|donatur|penerima)(?:\/|$)/.test(nextPath)
+          /^\/(admin|benefactor|beneficiary)(?:\/|$)/.test(nextPath)
         ) {
           router.replace(nextPath)
         }
@@ -141,7 +144,9 @@ export function AuthSync() {
           identityToken={identityToken}
           onCompleted={(userType) => {
             setOnboardingRequired(false)
-            router.replace(getDashboardPath(syncedRole ?? "USER", userType))
+            router.replace(
+              getDashboardPath(getRoleForOnboardingUserType(userType), userType)
+            )
           }}
         />
       ) : null}

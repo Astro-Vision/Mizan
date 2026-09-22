@@ -8,10 +8,13 @@ import { decimalBnbToWei } from "@/src/lib/payments/validation"
 
 export type PaymentCampaign = {
   id: string
-  judul: string
-  penyelenggara: string
+  title: string
+  organizerName: string
   targetAmountWei: string
   recipientWallet: string | null
+  // Optional backwards compatibility
+  judul?: string
+  penyelenggara?: string
 }
 
 export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] }) {
@@ -144,7 +147,7 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
             >
               {campaigns.map((campaign) => (
                 <option key={campaign.id} value={campaign.id}>
-                  {campaign.judul} — {campaign.penyelenggara}
+                  {campaign.title ?? campaign.judul} — {campaign.organizerName ?? campaign.penyelenggara}
                 </option>
               ))}
             </select>
