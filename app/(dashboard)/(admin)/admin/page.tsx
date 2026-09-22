@@ -7,7 +7,7 @@ import {
   ADMIN_STATS,
   ADMIN_ACTIVITIES,
 } from "@/src/lib/dashboard-data"
-import { getCampaigns } from "./kampanye/actions"
+import { getCampaigns } from "./campaigns/actions"
 import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
 export const metadata: Metadata = {

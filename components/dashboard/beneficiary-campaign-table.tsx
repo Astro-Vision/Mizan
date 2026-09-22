@@ -21,14 +21,14 @@ import {
   X,
 } from "lucide-react"
 import { formatAngka } from "@/src/lib/site-data"
-import type { BeneficiaryCampaign, BeneficiaryCampaignStatus } from "@/app/(dashboard)/(beneficiary)/penerima/kampanye/actions"
+import type { BeneficiaryCampaign, BeneficiaryCampaignStatus } from "@/app/(dashboard)/(beneficiary)/beneficiary/campaigns/actions"
 import {
   manageMilestones,
   uploadProof,
   requestWithdrawal,
   deleteBeneficiaryCampaign,
   submitForReview,
-} from "@/app/(dashboard)/(beneficiary)/penerima/kampanye/actions"
+} from "@/app/(dashboard)/(beneficiary)/beneficiary/campaigns/actions"
 
 // ── Local helpers ──────────────────────────────────────────────────────────
 
@@ -210,7 +210,7 @@ function ActionMenu({ campaign, onAction }: ActionMenuProps) {
       key: "detail",
       label: "Lihat detail",
       icon: Eye,
-      href: `/penerima/kampanye/${campaign.id}`,
+      href: `/beneficiary/campaigns/${campaign.id}`,
     },
     ...(isDraft || isRejected
       ? [
@@ -218,7 +218,7 @@ function ActionMenu({ campaign, onAction }: ActionMenuProps) {
             key: "edit",
             label: "Edit kampanye",
             icon: Pencil,
-            href: `/penerima/kampanye/${campaign.id}/edit`,
+            href: `/beneficiary/campaigns/${campaign.id}/edit`,
           } as const,
         ]
       : []),
@@ -681,7 +681,7 @@ export function BeneficiaryCampaignTable({ campaigns }: BeneficiaryCampaignTable
                 </p>
               </div>
               <Link
-                href="/penerima/kampanye/buat"
+                href="/beneficiary/campaigns/create"
                 className="inline-flex h-10 items-center gap-2 rounded-[6px] bg-brand-700 px-4 text-sm font-medium text-white transition-colors hover:bg-brand-600"
               >
                 Buat Kampanye Baru

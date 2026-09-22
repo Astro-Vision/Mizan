@@ -139,8 +139,8 @@ export async function createMockAiCampaign(
     recipientWallet: data.recipientWallet.toLowerCase(),
   })
 
-  revalidatePath("/admin/kampanye")
-  redirect("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
+  redirect("/admin/campaigns")
 }
 
 export async function updateCampaign(
@@ -181,8 +181,8 @@ export async function updateCampaign(
     rejectionReason: null,
   })
 
-  revalidatePath("/admin/kampanye")
-  redirect("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
+  redirect("/admin/campaigns")
 }
 
 export async function approveCampaign(id: string): Promise<CampaignFormState> {
@@ -203,7 +203,7 @@ export async function approveCampaign(id: string): Promise<CampaignFormState> {
     approvedAt: new Date().toISOString(),
     rejectionReason: null,
   })
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return { success: true, message: "Campaign disetujui dan siap dipublish." }
 }
 
@@ -229,7 +229,7 @@ export async function rejectCampaign(
     rejectionReason: reason,
     status: "CLOSED",
   })
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return { success: true, message: "Campaign ditolak." }
 }
 
@@ -245,7 +245,7 @@ export async function publishCampaign(id: string): Promise<CampaignFormState> {
 
   // Scope 3 only exposes the approved state to the next publishing step.
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({ status: "ACTIVE" })
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return { success: true, message: "Campaign aktif dan siap menerima pembayaran." }
 }
 
@@ -259,6 +259,6 @@ export async function deleteCampaign(id: string): Promise<CampaignFormState> {
   if (!existing) return { success: false, message: "Kampanye tidak ditemukan." }
 
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).delete()
-  revalidatePath("/admin/kampanye")
+  revalidatePath("/admin/campaigns")
   return { success: true, message: "Kampanye berhasil dihapus." }
 }

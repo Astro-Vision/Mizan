@@ -97,7 +97,7 @@ export default async function KampanyeDetailPage({
     <div className="mx-auto max-w-[840px]">
       {/* Breadcrumb */}
       <Link
-        href="/penerima/kampanye"
+        href="/beneficiary/campaigns"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
       >
         <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden="true" />
@@ -129,7 +129,7 @@ export default async function KampanyeDetailPage({
         <div className="flex shrink-0 flex-wrap gap-2">
           {canEdit && (
             <Link
-              href={`/penerima/kampanye/${id}/edit`}
+              href={`/beneficiary/campaigns/${id}/edit`}
               className="inline-flex h-10 items-center gap-2 rounded-[6px] border border-line-ui px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-sunken"
             >
               <Pencil className="size-4" strokeWidth={1.5} aria-hidden="true" />

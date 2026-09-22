@@ -231,8 +231,8 @@ export async function createBeneficiaryCampaign(
     recipientWallet: data.recipientWallet.toLowerCase(),
   })
 
-  revalidatePath("/penerima/kampanye")
-  redirect("/penerima/kampanye")
+  revalidatePath("/beneficiary/campaigns")
+  redirect("/beneficiary/campaigns")
 }
 
 /** Update an existing DRAFT campaign (only allowed while status is AI_DRAFT). */
@@ -277,8 +277,8 @@ export async function updateBeneficiaryCampaign(
     rejectionReason: existing.reviewStatus === "REJECTED" ? null : existing.rejectionReason,
   })
 
-  revalidatePath("/penerima/kampanye")
-  redirect("/penerima/kampanye")
+  revalidatePath("/beneficiary/campaigns")
+  redirect("/beneficiary/campaigns")
 }
 
 /** Delete a DRAFT campaign. Campaigns already submitted/active cannot be deleted. */
@@ -299,7 +299,7 @@ export async function deleteBeneficiaryCampaign(
 
   // TODO(auth): verify ownership before deleting
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).delete()
-  revalidatePath("/penerima/kampanye")
+  revalidatePath("/beneficiary/campaigns")
   return { success: true, message: "Kampanye berhasil dihapus." }
 }
 
@@ -325,7 +325,7 @@ export async function submitForReview(id: string): Promise<CampaignFormState> {
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
     reviewStatus: "PENDING_REVIEW",
   })
-  revalidatePath("/penerima/kampanye")
+  revalidatePath("/beneficiary/campaigns")
   return { success: true, message: "Kampanye berhasil diajukan untuk review admin." }
 }
 
@@ -334,7 +334,7 @@ export async function submitForReview(id: string): Promise<CampaignFormState> {
  * Returns a mock success response for UI flow demonstration.
  */
 export async function manageMilestones(id: string): Promise<CampaignFormState> {
-  // TODO: navigate to /penerima/kampanye/[id]/milestone when page is built
+  // TODO: navigate to /beneficiary/campaigns/[id]/milestone when page is built
   void id
   return { success: true, message: "Fitur kelola milestone belum tersedia." }
 }
@@ -344,7 +344,7 @@ export async function manageMilestones(id: string): Promise<CampaignFormState> {
  * Returns a mock success response for UI flow demonstration.
  */
 export async function uploadProof(id: string): Promise<CampaignFormState> {
-  // TODO: navigate to /penerima/kampanye/[id]/bukti when page is built
+  // TODO: navigate to /beneficiary/campaigns/[id]/bukti when page is built
   void id
   return { success: true, message: "Fitur upload bukti belum tersedia." }
 }

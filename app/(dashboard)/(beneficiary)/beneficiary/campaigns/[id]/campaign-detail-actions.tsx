@@ -4,11 +4,11 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Send, Trash2, X } from "lucide-react"
 import { cn } from "@/src/lib/utils"
-import type { BeneficiaryCampaignStatus } from "@/app/(dashboard)/(beneficiary)/penerima/kampanye/actions"
+import type { BeneficiaryCampaignStatus } from "@/app/(dashboard)/(beneficiary)/beneficiary/campaigns/actions"
 import {
   submitForReview,
   deleteBeneficiaryCampaign,
-} from "@/app/(dashboard)/(beneficiary)/penerima/kampanye/actions"
+} from "@/app/(dashboard)/(beneficiary)/beneficiary/campaigns/actions"
 
 // ── Confirm dialog ─────────────────────────────────────────────────────────
 
@@ -126,7 +126,7 @@ export function CampaignDetailActions({
     try {
       const result = await deleteBeneficiaryCampaign(campaignId)
       if (result.success) {
-        router.push("/penerima/kampanye")
+        router.push("/beneficiary/campaigns")
       } else {
         showToast(result.message, false)
       }

@@ -5,7 +5,7 @@ import { useActionState } from "react"
 import Link from "next/link"
 import { cn } from "@/src/lib/utils"
 import { CATEGORIES } from "@/src/lib/site-data"
-import type { BeneficiaryCampaign, BeneficiaryCampaignFormState } from "@/app/(dashboard)/(beneficiary)/penerima/kampanye/actions"
+import type { BeneficiaryCampaign, BeneficiaryCampaignFormState } from "@/app/(dashboard)/(beneficiary)/beneficiary/campaigns/actions"
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -312,7 +312,7 @@ export function BeneficiaryCampaignForm({
           {pending ? "Menyimpan…" : submitLabel}
         </button>
         <Link
-          href="/penerima/kampanye"
+          href="/beneficiary/campaigns"
           className="inline-flex h-12 items-center justify-center rounded-[10px] border border-line-ui px-6 text-sm font-medium text-ink-muted transition-colors duration-150 hover:bg-surface-sunken hover:text-ink"
         >
           Batal

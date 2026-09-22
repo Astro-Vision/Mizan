@@ -91,7 +91,7 @@ export function CampaignForm({
           {pending ? "Menyimpan…" : submitLabel}
         </button>
         <Link
-          href="/admin/kampanye"
+          href="/admin/campaigns"
           className="inline-flex h-12 items-center justify-center rounded-[10px] border border-brand-200 px-6 text-sm font-medium text-brand-700 transition-colors duration-150 hover:bg-brand-50 dark:border-brand-800 dark:text-brand-300 dark:hover:bg-brand-950"
         >
           Batal

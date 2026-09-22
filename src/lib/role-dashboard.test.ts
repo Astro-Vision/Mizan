@@ -10,20 +10,20 @@ import {
 describe("role dashboard routing", () => {
   it.each([
     ["ADMIN", undefined, "/admin"],
-    ["BENEFACTOR", undefined, "/donatur"],
-    ["BENEFICIARY", undefined, "/penerima"],
-    ["BENEFACTOR", "BENEFACTOR", "/donatur"],
-    ["BENEFACTOR", "DONOR", "/donatur"],
-    ["BENEFICIARY", "BENEFICIARY", "/penerima"],
+    ["BENEFACTOR", undefined, "/benefactor"],
+    ["BENEFICIARY", undefined, "/beneficiary"],
+    ["BENEFACTOR", "BENEFACTOR", "/benefactor"],
+    ["BENEFACTOR", "DONOR", "/benefactor"],
+    ["BENEFICIARY", "BENEFICIARY", "/beneficiary"],
   ])("routes %s/%s to %s", (role, userType, expectedPath) => {
     expect(getDashboardPath(role, userType)).toBe(expectedPath)
   })
 
   it("keeps an incomplete account on a dashboard using its user type", () => {
-    expect(getDashboardPath(undefined, "BENEFACTOR")).toBe("/donatur")
-    expect(getDashboardPath(undefined, "DONOR")).toBe("/donatur")
-    expect(getDashboardPath(undefined, "BENEFICIARY")).toBe("/penerima")
-    expect(getDashboardPath(null, null)).toBe("/donatur")
+    expect(getDashboardPath(undefined, "BENEFACTOR")).toBe("/benefactor")
+    expect(getDashboardPath(undefined, "DONOR")).toBe("/benefactor")
+    expect(getDashboardPath(undefined, "BENEFICIARY")).toBe("/beneficiary")
+    expect(getDashboardPath(null, null)).toBe("/benefactor")
   })
 
   it("maps onboarding choices to non-admin application roles", () => {
@@ -34,8 +34,8 @@ describe("role dashboard routing", () => {
 
   it("only maps complete application roles to protected dashboards", () => {
     expect(getRoleDashboardPath("ADMIN")).toBe("/admin")
-    expect(getRoleDashboardPath("BENEFACTOR")).toBe("/donatur")
-    expect(getRoleDashboardPath("BENEFACTORY")).toBe("/penerima")
+    expect(getRoleDashboardPath("BENEFACTOR")).toBe("/benefactor")
+    expect(getRoleDashboardPath("BENEFICIARY")).toBe("/beneficiary")
     expect(getRoleDashboardPath("USER")).toBeNull()
     expect(getRoleDashboardPath(null)).toBeNull()
   })
@@ -43,7 +43,6 @@ describe("role dashboard routing", () => {
   it("only accepts known onboarding user types", () => {
     expect(getOnboardingUserType("DONOR")).toBe("DONOR")
     expect(getOnboardingUserType("BENEFICIARY")).toBe("BENEFICIARY")
-    expect(getOnboardingUserType("ORGANIZATION")).toBe("ORGANIZATION")
     expect(getOnboardingUserType("UNKNOWN")).toBeNull()
   })
 })

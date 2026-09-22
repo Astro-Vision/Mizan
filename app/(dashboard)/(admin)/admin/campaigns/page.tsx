@@ -23,7 +23,7 @@ export default async function KampanyePage() {
           <p className="mt-2 text-sm text-ink-muted">{TESTNET_NOTICE}</p>
         </div>
         <Link
-          href="/admin/kampanye/tambah"
+          href="/admin/campaigns/create"
           className="inline-flex h-12 shrink-0 items-center gap-2 rounded-[10px] bg-brand-700 px-6 text-sm font-medium text-white transition-colors duration-150 hover:bg-brand-600 active:bg-brand-800"
         >
           <Plus className="size-4" strokeWidth={1.5} aria-hidden="true" />
