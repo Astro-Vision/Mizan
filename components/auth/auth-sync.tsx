@@ -99,7 +99,7 @@ export function AuthSync() {
         if (
           !needsOnboarding &&
           nextPath &&
-          /^\/(admin|donatur|penerima)(?:\/|$)/.test(nextPath)
+          /^\/(admin|benefactor|beneficiary)(?:\/|$)/.test(nextPath)
         ) {
           router.replace(nextPath)
         }

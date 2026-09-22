@@ -14,7 +14,7 @@ export default function BuatKampanyePage() {
     <div className="mx-auto max-w-[720px]">
       {/* Breadcrumb */}
       <Link
-        href="/penerima/kampanye"
+        href="/beneficiary/campaigns"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
       >
         <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden="true" />

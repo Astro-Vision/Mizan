@@ -12,7 +12,7 @@ import {
   deleteCampaign,
   publishCampaign,
   rejectCampaign,
-} from "@/app/(dashboard)/(admin)/admin/kampanye/actions"
+} from "@/app/(dashboard)/(admin)/admin/campaigns/actions"
 
 type CampaignTableProps = { campaigns: CampaignReview[] }
 
@@ -165,7 +165,7 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
           </button>
         ) : null}
         <Link
-          href={`/admin/kampanye/${campaign.id}/edit`}
+          href={`/admin/campaigns/${campaign.id}/edit`}
           className="flex size-8 items-center justify-center rounded-[6px] text-ink-muted transition-colors hover:bg-surface-sunken hover:text-ink"
           aria-label={`Edit kampanye ${title}`}
         >

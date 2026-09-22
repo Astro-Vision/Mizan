@@ -144,24 +144,24 @@ export type NavItem = {
 
 export const ADMIN_NAV: NavItem[] = [
   { label: "Ringkasan", href: "/admin", icon: "LayoutDashboard" },
-  { label: "Kampanye", href: "/admin/kampanye", icon: "Megaphone", badge: 2 },
+  { label: "Kampanye", href: "/admin/campaigns", icon: "Megaphone", badge: 2 },
   { label: "Penyaluran", href: "/admin/penyaluran", icon: "ArrowUpRight" },
   { label: "Donatur", href: "/admin/donatur", icon: "Users" },
   { label: "Pengaturan", href: "/admin/pengaturan", icon: "Settings" },
 ]
 
 export const BENEFACTOR_NAV: NavItem[] = [
-  { label: "Ringkasan", href: "/donatur", icon: "LayoutDashboard" },
-  { label: "Donasi Saya", href: "/donatur/riwayat", icon: "History" },
-  { label: "Jelajahi Kampanye", href: "/donatur/jelajahi", icon: "Search" },
-  { label: "Pengaturan", href: "/donatur/pengaturan", icon: "Settings" },
+  { label: "Ringkasan", href: "/benefactor", icon: "LayoutDashboard" },
+  { label: "Donasi Saya", href: "/benefactor/riwayat", icon: "History" },
+  { label: "Jelajahi Kampanye", href: "/benefactor/jelajahi", icon: "Search" },
+  { label: "Pengaturan", href: "/benefactor/pengaturan", icon: "Settings" },
 ]
 
 export const BENEFICIARY_NAV: NavItem[] = [
-  { label: "Ringkasan", href: "/penerima", icon: "LayoutDashboard" },
-  { label: "Penyaluran", href: "/penerima/penyaluran", icon: "ArrowDownLeft" },
-  { label: "Kampanye Saya", href: "/penerima/kampanye", icon: "Megaphone" },
-  { label: "Pengaturan", href: "/penerima/pengaturan", icon: "Settings" },
+  { label: "Ringkasan", href: "/beneficiary", icon: "LayoutDashboard" },
+  { label: "Penyaluran", href: "/beneficiary/penyaluran", icon: "ArrowDownLeft" },
+  { label: "Kampanye Saya", href: "/beneficiary/campaigns", icon: "Megaphone" },
+  { label: "Pengaturan", href: "/beneficiary/pengaturan", icon: "Settings" },
 ]
 
 // ── Benefactor (Donatur) ───────────────────────────────────────────────────

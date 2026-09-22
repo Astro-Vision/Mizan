@@ -18,10 +18,10 @@ export function getDashboardPath(
   switch (userType) {
     case "BENEFICIARY":
     case "ORGANIZATION":
-      return "/penerima"
+      return "/beneficiary"
     case "DONOR":
     default:
-      return "/donatur"
+      return "/benefactor"
   }
 }
 
@@ -30,9 +30,11 @@ export function getRoleDashboardPath(role?: string | null): string | null {
     case "ADMIN":
       return "/admin"
     case "BENEFACTOR":
-      return "/donatur"
+      return "/benefactor"
     case "BENEFICIARY":
-      return "/penerima"
+      return "/beneficiary"
+    default:
+      return null
   }
 }
 
@@ -41,10 +43,10 @@ export function getOnboardingUserType(
 ): OnboardingUserType | null {
   switch (userType) {
     case "DONOR":
+      return "DONOR"
     case "BENEFICIARY":
-      return "/penerima"
+      return "BENEFICIARY"
     case "BENEFACTOR":
-    case "DONOR":
     default:
       return null
   }
