@@ -5,6 +5,9 @@ import { redirect } from "next/navigation"
 import type { CampaignFormState } from "@/src/lib/campaign-workflow"
 import { decimalBnbToWei } from "@/src/lib/payments/validation"
 import { db } from "@/src/prisma/db"
+import { requireBeneficiaryCommunity } from "@/src/lib/beneficiary/access"
+import { campaignInputSchema } from "@/src/lib/beneficiary/validation"
+import { formatCampaignCategory } from "@/src/lib/beneficiary/campaign-presentation"
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -149,6 +152,7 @@ function toPresentation(row: {
   reviewStatus: string
   status: string
   aiDraft: unknown | null
+  category: string
   aiReference: string | null
   createdAt: string
   updatedAt: string
@@ -158,8 +162,9 @@ function toPresentation(row: {
   const draft =
     row.aiDraft && typeof row.aiDraft === "object" ? (row.aiDraft as Record<string, unknown>) : {}
   const description = typeof draft.description === "string" ? draft.description : ""
-  const category =
-    typeof draft.category === "string" && draft.category ? draft.category : "Umum"
+  const category = formatCampaignCategory(
+    typeof draft.category === "string" && draft.category ? draft.category : row.category,
+  )
   return {
     id: String(row.id),
     title: row.title,
@@ -182,18 +187,46 @@ function toPresentation(row: {
 }
 
 export async function getBeneficiaryCampaigns(): Promise<BeneficiaryCampaign[]> {
-  // TODO(auth): filter by communityId once session is available
-  const rows = await db.orm.public.Campaign.orderBy((c) => c.createdAt.desc()).all()
-  return rows.map(toPresentation)
+  const { community } = await requireBeneficiaryCommunity()
+  if (!community) {
+    return []
+  }
+
+  const rows = await db.orm.public.Campaign
+    .where({ communityId: community.id })
+    .orderBy((c) => c.createdAt.desc())
+    .all()
+
+  return Promise.all(
+    rows.map(async (row) => {
+      const milestones = await db.orm.public.Milestone
+        .where({ campaignId: row.id })
+        .all()
+      const presentation = toPresentation(row)
+      return {
+        ...presentation,
+        nextMilestone:
+          milestones.find((milestone) => milestone.status !== "DISBURSED")?.description ?? null,
+      }
+    }),
+  )
 }
 
 export async function getBeneficiaryCampaignById(
   id: string,
 ): Promise<BeneficiaryCampaign | null> {
+  const { community } = await requireBeneficiaryCommunity()
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0) return null
   const row = await db.orm.public.Campaign.first({ id: numId })
-  return row ? toPresentation(row) : null
+  if (!row || row.communityId !== community.id) return null
+  const milestones = await db.orm.public.Milestone.where({ campaignId: row.id }).all()
+  return row
+    ? {
+      ...toPresentation(row),
+      nextMilestone: milestones.find((milestone) => milestone.status !== "DISBURSED")?.description ?? null,
+    }
+    : null
 }
 
 /** Create a new campaign as DRAFT owned by the current beneficiary org. */
@@ -201,38 +234,62 @@ export async function createBeneficiaryCampaign(
   _prev: BeneficiaryCampaignFormState,
   formData: FormData,
 ): Promise<BeneficiaryCampaignFormState> {
-  const { errors, data } = validateBeneficiaryForm(formData)
-  if (Object.keys(errors).length > 0) {
-    return { success: false, message: "Periksa kembali isian formulir.", errors }
+  const { community } = await requireBeneficiaryCommunity()
+  const rawMilestones = formData.getAll("milestones")
+    .map((value) => {
+      try {
+        return JSON.parse(String(value)) as { description: string; amountWei: string }
+      } catch {
+        return null
+      }
+    })
+    .filter((value): value is { description: string; amountWei: string } => value !== null)
+  const parsed = campaignInputSchema.safeParse({
+    title: formData.get("title"),
+    category: formData.get("category"),
+    description: formData.get("description"),
+    targetAmountWei: formData.get("targetAmountWei"),
+    recipientWallet: formData.get("recipientWallet") || community.walletAddress,
+    currency: formData.get("currency") || "BNB",
+    milestones: rawMilestones,
+  })
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: "Periksa kembali isian formulir.",
+      errors: Object.fromEntries(parsed.error.issues.map((issue) => [String(issue.path[0] ?? "form"), issue.message])),
+    }
   }
 
-  // TODO(auth): attach communityId from the authenticated user's Community
-  await db.orm.public.Campaign.create({
+  const data = parsed.data
+  const campaign = await db.orm.public.Campaign.create({
     title: data.title,
-    organizerName: data.organizerName,
+    organizerName: community.name,
+    category: data.category as "ZAKAT" | "DONASI_UMUM" | "WAKAF" | "BENCANA",
+    communityId: community.id,
     raisedAmountWei: "0",
     targetAmountWei: data.targetAmountWei,
     currency: data.currency,
     donorCount: 0,
     status: "ACTIVE",
-    source: "AI_MOCK",
-    // Persist description and category inside aiDraft JSON until dedicated columns exist
-    aiDraft: {
-      description: data.description,
-      category: data.category,
-      targetBnb: data.targetBnb,
-      recipientWallet: data.recipientWallet,
-      createdBy: "BENEFICIARY",
-    },
-    aiReference: null,
-    aiConfidence: null,
-    // New beneficiary campaigns start as DRAFT awaiting their own review submission
-    reviewStatus: "AI_DRAFT",
+    source: "MANUAL",
+    reviewStatus: "PENDING_REVIEW",
+    aiDraft: { description: data.description },
     recipientWallet: data.recipientWallet.toLowerCase(),
   })
 
+  await Promise.all(data.milestones.map((milestone, index) =>
+    db.orm.public.Milestone.create({
+      campaignId: campaign.id,
+      order: index + 1,
+      description: milestone.description,
+      amountWei: milestone.amountWei,
+      status: "PENDING",
+    }),
+  ))
+
   revalidatePath("/beneficiary/campaigns")
-  redirect("/beneficiary/campaigns")
+  redirect(`/beneficiary/campaigns/${campaign.id}?created=1`)
 }
 
 /** Update an existing DRAFT campaign (only allowed while status is AI_DRAFT). */

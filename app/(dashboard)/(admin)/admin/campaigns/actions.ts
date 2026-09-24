@@ -66,7 +66,7 @@ function toReview(row: {
   donorCount: number
   status: "ACTIVE" | "COMPLETED" | "CLOSED"
   reviewStatus: CampaignReviewStatus
-  source: "AI_MOCK"
+  source: "AI_MOCK" | "MANUAL"
   aiDraft: unknown | null
   aiReference: string | null
   aiConfidence: number | null
@@ -120,6 +120,7 @@ export async function createMockAiCampaign(
   await db.orm.public.Campaign.create({
     title: data.title,
     organizerName: data.organizerName,
+    category: "BENCANA",
     raisedAmountWei: "0",
     targetAmountWei: data.targetAmountWei,
     currency: "BNB",

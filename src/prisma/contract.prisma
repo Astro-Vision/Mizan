@@ -44,11 +44,11 @@ model User {
   dataConsentVersion     String?
   onboardingCompletedAt  TimestamptzString?
 
-  posts             Post[]
-  wallets           UserWallet[]
-  communities       Community[]       // communities owned by this user
-  approvedCampaigns Campaign[]        @relation("CampaignApprover")
-  campaignPayments  CampaignPayment[]
+  posts                Post[]
+  wallets              UserWallet[]
+  communityMemberships CommunityMember[]
+  approvedCampaigns    Campaign[]        @relation("CampaignApprover")
+  campaignPayments     CampaignPayment[]
 
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
@@ -87,19 +87,49 @@ model Post {
 model Community {
   id                 Int                          @id @default(autoincrement())
   name               String
-  ownerId            Int
-  owner              User                         @relation(fields: [ownerId], references: [id])
-  walletAddress      String
+  walletAddress      String                       // org treasury address — independent from any member's personal wallet
   chainType          String                       @default("BSC_TESTNET")
   verificationStatus CommunityVerificationStatus  @default(PENDING)
+  inviteCode         String                       @unique // shareable code so staff can request to join this Community
 
+  legalDocumentUrl   String? // e.g. SK Kemenag / akta / NIB scan, reviewed by Admin during verification
+  registrationNumber String? // NPWP / nomor izin LAZ, free-text since format varies by institution type
+
+  members   CommunityMember[]
   campaigns Campaign[]
 
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
 
   @@unique([walletAddress, chainType])
-  @@index([ownerId])
+}
+
+model CommunityMember {
+  id          Int    @id @default(autoincrement())
+  userId      Int
+  user        User   @relation(fields: [userId], references: [id])
+  communityId Int
+  community   Community @relation(fields: [communityId], references: [id])
+
+  role   CommunityMemberRole   @default(STAFF)
+  status CommunityMemberStatus @default(PENDING) // joining via invite code starts PENDING until an OWNER approves
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@unique([userId, communityId])
+  @@index([communityId])
+}
+
+enum CommunityMemberRole {
+  OWNER // created the Community — the only role that can approve new members & edit legal/wallet info
+  STAFF
+}
+
+enum CommunityMemberStatus {
+  PENDING
+  ACTIVE
+  REJECTED
 }
 
 enum CommunityVerificationStatus {
@@ -416,6 +446,4 @@ policy_insert audit_logs_langflow {
   target    = AuditLog
   roles     = [anon, authenticated]
   withCheck = "true"
-
-  @@map("langflow")
 }

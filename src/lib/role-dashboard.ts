@@ -38,6 +38,22 @@ export function getRoleDashboardPath(role?: string | null): string | null {
   }
 }
 
+export function getPostAuthRedirectPath(
+  nextPath: string | null,
+  role?: string | null,
+  userType?: string | null,
+): string | null {
+  if (nextPath === "/dashboard") {
+    return getDashboardPath(role, userType)
+  }
+
+  if (nextPath && /^\/(admin|benefactor|beneficiary)(?:\/|$)/.test(nextPath)) {
+    return nextPath
+  }
+
+  return null
+}
+
 export function getOnboardingUserType(
   userType?: string | null
 ): OnboardingUserType | null {
