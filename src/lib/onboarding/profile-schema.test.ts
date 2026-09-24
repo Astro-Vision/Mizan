@@ -1,50 +1,51 @@
 import { describe, expect, it } from 'vitest';
-
 import { onboardingProfileSchema } from './profile-schema';
 
 describe('onboardingProfileSchema', () => {
   it('accepts the approved onboarding profile for BENEFACTOR', () => {
     const result = onboardingProfileSchema.parse({
+      role: 'BENEFACTOR',
+      name: 'Ahmad Rizky',
       username: 'mizan-user',
       domicile: 'Yogyakarta',
-      userType: 'BENEFACTOR',
-      whatsappNumber: '+6281234567890',
+      whatsappNumber: '081234567890',
       whatsappNotificationConsent: true,
       referralSource: 'FRIEND',
       referralSourceOther: null,
-      dataConsent: true,
     });
 
     expect(result.username).toBe('mizan-user');
-    expect(result.userType).toBe('BENEFACTOR');
+    expect(result.role).toBe('BENEFACTOR');
+    expect(result.name).toBe('Ahmad Rizky');
   });
 
   it('accepts the approved onboarding profile for BENEFICIARY', () => {
     const result = onboardingProfileSchema.parse({
+      role: 'BENEFICIARY',
+      name: 'Siti Rahma',
       username: 'mizan-beneficiary',
       domicile: 'Jakarta',
-      userType: 'BENEFICIARY',
       whatsappNumber: '+6281234567890',
       whatsappNotificationConsent: true,
       referralSource: 'COMMUNITY',
       referralSourceOther: null,
-      dataConsent: true,
     });
 
     expect(result.username).toBe('mizan-beneficiary');
-    expect(result.userType).toBe('BENEFICIARY');
+    expect(result.role).toBe('BENEFICIARY');
+    expect(result.name).toBe('Siti Rahma');
   });
 
-  it('rejects incomplete consent and malformed optional WhatsApp number', () => {
+  it('rejects incomplete referral source OTHER', () => {
     const result = onboardingProfileSchema.safeParse({
+      role: 'BENEFACTOR',
+      name: 'User Test',
       username: 'mizan-user',
       domicile: 'Yogyakarta',
-      userType: 'BENEFACTOR',
       whatsappNumber: '08123',
       whatsappNotificationConsent: false,
       referralSource: 'OTHER',
       referralSourceOther: '',
-      dataConsent: false,
     });
 
     expect(result.success).toBe(false);

@@ -1,30 +1,15 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Plus } from "lucide-react"
-
-import {
-  BeneficiaryCampaignTable,
-  BeneficiaryCampaignError,
-} from "@/components/dashboard/beneficiary-campaign-table"
 import { getBeneficiaryCampaigns, type BeneficiaryCampaign } from "./actions"
+import { BeneficiaryCampaignGrid } from "@/components/dashboard/beneficiary-campaign-grid"
 
 export const metadata: Metadata = {
   title: "Kampanye Saya — Penerima Manfaat",
 }
 
 export default async function KampanyeSayaPage() {
-  let campaigns: BeneficiaryCampaign[] = []
-  let error: string | null = null
-
-  try {
-    campaigns = await getBeneficiaryCampaigns()
-  } catch (err) {
-    campaigns = []
-    error =
-      err instanceof Error
-        ? err.message
-        : "Terjadi kesalahan tidak diketahui saat memuat kampanye."
-  }
+  const campaigns: BeneficiaryCampaign[] = await getBeneficiaryCampaigns()
 
   return (
     <div className="mx-auto max-w-[1240px]">
@@ -47,11 +32,7 @@ export default async function KampanyeSayaPage() {
       </div>
 
       {/* Content */}
-      {error ? (
-        <BeneficiaryCampaignError message={error} />
-      ) : (
-        <BeneficiaryCampaignTable campaigns={campaigns} />
-      )}
+      <BeneficiaryCampaignGrid campaigns={campaigns} />
     </div>
   )
 }

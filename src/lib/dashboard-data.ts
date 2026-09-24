@@ -151,25 +151,20 @@ export const ADMIN_NAV: NavItem[] = [
   { label: "Kampanye", href: "/admin/campaigns", icon: "Megaphone", badge: 2 },
   { label: "Penyaluran", href: "/admin/penyaluran", icon: "ArrowUpRight" },
   { label: "Donatur", href: "/admin/donatur", icon: "Users" },
-  { label: "Pengaturan", href: "/admin/pengaturan", icon: "Settings" },
+  { label: "Pengaturan", href: "/admin/profile", icon: "Settings" },
 ]
 
 export const BENEFACTOR_NAV: NavItem[] = [
   { label: "Ringkasan", href: "/benefactor", icon: "LayoutDashboard" },
   { label: "Donasi Saya", href: "/benefactor/riwayat", icon: "History" },
   { label: "Jelajahi Kampanye", href: "/benefactor/jelajahi", icon: "Search" },
-  { label: "Pengaturan", href: "/benefactor/pengaturan", icon: "Settings" },
+  { label: "Pengaturan", href: "/benefactor/profile", icon: "Settings" },
 ]
 
 export const BENEFICIARY_NAV: NavItem[] = [
   { label: "Ringkasan", href: "/beneficiary", icon: "LayoutDashboard" },
-  {
-    label: "Penyaluran",
-    href: "/beneficiary/penyaluran",
-    icon: "ArrowDownLeft",
-  },
   { label: "Kampanye Saya", href: "/beneficiary/campaigns", icon: "Megaphone" },
-  { label: "Pengaturan", href: "/beneficiary/pengaturan", icon: "Settings" },
+  { label: "Pengaturan", href: "/beneficiary/profile", icon: "Settings" },
 ]
 
 // ── Benefactor (Donatur) ───────────────────────────────────────────────────

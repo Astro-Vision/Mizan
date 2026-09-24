@@ -197,6 +197,7 @@ export async function createMockAiCampaign(
   await db.orm.public.Campaign.create({
     title: data.title,
     organizerName: data.organizerName,
+    category: "BENCANA",
     raisedAmountWei: "0",
     targetAmountWei: data.targetAmountWei,
     currency: "BNB",

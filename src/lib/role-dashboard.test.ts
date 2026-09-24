@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
   getDashboardPath,
   getOnboardingUserType,
+  getPostAuthRedirectPath,
   getRoleDashboardPath,
   getRoleForOnboardingUserType,
 } from "./role-dashboard"
@@ -38,6 +39,19 @@ describe("role dashboard routing", () => {
     expect(getRoleDashboardPath("BENEFICIARY")).toBe("/beneficiary")
     expect(getRoleDashboardPath("USER")).toBeNull()
     expect(getRoleDashboardPath(null)).toBeNull()
+  })
+
+  it("resolves the generic dashboard callback to the beneficiary dashboard", () => {
+    expect(getPostAuthRedirectPath("/dashboard", "BENEFICIARY")).toBe(
+      "/beneficiary",
+    )
+  })
+
+  it("preserves a valid role-specific callback path", () => {
+    expect(getPostAuthRedirectPath("/beneficiary/campaigns", "BENEFICIARY")).toBe(
+      "/beneficiary/campaigns",
+    )
+    expect(getPostAuthRedirectPath("/settings", "BENEFICIARY")).toBeNull()
   })
 
   it("only accepts known onboarding user types", () => {

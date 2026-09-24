@@ -1,7 +1,17 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ChevronLeft, Pencil, ListChecks, ImageUp, Banknote, ArrowRight } from "lucide-react"
+import {
+  ArrowRight,
+  Banknote,
+  CheckCircle2,
+  ChevronLeft,
+  CircleDollarSign,
+  ImageUp,
+  ListChecks,
+  Pencil,
+  Users,
+} from "lucide-react"
 import { cn } from "@/src/lib/utils"
 
 import { getBeneficiaryCampaignById } from "../actions"
@@ -68,10 +78,13 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 
 export default async function KampanyeDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ created?: string }>
 }) {
   const { id } = await params
+  const { created } = await searchParams
   const campaign = await getBeneficiaryCampaignById(id)
   if (!campaign) notFound()
 
@@ -94,32 +107,47 @@ export default async function KampanyeDetailPage({
   })
 
   return (
-    <div className="mx-auto max-w-[840px]">
+    <div className="mx-auto max-w-[1040px]">
       {/* Breadcrumb */}
       <Link
         href="/beneficiary/campaigns"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
+        className="mb-7 inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-brand-700"
       >
         <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden="true" />
         Kampanye Saya
       </Link>
 
       {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      {created === "1" && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">
+          <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-brand-700" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Kampanye berhasil dibuat</p>
+            <p className="mt-0.5 text-brand-700/80">
+              Kampanye tersimpan dan siap menunggu review admin.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-9 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="mz-overline">Penerima Manfaat</p>
-          <h1 className="mt-3 text-h1 text-ink">{campaign.title}</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <p className="mz-overline">Detail kampanye</p>
+          <h1 className="mt-2 max-w-3xl text-h1 text-ink">{campaign.title}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-muted">
+            Kelola perkembangan, milestone, dan pencairan dana kampanye dari satu tempat.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <span
               className={cn(
-                "inline-flex h-7 items-center rounded-full px-3 text-[0.75rem] font-semibold tracking-[0.02em] uppercase",
+                "inline-flex h-8 items-center rounded-full px-3 text-xs font-semibold",
                 statusCfg.bg,
                 statusCfg.text,
               )}
             >
               {statusCfg.label}
             </span>
-            <span className="inline-flex h-7 items-center rounded-full bg-surface-sunken px-3 text-xs text-ink-muted">
+            <span className="inline-flex h-8 items-center rounded-full border border-line-soft bg-surface px-3 text-xs text-ink-muted">
               {campaign.category}
             </span>
           </div>
@@ -141,13 +169,16 @@ export default async function KampanyeDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Left / main */}
-        <div className="space-y-6 lg:col-span-2">
+        <div className="space-y-6">
           {/* Description */}
           {campaign.description ? (
-            <section className="rounded-2xl border border-line-soft bg-surface p-6">
-              <h2 className="mb-3 text-sm font-semibold text-ink">Deskripsi Kampanye</h2>
+            <section className="rounded-2xl border border-line-soft bg-surface p-6 shadow-xs sm:p-7">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h2 className="text-lg font-semibold tracking-[-0.02em] text-ink">Tentang kampanye</h2>
+                <span className="text-xs text-ink-muted">Ringkasan</span>
+              </div>
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink-muted">
                 {campaign.description}
               </p>
@@ -155,89 +186,87 @@ export default async function KampanyeDetailPage({
           ) : null}
 
           {/* Progress */}
-          <section className="rounded-2xl border border-line-soft bg-surface p-6">
-            <h2 className="mb-4 text-sm font-semibold text-ink">Progress Dana</h2>
-            <div className="mb-2 flex items-end justify-between">
-              <span className="font-mono text-2xl font-semibold tabular-nums text-ink">
-                {raisedBnb}
-                <span className="ml-1 text-sm font-normal text-ink-muted">{campaign.currency}</span>
-              </span>
-              <span className="text-sm text-ink-muted">
-                dari {targetBnb} {campaign.currency}
-              </span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-brand-100 dark:bg-brand-900">
-              <div
-                className="h-full rounded-full bg-brand-700 transition-[width] duration-300"
-                style={{ width: `${campaign.progressPct}%` }}
-              />
-            </div>
-            <p className="mt-2 text-right font-mono text-xs tabular-nums text-ink-muted">
-              {campaign.progressPct}%
-            </p>
-
-            <div className="mt-4 grid grid-cols-2 gap-4 border-t border-line-soft pt-4">
-              <div>
-                <p className="text-xs text-ink-muted">Jumlah donor</p>
-                <p className="mt-1 font-mono text-lg font-semibold tabular-nums text-ink">
-                  {campaign.donorCount}
-                </p>
+          <section className="overflow-hidden rounded-2xl border border-brand-200 bg-brand-50 shadow-xs">
+            <div className="border-b border-brand-200 px-6 pb-5 pt-6 sm:px-7">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-brand-900">Progress dana</p>
+                  <p className="mt-1 text-sm text-brand-700/80">Dana terkumpul dari para donatur.</p>
+                </div>
+                <CircleDollarSign className="size-6 text-brand-700" strokeWidth={1.5} aria-hidden="true" />
               </div>
-              <div>
-                <p className="text-xs text-ink-muted">Milestone berikutnya</p>
-                <p className="mt-1 text-sm text-ink">{campaign.nextMilestone ?? "—"}</p>
+              <div className="mt-6 flex items-end justify-between gap-3">
+                <span className="font-mono text-3xl font-semibold tabular-nums tracking-[-0.04em] text-brand-950">
+                  {raisedBnb}
+                  <span className="ml-1 text-sm font-normal tracking-normal text-brand-700/80">{campaign.currency}</span>
+                </span>
+                <span className="pb-1 text-right text-xs text-brand-700/80">
+                  Target<br /><span className="font-mono text-sm tabular-nums text-brand-900">{targetBnb} {campaign.currency}</span>
+                </span>
+              </div>
+            </div>
+            <div className="px-6 py-5 sm:px-7">
+              <div className="mb-2 flex items-end justify-between">
+                <span className="text-xs font-medium text-brand-700">Terkumpul</span>
+                <span className="font-mono text-xs tabular-nums text-brand-700">
+                  {campaign.progressPct}%
+                </span>
+              </div>
+              <div className="h-2.5 overflow-hidden rounded-full bg-brand-200">
+                <div
+                  className="h-full rounded-full bg-brand-700 transition-[width] duration-300"
+                  style={{ width: `${campaign.progressPct}%` }}
+                />
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-4 border-t border-brand-200 pt-4">
+                <div>
+                  <p className="flex items-center gap-1.5 text-xs text-brand-700">
+                    <Users className="size-3.5" aria-hidden="true" /> Donatur
+                  </p>
+                  <p className="mt-1 font-mono text-lg font-semibold tabular-nums text-brand-950">
+                    {campaign.donorCount}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-brand-700">Milestone aktif</p>
+                  <p className="mt-1 line-clamp-2 text-sm text-brand-950">
+                    {campaign.nextMilestone ?? "Belum ada"}
+                  </p>
+                </div>
               </div>
             </div>
           </section>
 
           {/* Milestone & bukti — coming soon stubs */}
-          <section className="rounded-2xl border border-line-soft bg-surface p-6">
-            <h2 className="mb-4 text-sm font-semibold text-ink">Milestone &amp; Bukti</h2>
-            <div className="flex flex-col gap-2">
-              <button
-                type="button"
-                disabled
-                className="flex items-center justify-between rounded-[6px] border border-line-soft px-4 py-3 text-sm text-ink-muted opacity-60 cursor-not-allowed"
-              >
+          <section className="rounded-2xl border border-line-soft bg-surface p-6 shadow-xs sm:p-7">
+            <div className="mb-5">
+              <h2 className="text-lg font-semibold tracking-[-0.02em] text-ink">Kelola kampanye</h2>
+              <p className="mt-1 text-sm text-ink-muted">Pilih tindakan yang ingin dilakukan selanjutnya.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+              <Link href={`/beneficiary/campaigns/${id}/milestones`} className="group flex min-h-24 flex-col items-start justify-between gap-4 rounded-xl border border-line-soft px-4 py-4 text-sm text-ink transition-colors hover:border-brand-300 hover:bg-brand-50">
                 <span className="flex items-center gap-2">
-                  <ListChecks className="size-4" strokeWidth={1.5} aria-hidden="true" />
+                  <ListChecks className="size-5 text-brand-700" strokeWidth={1.5} aria-hidden="true" />
                   Kelola Milestone
                 </span>
-                <ArrowRight className="size-4" strokeWidth={1.5} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                disabled
-                className="flex items-center justify-between rounded-[6px] border border-line-soft px-4 py-3 text-sm text-ink-muted opacity-60 cursor-not-allowed"
-              >
+                <span className="flex w-full items-center justify-between text-xs text-ink-muted">Atur tahapan penyaluran <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} aria-hidden="true" /></span>
+              </Link>
+              <Link href={`/beneficiary/campaigns/${id}/disbursement`} className="group flex min-h-24 flex-col items-start justify-between gap-4 rounded-xl border border-line-soft px-4 py-4 text-sm text-ink transition-colors hover:border-brand-300 hover:bg-brand-50">
                 <span className="flex items-center gap-2">
-                  <ImageUp className="size-4" strokeWidth={1.5} aria-hidden="true" />
-                  Upload Bukti Penyaluran
-                </span>
-                <ArrowRight className="size-4" strokeWidth={1.5} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                disabled
-                className="flex items-center justify-between rounded-[6px] border border-line-soft px-4 py-3 text-sm text-ink-muted opacity-60 cursor-not-allowed"
-              >
-                <span className="flex items-center gap-2">
-                  <Banknote className="size-4" strokeWidth={1.5} aria-hidden="true" />
+                  <Banknote className="size-5 text-brand-700" strokeWidth={1.5} aria-hidden="true" />
                   Ajukan Pencairan Dana
                 </span>
-                <ArrowRight className="size-4" strokeWidth={1.5} aria-hidden="true" />
-              </button>
-              <p className="mt-1 text-xs text-ink-muted">
-                Fitur ini tersedia setelah kampanye aktif dan admin menyetujui milestone.
-              </p>
+                <span className="flex w-full items-center justify-between text-xs text-ink-muted">Kirim permintaan pencairan <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} aria-hidden="true" /></span>
+              </Link>
             </div>
           </section>
         </div>
 
         {/* Right / meta */}
         <aside className="space-y-6">
-          <section className="rounded-2xl border border-line-soft bg-surface p-6">
-            <h2 className="mb-2 text-sm font-semibold text-ink">Detail Kampanye</h2>
+          <section className="rounded-2xl border border-line-soft bg-surface p-6 shadow-xs">
+            <p className="mz-overline">Informasi</p>
+            <h2 className="mb-3 mt-2 text-lg font-semibold tracking-[-0.02em] text-ink">Detail kampanye</h2>
             <dl>
               <InfoRow label="Penyelenggara" value={campaign.organizerName} />
               <InfoRow label="Kategori" value={campaign.category} />
