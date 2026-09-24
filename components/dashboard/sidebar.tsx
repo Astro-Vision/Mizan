@@ -23,6 +23,7 @@ import {
   LogOut,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { useLanguage } from "@/components/site/language-provider"
 
 const ICON_MAP: Record<string, LucideIcon> = {
   LayoutDashboard,
@@ -69,6 +70,7 @@ export function DashboardShell({
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
   const [loggingOut, setLoggingOut] = React.useState(false)
+  const { t, language, setLanguage } = useLanguage()
   const { logout } = useLogout()
   const { wallets } = useWallets()
   const connectedWallet = wallets.find((wallet) => wallet.type === "ethereum")
@@ -107,7 +109,7 @@ export function DashboardShell({
         <Link
           href="/"
           className="flex min-h-11 shrink-0 items-center"
-          aria-label="Mizan — kembali ke beranda"
+          aria-label={t("Mizan — kembali ke beranda")}
         >
           <MizanWordmark />
         </Link>
@@ -116,7 +118,7 @@ export function DashboardShell({
       {/* Role chip + testnet */}
       <div className="flex items-center gap-2 px-6 pb-4">
         <span className="inline-flex h-7 items-center rounded-full bg-brand-50 px-3 text-[0.8125rem] leading-[1.4] font-semibold tracking-[0.02em] text-brand-700 uppercase dark:bg-brand-950 dark:text-brand-300">
-          {role}
+          {t(role)}
         </span>
         <span className="inline-flex h-7 items-center rounded-full bg-accent-200 px-3 text-[0.8125rem] leading-[1.4] font-semibold tracking-[0.02em] text-ink dark:bg-accent-200/20 dark:text-accent-text">
           Testnet
@@ -126,7 +128,7 @@ export function DashboardShell({
       {/* Navigasi — scroll internal bila item terlalu banyak, agar footer tetap terlihat */}
       <nav
         className="min-h-0 flex-1 overflow-y-auto px-3"
-        aria-label={`Navigasi ${role}`}
+        aria-label={`${t("Navigasi utama")} ${t(role)}`}
       >
         <ul className="flex flex-col gap-0.5">
           {navItems.map((item) => {
@@ -152,7 +154,7 @@ export function DashboardShell({
                       aria-hidden="true"
                     />
                   ) : null}
-                  <span className="flex-1">{item.label}</span>
+                  <span className="flex-1">{t(item.label)}</span>
                   {item.badge != null && item.badge > 0 ? (
                     <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-50 px-1.5 font-mono text-xs font-semibold text-brand-700 tabular-nums dark:bg-brand-950 dark:text-brand-300">
                       {item.badge}
@@ -167,7 +169,7 @@ export function DashboardShell({
 
       {/* Dompet */}
       <div className="border-t border-line-soft p-4">
-        <p className="mb-1 text-xs text-ink-muted">Dompet terhubung</p>
+        <p className="mb-1 text-xs text-ink-muted">{t("Dompet terhubung")}</p>
         <div className="flex items-center gap-2">
           <span className="flex-1 truncate font-mono text-sm text-ink">
             {liveWalletShort}
@@ -176,7 +178,7 @@ export function DashboardShell({
             type="button"
             onClick={handleCopy}
             className="flex size-8 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-surface-sunken hover:text-ink"
-            aria-label="Salin alamat dompet"
+            aria-label={t("Salin alamat dompet")}
           >
             {copied ? (
               <Check className="size-4" strokeWidth={1.5} aria-hidden="true" />
@@ -184,6 +186,13 @@ export function DashboardShell({
               <Copy className="size-4" strokeWidth={1.5} aria-hidden="true" />
             )}
           </button>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between text-xs text-ink-muted">
+          <span>{t("Pilih bahasa")}</span>
+          <div className="flex gap-1" role="group" aria-label={t("Pilih bahasa")}>
+            {(["id", "en"] as const).map((value) => <button key={value} type="button" onClick={() => setLanguage(value)} className={cn("rounded px-2 py-1 font-medium", language === value ? "bg-brand-50 text-brand-700" : "hover:bg-surface-sunken")}>{value === "id" ? "ID" : "EN"}</button>)}
+          </div>
         </div>
 
         {/* Log out — tersedia untuk semua role */}
@@ -198,7 +207,7 @@ export function DashboardShell({
             strokeWidth={1.5}
             aria-hidden="true"
           />
-          {loggingOut ? "Keluar…" : "Keluar"}
+          {loggingOut ? t("Keluar…") : t("Keluar")}
         </button>
       </div>
     </>

@@ -251,6 +251,9 @@ export async function createBeneficiaryCampaign(
     targetAmountWei: formData.get("targetAmountWei"),
     recipientWallet: formData.get("recipientWallet") || community.walletAddress,
     currency: formData.get("currency") || "BNB",
+    image: formData.get("image") || undefined,
+    location: formData.get("location") || undefined,
+    daysLeft: formData.get("daysLeft") || 0,
     milestones: rawMilestones,
   })
   if (!parsed.success) {
@@ -274,8 +277,12 @@ export async function createBeneficiaryCampaign(
     status: "ACTIVE",
     source: "MANUAL",
     reviewStatus: "PENDING_REVIEW",
-    aiDraft: { description: data.description },
+    aiDraft: { description: data.description, category: data.category, createdBy: "BENEFICIARY" },
     recipientWallet: data.recipientWallet.toLowerCase(),
+    image: data.image || null,
+    location: data.location || null,
+    summary: data.description,
+    daysLeft: data.daysLeft ?? 0,
   })
 
   await Promise.all(data.milestones.map((milestone, index) =>

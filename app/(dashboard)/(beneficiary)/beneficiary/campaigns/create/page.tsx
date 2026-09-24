@@ -36,7 +36,7 @@ export default async function BuatKampanyePage() {
       <div>
         <BeneficiaryCampaignCreateForm
           action={createBeneficiaryCampaign}
-          walletAddress={community.walletAddress}
+          organizerName={community.name}
         />
       </div>
     </div>

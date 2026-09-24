@@ -48,7 +48,7 @@ export function BeneficiaryCampaignGrid({ campaigns }: { campaigns: BeneficiaryC
         ))}
       </div>
       {filtered.length === 0 ? (
-        <div className="mz-card flex flex-col items-center gap-4 px-6 py-16 text-center"><div className="flex size-14 items-center justify-center rounded-full bg-brand-50 text-brand-700"><Plus size={24} strokeWidth={1.5} /></div><div><h2 className="text-h3 text-ink">Belum ada kampanye</h2><p className="mt-2 max-w-md text-sm text-ink-muted">Buat kampanye pertama untuk mulai mengelola penyaluran organisasi Anda.</p></div><Link href="/beneficiary/campaigns/new" className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-brand-700 px-5 text-sm font-medium text-white">Buat Kampanye Baru</Link></div>
+        <div className="mz-card flex flex-col items-center gap-4 px-6 py-16 text-center"><div className="flex size-14 items-center justify-center rounded-full bg-brand-50 text-brand-700"><Plus size={24} strokeWidth={1.5} /></div><div><h2 className="text-h3 text-ink">Belum ada kampanye</h2><p className="mt-2 max-w-md text-sm text-ink-muted">Buat kampanye pertama untuk mulai mengelola penyaluran organisasi Anda.</p></div><Link href="/beneficiary/campaigns/create" className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-brand-700 px-5 text-sm font-medium text-white">Buat Kampanye Baru</Link></div>
       ) : <div className="grid gap-4 sm:grid-cols-2">{filtered.map((campaign) => <CampaignCard key={campaign.id} campaign={campaign} />)}</div>}
     </div>
   )
