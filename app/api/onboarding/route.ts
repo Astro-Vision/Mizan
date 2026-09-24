@@ -128,8 +128,8 @@ const saveOnboardingProfile = async (
     role:
       currentRole === "ADMIN"
         ? currentRole
-        : getRoleForOnboardingUserType(profile.userType),
-    userType: profile.userType,
+        : getRoleForOnboardingUserType(profile.userType ?? "BENEFACTOR"),
+    userType: profile.userType ?? "DONOR",
     domicile: profile.domicile,
     whatsappNumber: profile.whatsappNumber,
     whatsappNotificationConsent: profile.whatsappNotificationConsent,

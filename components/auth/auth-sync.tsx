@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from "react"
 import { useIdentityToken, usePrivy } from "@privy-io/react-auth"
 import { useRouter } from "next/navigation"
 
-import { OnboardingModal } from "@/components/auth/onboarding-modal"
 import {
-  getDashboardPath,
-  getRoleForOnboardingUserType,
+  getPostAuthRedirectPath,
+  getRoleDashboardPath,
 } from "@/src/lib/role-dashboard"
 
 type AuthSyncResponse = {
@@ -28,8 +27,6 @@ export function AuthSync() {
   const { identityToken } = useIdentityToken()
   const router = useRouter()
   const [syncError, setSyncError] = useState<string | null>(null)
-  const [onboardingRequired, setOnboardingRequired] = useState(false)
-  const [syncedRole, setSyncedRole] = useState<string | null>(null)
   const [syncRetryCount, setSyncRetryCount] = useState(0)
   const inFlightRequests = useRef(new Set<string>())
   const linkedAccountSignature =
@@ -78,8 +75,6 @@ export function AuthSync() {
 
         setSyncError(null)
         const needsOnboarding = body?.onboardingRequired === true
-        setSyncedRole(body?.user?.role ?? null)
-        setOnboardingRequired(needsOnboarding)
 
         if (body?.syncSkipped) {
           if (syncRetryCount < MAX_SYNC_RETRIES) {
@@ -94,14 +89,27 @@ export function AuthSync() {
           return
         }
 
-        const nextPath = new URLSearchParams(window.location.search).get("next")
+        const currentPath = window.location.pathname
 
-        if (
-          !needsOnboarding &&
-          nextPath &&
-          /^\/(admin|benefactor|beneficiary)(?:\/|$)/.test(nextPath)
-        ) {
-          router.replace(nextPath)
+        if (needsOnboarding) {
+          if (!currentPath.startsWith("/onboarding")) {
+            router.replace("/onboarding/role")
+          }
+        } else {
+          if (currentPath.startsWith("/onboarding")) {
+            const targetPath = getRoleDashboardPath(body?.user?.role) ?? "/explore"
+            router.replace(targetPath)
+          } else {
+            const nextPath = new URLSearchParams(window.location.search).get("next")
+            const targetPath = getPostAuthRedirectPath(
+              nextPath,
+              body?.user?.role,
+              body?.user?.userType,
+            )
+            if (targetPath) {
+              router.replace(targetPath)
+            }
+          }
         }
 
       } catch {
@@ -138,17 +146,6 @@ export function AuthSync() {
         >
           {syncError}
         </p>
-      ) : null}
-      {onboardingRequired && ready && authenticated && identityToken ? (
-        <OnboardingModal
-          identityToken={identityToken}
-          onCompleted={(userType) => {
-            setOnboardingRequired(false)
-            router.replace(
-              getDashboardPath(getRoleForOnboardingUserType(userType), userType)
-            )
-          }}
-        />
       ) : null}
     </>
   )

@@ -27,9 +27,13 @@ export function formatWeiBnb(value: string) {
   return fraction ? `${whole}.${fraction}` : whole.toString()
 }
 
-export async function getLiveCampaignSnapshots() {
+export async function getLiveCampaignSnapshots(communityId?: number) {
   const campaigns = await db.orm.public.Campaign
-    .where({ reviewStatus: 'APPROVED', status: 'ACTIVE' })
+    .where(
+      communityId === undefined
+        ? { reviewStatus: 'APPROVED', status: 'ACTIVE' }
+        : { communityId, reviewStatus: 'APPROVED', status: 'ACTIVE' },
+    )
     .orderBy((campaign) => campaign.createdAt.desc())
     .all()
 
