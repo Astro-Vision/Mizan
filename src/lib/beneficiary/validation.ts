@@ -18,6 +18,9 @@ export const campaignInputSchema = z
     targetAmountWei: weiString,
     recipientWallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Alamat dompet tidak valid."),
     currency: z.enum(["BNB", "USDT"]).default("BNB"),
+    image: z.string().trim().max(1000, "URL gambar terlalu panjang.").optional(),
+    location: z.string().trim().max(200, "Lokasi terlalu panjang.").optional(),
+    daysLeft: z.coerce.number().int().min(0).max(3650).optional(),
     milestones: z.array(milestoneSchema).min(1, "Minimal satu milestone wajib diisi."),
   })
   .superRefine((value, context) => {

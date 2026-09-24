@@ -67,9 +67,9 @@ function formatWeiBnb(wei: string): string {
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-line-soft py-3 last:border-b-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-      <dt className="shrink-0 text-sm text-ink-muted sm:w-48">{label}</dt>
-      <dd className="text-sm text-ink sm:text-right">{value}</dd>
+    <div className="flex flex-col gap-1 border-b border-line-soft py-3 last:border-b-0">
+      <dt className="text-sm text-ink-muted">{label}</dt>
+      <dd className="text-sm text-ink">{value}</dd>
     </div>
   )
 }
