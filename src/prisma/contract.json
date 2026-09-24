@@ -742,6 +742,13 @@
                   "kind": "scalar"
                 }
               },
+              "daysLeft": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "donorCount": {
                 "nullable": false,
                 "type": {
@@ -753,6 +760,20 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "image": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "location": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -821,6 +842,13 @@
                   "entityName": "CampaignStatus",
                   "namespaceId": "public",
                   "plane": "domain"
+                }
+              },
+              "summary": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "targetAmountWei": {
@@ -942,11 +970,20 @@
                 "currency": {
                   "column": "currency"
                 },
+                "daysLeft": {
+                  "column": "daysLeft"
+                },
                 "donorCount": {
                   "column": "donorCount"
                 },
                 "id": {
                   "column": "id"
+                },
+                "image": {
+                  "column": "image"
+                },
+                "location": {
+                  "column": "location"
                 },
                 "organizerName": {
                   "column": "organizerName"
@@ -968,6 +1005,9 @@
                 },
                 "status": {
                   "column": "status"
+                },
+                "summary": {
+                  "column": "summary"
                 },
                 "targetAmountWei": {
                   "column": "targetAmountWei"
@@ -2947,6 +2987,15 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "daysLeft": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "donorCount": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -2964,6 +3013,16 @@
                   },
                   "nativeType": "int4",
                   "nullable": false
+                },
+                "image": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "location": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "organizerName": {
                   "codecId": "pg/text@1",
@@ -3033,6 +3092,11 @@
                     "namespaceId": "public",
                     "plane": "storage"
                   }
+                },
+                "summary": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "targetAmountWei": {
                   "codecId": "pg/text@1",

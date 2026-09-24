@@ -1,4 +1,3 @@
-
 /* =========================================================================
    Shared dashboard types, navigation, and legacy admin presentation data.
    Donor/beneficiary totals are loaded from CampaignPayment at runtime.
@@ -38,6 +37,12 @@ export type CampaignReview = {
   aiReference?: string | null
   aiConfidence?: number | null
   recipientWallet?: string | null
+  // Presentation fields shown on the public card / detail page.
+  category?: string
+  image?: string | null
+  location?: string | null
+  summary?: string | null
+  daysLeft?: number
   // Backward compatibility fields
   judul?: string
   penyelenggara?: string
@@ -83,7 +88,6 @@ export const ADMIN_STATS: StatItem[] = [
     icon: "Users",
   },
 ]
-
 
 export const ADMIN_ACTIVITIES: ActivityItem[] = [
   {

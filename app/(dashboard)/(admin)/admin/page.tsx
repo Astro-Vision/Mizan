@@ -4,9 +4,9 @@ import { StatCard } from "@/components/dashboard/stat-card"
 import { ActivityRow } from "@/components/dashboard/activity-row"
 import { CampaignRow } from "@/components/dashboard/campaign-row"
 import {
-  ADMIN_STATS,
-  ADMIN_ACTIVITIES,
-} from "@/src/lib/dashboard-data"
+  getAdminStats,
+  getAdminActivities,
+} from "@/src/lib/admin-dashboard-server"
 import { getCampaigns } from "./campaigns/actions"
 import { TESTNET_NOTICE } from "@/src/lib/site-data"
 
@@ -14,10 +14,17 @@ export const metadata: Metadata = {
   title: "Panel Admin",
 }
 
+// Admin dashboard reflects live data on every request.
+export const dynamic = "force-dynamic"
+
 export default async function AdminPage() {
-  const campaigns = await getCampaigns()
+  const [campaigns, stats, activities] = await Promise.all([
+    getCampaigns(),
+    getAdminStats(),
+    getAdminActivities(),
+  ])
   return (
-    <div className="mx-auto max-w-[1240px]">
+    <div className="mx-auto max-w-310">
       {/* Header */}
       <div className="mb-8">
         <p className="mz-overline">Panel Admin</p>
@@ -27,7 +34,7 @@ export default async function AdminPage() {
 
       {/* Stat cards — 4 kolom di desktop */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {ADMIN_STATS.map((stat) => (
+        {stats.map((stat) => (
           <StatCard
             key={stat.label}
             stat={stat}
@@ -43,9 +50,15 @@ export default async function AdminPage() {
           Daftar kampanye beserta status peninjauan.
         </p>
         <div className="mt-6 rounded-2xl border border-line-soft bg-surface p-4 sm:p-6">
-          {campaigns.map((campaign) => (
-            <CampaignRow key={campaign.id} campaign={campaign} />
-          ))}
+          {campaigns.length > 0 ? (
+            campaigns.map((campaign) => (
+              <CampaignRow key={campaign.id} campaign={campaign} />
+            ))
+          ) : (
+            <p className="py-8 text-center text-sm text-ink-muted">
+              Belum ada kampanye.
+            </p>
+          )}
         </div>
       </section>
 
@@ -56,9 +69,14 @@ export default async function AdminPage() {
           Transaksi dan kejadian terakhir di platform.
         </p>
         <div className="mt-6 rounded-2xl border border-line-soft bg-surface p-4 sm:p-6">
-          {ADMIN_ACTIVITIES.map((item) => (
-            <ActivityRow key={item.id} item={item} />
-          ))}
+          {activities.length > 0 ? (
+            activities.map((item) => <ActivityRow key={item.id} item={item} />)
+          ) : (
+            <p className="py-8 text-center text-sm text-ink-muted">
+              Belum ada aktivitas. Transaksi dan kampanye baru akan muncul di
+              sini.
+            </p>
+          )}
         </div>
       </section>
     </div>

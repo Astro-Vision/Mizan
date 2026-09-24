@@ -149,8 +149,6 @@ model Campaign {
   communityId   Int?
   community     Community? @relation(fields: [communityId], references: [id])
 
-  category CampaignCategory
-
   source       CampaignSource       @default(AI_MOCK)
   aiDraft      Json?
   aiReference  String?
@@ -172,8 +170,15 @@ model Campaign {
   contractCampaignId      String?
   contractTransactionHash String?
 
-  payments   CampaignPayment[]
-  milestones Milestone[]
+  // Presentation fields for the public campaign card / detail page.
+  // English column names; the UI maps them to Indonesian labels.
+  category CampaignCategory?               // campaign type, drives the list-page filter
+  image    String?                          // cover image URL/path
+  location String?                          // human-readable location label
+  summary  String?                          // short description shown on the card
+  daysLeft Int     @default(0)              // remaining days until the deadline
+
+  payments CampaignPayment[]
 
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
