@@ -152,7 +152,7 @@ export function CampaignCard({
 }) {
   const { t } = useLanguage()
   const featured = variant === "featured"
-  const detailHref = `/kampanye/${campaign.id}`
+  const detailHref = `/campaigns/${campaign.id}`
 
   return (
     <article

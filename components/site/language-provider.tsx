@@ -14,6 +14,46 @@ type LanguageContextValue = {
 const LanguageContext = React.createContext<LanguageContextValue | null>(null)
 
 const ENGLISH: Record<string, string> = {
+  Dashboard: "Dashboard",
+  Ringkasan: "Overview",
+  "Kampanye Saya": "My Campaigns",
+  "Penyaluran": "Disbursements",
+  Donatur: "Donors",
+  Pengaturan: "Settings",
+  "Donasi Saya": "My Donations",
+  "Jelajahi Kampanye": "Explore Campaigns",
+  Admin: "Admin",
+  Dompet: "Wallet",
+  "Dompet terhubung": "Connected wallet",
+  "Salin alamat dompet": "Copy wallet address",
+  "Pilih bahasa": "Choose language",
+  Bahasa: "Language",
+  Indonesia: "Indonesian",
+  Inggris: "English",
+  "Keluar…": "Logging out…",
+  "Detail kampanye": "Campaign details",
+  "Buat Kampanye Baru": "Create New Campaign",
+  "Buat Kampanye": "Create Campaign",
+  "Kampanye berhasil dibuat": "Campaign created successfully",
+  "Menunggu Review Admin": "Awaiting admin review",
+  "Perlu diperiksa": "Needs review",
+  "AI terverifikasi": "AI verified",
+  Ditolak: "Rejected",
+  "Siap dicairkan": "Ready for disbursement",
+  "Sudah disalurkan": "Disbursed",
+  "Belum ada kampanye": "No campaigns yet",
+  "Belum ada milestone.": "No milestones yet.",
+  "Belum ada output AI.": "No AI output yet.",
+  "Belum ada catatan.": "No note yet.",
+  "Catatan penggunaan dana": "Fund usage note",
+  "Output verifikasi Langflow": "Langflow verification output",
+  "Lihat bukti": "View proof",
+  Setujui: "Approve",
+  Tolak: "Reject",
+  "Tandai disalurkan": "Mark as disbursed",
+  Konfirmasi: "Confirm",
+  "Penyaluran dana": "Fund disbursement",
+  "Memuat halaman…": "Loading page…",
   Zakat: "Zakat",
   Kampanye: "Campaigns",
   "Cara Kerja": "How It Works",
@@ -253,7 +293,11 @@ const ENGLISH: Record<string, string> = {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = React.useState<Language>("id")
+  const [language, setLanguageState] = React.useState<Language>(() => {
+    if (typeof window === "undefined") return "id"
+    const saved = window.localStorage.getItem("mizan-language")
+    return saved === "id" || saved === "en" ? saved : "id"
+  })
 
   React.useEffect(() => {
     document.documentElement.lang = language
@@ -263,7 +307,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const value = React.useMemo(
     () => ({
       language,
-      setLanguage: (nextLanguage: Language) => setLanguageState(nextLanguage),
+      setLanguage: (nextLanguage: Language) => {
+        setLanguageState(nextLanguage)
+        window.localStorage.setItem("mizan-language", nextLanguage)
+        document.cookie = `mizan-language=${nextLanguage}; path=/; max-age=31536000; samesite=lax`
+      },
       isEnglish: language === "en",
       t: (text: string) => (language === "en" ? (ENGLISH[text] ?? text) : text),
     }),

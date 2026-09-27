@@ -2,9 +2,9 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/src/lib/utils"
-import { useWallets } from "@privy-io/react-auth"
+import { useLogout, useWallets } from "@privy-io/react-auth"
 import { MizanWordmark } from "@/components/site/ui/mizan-mark"
 import type { NavItem } from "@/src/lib/dashboard-data"
 import {
@@ -20,8 +20,10 @@ import {
   Check,
   X,
   Menu,
+  LogOut,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { useLanguage } from "@/components/site/language-provider"
 
 const ICON_MAP: Record<string, LucideIcon> = {
   LayoutDashboard,
@@ -64,8 +66,12 @@ export function DashboardShell({
   children,
 }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
+  const [loggingOut, setLoggingOut] = React.useState(false)
+  const { t, language, setLanguage } = useLanguage()
+  const { logout } = useLogout()
   const { wallets } = useWallets()
   const connectedWallet = wallets.find((wallet) => wallet.type === "ethereum")
   const liveWalletFull = connectedWallet?.address ?? walletFull
@@ -79,6 +85,23 @@ export function DashboardShell({
     setTimeout(() => setCopied(false), 1500)
   }
 
+  async function handleLogout() {
+    setLoggingOut(true)
+    try {
+      // Clear the server dashboard session cookie, then end the Privy session.
+      await fetch("/api/auth/logout", { method: "POST" })
+    } catch {
+      // Ignore network errors — still clear the client session below.
+    } finally {
+      try {
+        await logout()
+      } finally {
+        setMobileOpen(false)
+        router.replace("/")
+      }
+    }
+  }
+
   const sidebarContent = (
     <>
       {/* Wordmark */}
@@ -86,7 +109,7 @@ export function DashboardShell({
         <Link
           href="/"
           className="flex min-h-11 shrink-0 items-center"
-          aria-label="Mizan — kembali ke beranda"
+          aria-label={t("Mizan — kembali ke beranda")}
         >
           <MizanWordmark />
         </Link>
@@ -94,16 +117,19 @@ export function DashboardShell({
 
       {/* Role chip + testnet */}
       <div className="flex items-center gap-2 px-6 pb-4">
-        <span className="inline-flex h-7 items-center rounded-full bg-brand-50 px-3 text-[0.8125rem] font-semibold uppercase leading-[1.4] tracking-[0.02em] text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-          {role}
+        <span className="inline-flex h-7 items-center rounded-full bg-brand-50 px-3 text-[0.8125rem] leading-[1.4] font-semibold tracking-[0.02em] text-brand-700 uppercase dark:bg-brand-950 dark:text-brand-300">
+          {t(role)}
         </span>
-        <span className="inline-flex h-7 items-center rounded-full bg-accent-200 px-3 text-[0.8125rem] font-semibold leading-[1.4] tracking-[0.02em] text-ink dark:bg-accent-200/20 dark:text-accent-text">
+        <span className="inline-flex h-7 items-center rounded-full bg-accent-200 px-3 text-[0.8125rem] leading-[1.4] font-semibold tracking-[0.02em] text-ink dark:bg-accent-200/20 dark:text-accent-text">
           Testnet
         </span>
       </div>
 
-      {/* Navigasi */}
-      <nav className="flex-1 px-3" aria-label={`Navigasi ${role}`}>
+      {/* Navigasi — scroll internal bila item terlalu banyak, agar footer tetap terlihat */}
+      <nav
+        className="min-h-0 flex-1 overflow-y-auto px-3"
+        aria-label={`${t("Navigasi utama")} ${t(role)}`}
+      >
         <ul className="flex flex-col gap-0.5">
           {navItems.map((item) => {
             const Icon = ICON_MAP[item.icon]
@@ -118,7 +144,7 @@ export function DashboardShell({
                     "flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors duration-150",
                     isActive
                       ? "bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                      : "text-ink-body hover:bg-surface-sunken hover:text-ink",
+                      : "text-ink-body hover:bg-surface-sunken hover:text-ink"
                   )}
                 >
                   {Icon ? (
@@ -128,9 +154,9 @@ export function DashboardShell({
                       aria-hidden="true"
                     />
                   ) : null}
-                  <span className="flex-1">{item.label}</span>
+                  <span className="flex-1">{t(item.label)}</span>
                   {item.badge != null && item.badge > 0 ? (
-                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-50 px-1.5 font-mono text-xs font-semibold tabular-nums text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-50 px-1.5 font-mono text-xs font-semibold text-brand-700 tabular-nums dark:bg-brand-950 dark:text-brand-300">
                       {item.badge}
                     </span>
                   ) : null}
@@ -143,7 +169,7 @@ export function DashboardShell({
 
       {/* Dompet */}
       <div className="border-t border-line-soft p-4">
-        <p className="mb-1 text-xs text-ink-muted">Dompet terhubung</p>
+        <p className="mb-1 text-xs text-ink-muted">{t("Dompet terhubung")}</p>
         <div className="flex items-center gap-2">
           <span className="flex-1 truncate font-mono text-sm text-ink">
             {liveWalletShort}
@@ -152,7 +178,7 @@ export function DashboardShell({
             type="button"
             onClick={handleCopy}
             className="flex size-8 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-surface-sunken hover:text-ink"
-            aria-label="Salin alamat dompet"
+            aria-label={t("Salin alamat dompet")}
           >
             {copied ? (
               <Check className="size-4" strokeWidth={1.5} aria-hidden="true" />
@@ -161,14 +187,37 @@ export function DashboardShell({
             )}
           </button>
         </div>
+
+        <div className="mt-3 flex items-center justify-between text-xs text-ink-muted">
+          <span>{t("Pilih bahasa")}</span>
+          <div className="flex gap-1" role="group" aria-label={t("Pilih bahasa")}>
+            {(["id", "en"] as const).map((value) => <button key={value} type="button" onClick={() => setLanguage(value)} className={cn("rounded px-2 py-1 font-medium", language === value ? "bg-brand-50 text-brand-700" : "hover:bg-surface-sunken")}>{value === "id" ? "ID" : "EN"}</button>)}
+          </div>
+        </div>
+
+        {/* Log out — tersedia untuk semua role */}
+        <button
+          type="button"
+          onClick={() => void handleLogout()}
+          disabled={loggingOut}
+          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-soft px-3 text-sm font-medium text-ink-body transition-colors duration-150 hover:bg-surface-sunken hover:text-ink disabled:pointer-events-none disabled:opacity-50"
+        >
+          <LogOut
+            className="size-4 shrink-0"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+          {loggingOut ? t("Keluar…") : t("Keluar")}
+        </button>
       </div>
     </>
   )
 
   return (
     <div className="flex min-h-dvh">
-      {/* Sidebar — desktop */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-line-soft bg-surface lg:flex">
+      {/* Sidebar — desktop. Sticky full-height so the wallet + logout footer
+          stays visible even when page content is long. */}
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line-soft bg-surface lg:flex">
         {sidebarContent}
       </aside>
 

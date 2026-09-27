@@ -24,8 +24,16 @@
       "model": "Community",
       "namespace": "public"
     },
+    "communityMember": {
+      "model": "CommunityMember",
+      "namespace": "public"
+    },
     "disasterEvent": {
       "model": "DisasterEvent",
+      "namespace": "public"
+    },
+    "milestone": {
+      "model": "Milestone",
       "namespace": "public"
     },
     "post": {
@@ -61,6 +69,27 @@
     "namespaces": {
       "public": {
         "enum": {
+          "CampaignCategory": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "ZAKAT",
+                "value": "ZAKAT"
+              },
+              {
+                "name": "DONASI_UMUM",
+                "value": "DONASI_UMUM"
+              },
+              {
+                "name": "WAKAF",
+                "value": "WAKAF"
+              },
+              {
+                "name": "BENCANA",
+                "value": "BENCANA"
+              }
+            ]
+          },
           "CampaignReviewStatus": {
             "codecId": "pg/text@1",
             "members": [
@@ -88,6 +117,10 @@
               {
                 "name": "AI_MOCK",
                 "value": "AI_MOCK"
+              },
+              {
+                "name": "MANUAL",
+                "value": "MANUAL"
               }
             ]
           },
@@ -105,6 +138,36 @@
               {
                 "name": "CLOSED",
                 "value": "CLOSED"
+              }
+            ]
+          },
+          "CommunityMemberRole": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "OWNER",
+                "value": "OWNER"
+              },
+              {
+                "name": "STAFF",
+                "value": "STAFF"
+              }
+            ]
+          },
+          "CommunityMemberStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "ACTIVE",
+                "value": "ACTIVE"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
               }
             ]
           },
@@ -184,6 +247,35 @@
               {
                 "name": "LAINNYA",
                 "value": "LAINNYA"
+              }
+            ]
+          },
+          "MilestoneStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PENDING",
+                "value": "PENDING"
+              },
+              {
+                "name": "PROOF_SUBMITTED",
+                "value": "PROOF_SUBMITTED"
+              },
+              {
+                "name": "AI_VERIFIED",
+                "value": "AI_VERIFIED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              },
+              {
+                "name": "DISBURSEMENT_REQUESTED",
+                "value": "DISBURSEMENT_REQUESTED"
+              },
+              {
+                "name": "DISBURSED",
+                "value": "DISBURSED"
               }
             ]
           },
@@ -610,6 +702,19 @@
                   "kind": "scalar"
                 }
               },
+              "category": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CampaignCategory",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "communityId": {
                 "nullable": true,
                 "type": {
@@ -645,6 +750,13 @@
                   "kind": "scalar"
                 }
               },
+              "daysLeft": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "donorCount": {
                 "nullable": false,
                 "type": {
@@ -656,6 +768,20 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "image": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "location": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -724,6 +850,13 @@
                   "entityName": "CampaignStatus",
                   "namespaceId": "public",
                   "plane": "domain"
+                }
+              },
+              "summary": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "targetAmountWei": {
@@ -812,6 +945,9 @@
                 "approvedById": {
                   "column": "approvedById"
                 },
+                "category": {
+                  "column": "category"
+                },
                 "communityId": {
                   "column": "communityId"
                 },
@@ -827,11 +963,20 @@
                 "currency": {
                   "column": "currency"
                 },
+                "daysLeft": {
+                  "column": "daysLeft"
+                },
                 "donorCount": {
                   "column": "donorCount"
                 },
                 "id": {
                   "column": "id"
+                },
+                "image": {
+                  "column": "image"
+                },
+                "location": {
+                  "column": "location"
                 },
                 "organizerName": {
                   "column": "organizerName"
@@ -853,6 +998,9 @@
                 },
                 "status": {
                   "column": "status"
+                },
+                "summary": {
+                  "column": "summary"
                 },
                 "targetAmountWei": {
                   "column": "targetAmountWei"
@@ -1055,6 +1203,20 @@
                   "kind": "scalar"
                 }
               },
+              "inviteCode": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "legalDocumentUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "name": {
                 "nullable": false,
                 "type": {
@@ -1062,10 +1224,10 @@
                   "kind": "scalar"
                 }
               },
-              "ownerId": {
-                "nullable": false,
+              "registrationNumber": {
+                "nullable": true,
                 "type": {
-                  "codecId": "pg/int4@1",
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -1113,18 +1275,18 @@
                   "namespace": "public"
                 }
               },
-              "owner": {
-                "cardinality": "N:1",
+              "members": {
+                "cardinality": "1:N",
                 "on": {
                   "localFields": [
-                    "ownerId"
+                    "id"
                   ],
                   "targetFields": [
-                    "id"
+                    "communityId"
                   ]
                 },
                 "to": {
-                  "model": "User",
+                  "model": "CommunityMember",
                   "namespace": "public"
                 }
               }
@@ -1140,11 +1302,17 @@
                 "id": {
                   "column": "id"
                 },
+                "inviteCode": {
+                  "column": "inviteCode"
+                },
+                "legalDocumentUrl": {
+                  "column": "legalDocumentUrl"
+                },
                 "name": {
                   "column": "name"
                 },
-                "ownerId": {
-                  "column": "ownerId"
+                "registrationNumber": {
+                  "column": "registrationNumber"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -1158,6 +1326,130 @@
               },
               "namespaceId": "public",
               "table": "community"
+            }
+          },
+          "CommunityMember": {
+            "fields": {
+              "communityId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CommunityMemberRole",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CommunityMemberStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "community": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "communityId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Community",
+                  "namespace": "public"
+                }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "communityId": {
+                  "column": "communityId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "role": {
+                  "column": "role"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "userId": {
+                  "column": "userId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "communityMember"
             }
           },
           "DisasterEvent": {
@@ -1323,6 +1615,189 @@
               },
               "namespaceId": "public",
               "table": "disasterEvent"
+            }
+          },
+          "Milestone": {
+            "fields": {
+              "aiConfidence": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "aiVerificationNote": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "amountWei": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "campaignId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "contractMilestoneId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "disbursementRequestedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "disbursementTxHash": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "order": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "proofImageUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "proofNote": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "MilestoneStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "campaign": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "campaignId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Campaign",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "aiConfidence": {
+                  "column": "aiConfidence"
+                },
+                "aiVerificationNote": {
+                  "column": "aiVerificationNote"
+                },
+                "amountWei": {
+                  "column": "amountWei"
+                },
+                "campaignId": {
+                  "column": "campaignId"
+                },
+                "contractMilestoneId": {
+                  "column": "contractMilestoneId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "disbursementRequestedAt": {
+                  "column": "disbursementRequestedAt"
+                },
+                "disbursementTxHash": {
+                  "column": "disbursementTxHash"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "order": {
+                  "column": "order"
+                },
+                "proofImageUrl": {
+                  "column": "proofImageUrl"
+                },
+                "proofNote": {
+                  "column": "proofNote"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "milestone"
             }
           },
           "Post": {
@@ -2094,18 +2569,18 @@
                   "namespace": "public"
                 }
               },
-              "communities": {
+              "communityMemberships": {
                 "cardinality": "1:N",
                 "on": {
                   "localFields": [
                     "id"
                   ],
                   "targetFields": [
-                    "ownerId"
+                    "userId"
                   ]
                 },
                 "to": {
-                  "model": "Community",
+                  "model": "CommunityMember",
                   "namespace": "public"
                 }
               },
@@ -2535,13 +3010,18 @@
             "campaign": {
               "checks": [
                 {
+                  "expression": "\"category\" IN ('ZAKAT', 'DONASI_UMUM', 'WAKAF', 'BENCANA')",
+                  "name": "campaign_category_check_e13ef3a7",
+                  "prefix": "campaign_category_check"
+                },
+                {
                   "expression": "\"reviewStatus\" IN ('AI_DRAFT', 'PENDING_REVIEW', 'APPROVED', 'REJECTED')",
                   "name": "campaign_reviewStatus_check_8871a79a",
                   "prefix": "campaign_reviewStatus_check"
                 },
                 {
-                  "expression": "\"source\" IN ('AI_MOCK')",
-                  "name": "campaign_source_check_49f4562b",
+                  "expression": "\"source\" IN ('AI_MOCK', 'MANUAL')",
+                  "name": "campaign_source_check_f0d75fbf",
                   "prefix": "campaign_source_check"
                 },
                 {
@@ -2576,6 +3056,17 @@
                   "nativeType": "int4",
                   "nullable": true
                 },
+                "category": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CampaignCategory",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
                 "communityId": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
@@ -2609,6 +3100,15 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "daysLeft": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
                 "donorCount": {
                   "codecId": "pg/int4@1",
                   "default": {
@@ -2626,6 +3126,16 @@
                   },
                   "nativeType": "int4",
                   "nullable": false
+                },
+                "image": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "location": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "organizerName": {
                   "codecId": "pg/text@1",
@@ -2695,6 +3205,11 @@
                     "namespaceId": "public",
                     "plane": "storage"
                   }
+                },
+                "summary": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "targetAmountWei": {
                   "codecId": "pg/text@1",
@@ -2974,15 +3489,25 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
+                "inviteCode": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "legalDocumentUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "name": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
                 },
-                "ownerId": {
-                  "codecId": "pg/int4@1",
-                  "nativeType": "int4",
-                  "nullable": false
+                "registrationNumber": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
@@ -3010,14 +3535,113 @@
                   "nullable": false
                 }
               },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "inviteCode"
+                  ]
+                },
+                {
+                  "columns": [
+                    "walletAddress",
+                    "chainType"
+                  ]
+                }
+              ]
+            },
+            "communityMember": {
+              "checks": [
+                {
+                  "expression": "\"role\" IN ('OWNER', 'STAFF')",
+                  "name": "communityMember_role_check_1ff37111",
+                  "prefix": "communityMember_role_check"
+                },
+                {
+                  "expression": "\"status\" IN ('PENDING', 'ACTIVE', 'REJECTED')",
+                  "name": "communityMember_status_check_767350ca",
+                  "prefix": "communityMember_status_check"
+                }
+              ],
+              "columns": {
+                "communityId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "role": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "STAFF"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CommunityMemberRole",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CommunityMemberStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                }
+              },
               "foreignKeys": [
                 {
                   "source": {
                     "columns": [
-                      "ownerId"
+                      "userId"
                     ],
                     "namespaceId": "public",
-                    "tableName": "community"
+                    "tableName": "communityMember"
                   },
                   "target": {
                     "columns": [
@@ -3026,15 +3650,39 @@
                     "namespaceId": "public",
                     "tableName": "user"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "communityId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "communityMember"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "community"
+                  }
                 }
               ],
               "indexes": [
                 {
                   "columns": [
-                    "ownerId"
+                    "communityId"
                   ],
-                  "name": "community_ownerId_idx_e2d0c1ef",
-                  "prefix": "community_ownerId_idx",
+                  "name": "communityMember_communityId_idx_e2c72225",
+                  "prefix": "communityMember_communityId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "communityMember_userId_idx_a489d58a",
+                  "prefix": "communityMember_userId_idx",
                   "unique": false
                 }
               ],
@@ -3046,8 +3694,8 @@
               "uniques": [
                 {
                   "columns": [
-                    "walletAddress",
-                    "chainType"
+                    "userId",
+                    "communityId"
                   ]
                 }
               ]
@@ -3178,6 +3826,144 @@
                   ],
                   "name": "disasterEvent_validationStatus_idx_e615ae80",
                   "prefix": "disasterEvent_validationStatus_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "milestone": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('PENDING', 'PROOF_SUBMITTED', 'AI_VERIFIED', 'REJECTED', 'DISBURSEMENT_REQUESTED', 'DISBURSED')",
+                  "name": "milestone_status_check_7a06db4d",
+                  "prefix": "milestone_status_check"
+                }
+              ],
+              "columns": {
+                "aiConfidence": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": true
+                },
+                "aiVerificationNote": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "amountWei": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "campaignId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "contractMilestoneId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "description": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "disbursementRequestedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "disbursementTxHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "order": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "proofImageUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "proofNote": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PENDING"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "MilestoneStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "campaignId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "milestone"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "campaign"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "campaignId"
+                  ],
+                  "name": "milestone_campaignId_idx_3aacd648",
+                  "prefix": "milestone_campaignId_idx",
                   "unique": false
                 }
               ],
@@ -3930,6 +4716,15 @@
             }
           },
           "valueSet": {
+            "CampaignCategory": {
+              "kind": "valueSet",
+              "values": [
+                "ZAKAT",
+                "DONASI_UMUM",
+                "WAKAF",
+                "BENCANA"
+              ]
+            },
             "CampaignReviewStatus": {
               "kind": "valueSet",
               "values": [
@@ -3942,7 +4737,8 @@
             "CampaignSource": {
               "kind": "valueSet",
               "values": [
-                "AI_MOCK"
+                "AI_MOCK",
+                "MANUAL"
               ]
             },
             "CampaignStatus": {
@@ -3951,6 +4747,21 @@
                 "ACTIVE",
                 "COMPLETED",
                 "CLOSED"
+              ]
+            },
+            "CommunityMemberRole": {
+              "kind": "valueSet",
+              "values": [
+                "OWNER",
+                "STAFF"
+              ]
+            },
+            "CommunityMemberStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "ACTIVE",
+                "REJECTED"
               ]
             },
             "CommunityVerificationStatus": {
@@ -3982,6 +4793,17 @@
                 "KEKERINGAN",
                 "ANGIN_PUTING_BELIUNG",
                 "LAINNYA"
+              ]
+            },
+            "MilestoneStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PENDING",
+                "PROOF_SUBMITTED",
+                "AI_VERIFIED",
+                "REJECTED",
+                "DISBURSEMENT_REQUESTED",
+                "DISBURSED"
               ]
             },
             "PaymentMode": {
@@ -4050,7 +4872,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "469b5e8dc45125020f014e26a27c9e6eb91e621f0a1758d32f1b83a87d925823",
+    "storageHash": "38244996bb2fca1923f2ce73b32979b45f8b44ea38f6415fbe045b5326c4f018",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
@@ -4063,7 +4885,7 @@
     }
   },
   "execution": {
-    "executionHash": "96eed982e8f3204899cb79bab41a43fda13ccba682660a0b5845cd3c237741bd",
+    "executionHash": "10582aefe5a9a13d73fc634d737e791272126558641b5b76d907a20847bd8968",
     "mutations": {
       "defaults": [
         {
@@ -4150,6 +4972,21 @@
         },
         {
           "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "communityMember"
+          }
+        },
+        {
+          "onCreate": {
             "id": "uuidv4",
             "kind": "generator"
           },
@@ -4172,6 +5009,21 @@
             "column": "lastUpdatedAt",
             "namespace": "public",
             "table": "disasterEvent"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "milestone"
           }
         },
         {

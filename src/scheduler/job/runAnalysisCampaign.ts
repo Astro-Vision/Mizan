@@ -10,6 +10,7 @@ import {
 } from "@/src/lib/campaign/findRelatedCampaignDisaster"
 import { matchDisasterLocation } from "@/src/lib/campaign/matchDisasterLocation"
 import { validateAiCampaignDraft } from "@/src/lib/campaign/validateAiCampaign"
+import { toCategoryCode } from "@/src/lib/campaign-category"
 import { convertIdrToWeiBnb } from "@/src/lib/convertToIdr"
 import {
   completeScrapeJob,
@@ -244,6 +245,7 @@ export async function runAnalysisCampaign() {
         aiReference: capture.url,
         aiConfidence: aiDraft.confidenceScore,
         targetAmountWei,
+        category: toCategoryCode(extraction.category) ?? "BENCANA",
       })
 
       await markCaptureChecked(capture.id)

@@ -1,11 +1,11 @@
-import 'server-only'
+import "server-only"
 
-import { db } from '@/src/prisma/db'
+import { db } from "@/src/prisma/db"
 
 export type LiveCampaignSnapshot = {
   id: string
-  judul: string
-  penyelenggara: string
+  title: string
+  organizerName: string
   targetAmountWei: string
   fundedAmountWei: string
   paymentCount: number
@@ -16,46 +16,56 @@ export type LiveCampaignSnapshot = {
 }
 
 export function formatWeiBnb(value: string) {
-  const wei = BigInt(value || '0')
-  const whole = wei / BigInt('1000000000000000000')
-  const fraction = (wei % BigInt('1000000000000000000'))
+  const wei = BigInt(value || "0")
+  const whole = wei / BigInt("1000000000000000000")
+  const fraction = (wei % BigInt("1000000000000000000"))
     .toString()
-    .padStart(18, '0')
+    .padStart(18, "0")
     .slice(0, 4)
-    .replace(/0+$/, '')
+    .replace(/0+$/, "")
 
   return fraction ? `${whole}.${fraction}` : whole.toString()
 }
 
-export async function getLiveCampaignSnapshots() {
+export async function getLiveCampaignSnapshots(communityId?: number) {
   const campaigns = await db.orm.public.Campaign
-    .where({ reviewStatus: 'APPROVED', status: 'aktif' })
+    .where(
+      communityId === undefined
+        ? { reviewStatus: 'APPROVED', status: 'ACTIVE' }
+        : { communityId, reviewStatus: 'APPROVED', status: 'ACTIVE' },
+    )
     .orderBy((campaign) => campaign.createdAt.desc())
     .all()
 
   return Promise.all(
     campaigns.map(async (campaign): Promise<LiveCampaignSnapshot> => {
-      const payments = await db.orm.public.CampaignPayment
-        .where({ campaignId: campaign.id })
-        .all()
-      const confirmed = payments.filter((payment) => payment.status === 'CONFIRMED')
+      const payments = await db.orm.public.CampaignPayment.where({
+        campaignId: campaign.id,
+      }).all()
+      const confirmed = payments.filter(
+        (payment) => payment.status === "CONFIRMED"
+      )
       const fundedAmountWei = confirmed
-        .reduce((total, payment) => total + BigInt(payment.amountWei), BigInt(0))
+        .reduce(
+          (total, payment) => total + BigInt(payment.amountWei),
+          BigInt(0)
+        )
         .toString()
       const latestPayment = confirmed[confirmed.length - 1]
 
       return {
         id: String(campaign.id),
-        judul: campaign.judul,
-        penyelenggara: campaign.penyelenggara,
+        title: campaign.title,
+        organizerName: campaign.organizerName,
         targetAmountWei: campaign.targetAmountWei,
         fundedAmountWei,
         paymentCount: confirmed.length,
-        contributorCount: new Set(confirmed.map((payment) => payment.donorId)).size,
+        contributorCount: new Set(confirmed.map((payment) => payment.donorId))
+          .size,
         recipientWallet: campaign.recipientWallet,
         latestTransactionHash: latestPayment?.transactionHash ?? null,
         latestPaymentAt: latestPayment?.createdAt ?? null,
       }
-    }),
+    })
   )
 }

@@ -8,6 +8,7 @@ export interface CreateDisasterEventInput {
   validationStatus?: ValidationStatus
   locationName?: string
   province?: string
+  city?: string
   officialConfirmed?: boolean
 }
 
@@ -21,6 +22,7 @@ export async function createDisasterEvent(data: CreateDisasterEventInput) {
     validationStatus: data.validationStatus,
     locationName: data.locationName,
     province: data.province,
+    city: data.city,
     officialConfirmed: data.officialConfirmed,
     disasterType: data.disasterType,
   })

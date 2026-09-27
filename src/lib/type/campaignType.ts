@@ -15,6 +15,8 @@ type JsonValue =
   | JsonValue[]
   | { [key: string]: JsonValue }
 
+type campaignCategory = "ZAKAT" | "DONASI_UMUM" | "WAKAF" | "BENCANA"
+
 
 export interface CreateDraftCampaignInput {
   title: string
@@ -23,4 +25,5 @@ export interface CreateDraftCampaignInput {
   aiReference: string
   aiConfidence: number
   targetAmountWei: string
+  category: campaignCategory
 }

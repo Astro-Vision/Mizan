@@ -54,9 +54,6 @@ dist/
 # local development runs
 .dev-runs/
 
-# Prisma migrations
-/migrations/
-
 # Documentation
 /docs/
 

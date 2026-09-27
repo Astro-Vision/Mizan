@@ -124,6 +124,7 @@ const isKnownRole = (role: unknown): role is UserRole =>
   role === "USER" ||
   role === "ADMIN" ||
   role === "BENEFACTOR" ||
+  role === "BENEFICIARY" ||
   role === "BENEFACTORY"
 
 const isKnownUserType = (

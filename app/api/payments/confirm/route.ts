@@ -30,18 +30,23 @@ export async function POST(request: Request) {
     const donorWallet = input.donorWallet.toLowerCase()
     if (
       !profile.wallets.some(
-        (wallet) => wallet.chainType === "ethereum" && wallet.address === donorWallet,
+        (wallet) =>
+          wallet.chainType === "ethereum" && wallet.address === donorWallet
       )
     ) {
       return error("WALLET_NOT_LINKED", 403)
     }
 
-    const user = await db.orm.public.User.where({ privyId: profile.privyId }).first()
+    const user = await db.orm.public.User.where({
+      privyId: profile.privyId,
+    }).first()
     if (!user) return error("USER_NOT_SYNCED", 404)
 
-    const campaign = await db.orm.public.Campaign.first({ id: input.campaignId })
+    const campaign = await db.orm.public.Campaign.first({
+      id: input.campaignId,
+    })
     if (!campaign) return error("CAMPAIGN_NOT_FOUND", 404)
-    if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "aktif") {
+    if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "ACTIVE") {
       return error("CAMPAIGN_NOT_ACTIVE", 409)
     }
 
@@ -52,7 +57,11 @@ export async function POST(request: Request) {
       if (existing.transactionHash !== input.transactionHash) {
         return error("IDEMPOTENCY_KEY_REUSED", 409)
       }
-      return NextResponse.json({ ok: true, payment: serializePayment(existing), idempotent: true })
+      return NextResponse.json({
+        ok: true,
+        payment: serializePayment(existing),
+        idempotent: true,
+      })
     }
 
     const wallet = await db.orm.public.UserWallet.where({
@@ -66,19 +75,28 @@ export async function POST(request: Request) {
     if (!receipt) {
       return NextResponse.json(
         { ok: false, status: "PENDING", error: "TRANSACTION_NOT_MINED" },
-        { status: 202 },
+        { status: 202 }
       )
     }
     if (receipt.status !== "0x1") return error("TRANSACTION_FAILED", 422)
-    if (receipt.to?.toLowerCase() !== getConfiguredVaultAddress().toLowerCase()) {
+    if (
+      receipt.to?.toLowerCase() !== getConfiguredVaultAddress().toLowerCase()
+    ) {
       return error("WRONG_CONTRACT", 422)
     }
 
-    const event = receipt.logs?.find((log) =>
-      log.address?.toLowerCase() === getConfiguredVaultAddress().toLowerCase() &&
-      log.topics?.[0]?.toLowerCase() === FUNDS_TRANSFERRED_TOPIC,
+    const event = receipt.logs?.find(
+      (log) =>
+        log.address?.toLowerCase() ===
+          getConfiguredVaultAddress().toLowerCase() &&
+        log.topics?.[0]?.toLowerCase() === FUNDS_TRANSFERRED_TOPIC
     )
-    if (!event?.topics || event.topics.length < 4 || !event.data || event.data.length < 194) {
+    if (
+      !event?.topics ||
+      event.topics.length < 4 ||
+      !event.data ||
+      event.data.length < 194
+    ) {
       return error("FUNDING_EVENT_NOT_FOUND", 422)
     }
 
@@ -111,32 +129,43 @@ export async function POST(request: Request) {
       totalFundedWei: await getCampaignTotalWei(input.campaignId),
     })
   } catch (error) {
-    if (error instanceof z.ZodError) return errorResponse("INVALID_PAYMENT", 422)
+    if (error instanceof z.ZodError)
+      return errorResponse("INVALID_PAYMENT", 422)
     console.error("On-chain payment confirmation failed", error)
     return errorResponse("ONCHAIN_CONFIRM_FAILED", 500)
   }
 }
 
 async function readReceipt(transactionHash: string) {
-  const response = await fetch(process.env.BSC_TESTNET_RPC_URL || "https://data-seed-prebsc-1-s1.bnbchain.org:8545", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: 1,
-      method: "eth_getTransactionReceipt",
-      params: [transactionHash],
-    }),
-    cache: "no-store",
-  })
+  const response = await fetch(
+    process.env.BSC_TESTNET_RPC_URL ||
+      "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "eth_getTransactionReceipt",
+        params: [transactionHash],
+      }),
+      cache: "no-store",
+    }
+  )
   if (!response.ok) throw new Error(`BSC RPC gagal: HTTP ${response.status}`)
-  const payload = (await response.json()) as { result?: RpcReceipt | null; error?: { message?: string } }
-  if (payload.error) throw new Error(payload.error.message || "Receipt RPC gagal")
+  const payload = (await response.json()) as {
+    result?: RpcReceipt | null
+    error?: { message?: string }
+  }
+  if (payload.error)
+    throw new Error(payload.error.message || "Receipt RPC gagal")
   return payload.result ?? null
 }
 
 async function getCampaignTotalWei(campaignId: number) {
-  const payments = await db.orm.public.CampaignPayment.where({ campaignId }).all()
+  const payments = await db.orm.public.CampaignPayment.where({
+    campaignId,
+  }).all()
   return payments
     .filter((payment) => payment.status === "CONFIRMED")
     .reduce((total, payment) => total + BigInt(payment.amountWei), BigInt(0))
