@@ -3,6 +3,7 @@ import { isAddress, zeroAddress } from "viem"
 type ModuleParameters = {
   MizanFundingVaultModule: {
     campaignManager: string
+    verifier: string
     pauser: string
   }
 }
@@ -26,6 +27,7 @@ export function validateDeploymentParameters(raw: unknown): ModuleParameters {
   return {
     MizanFundingVaultModule: {
       campaignManager: address("campaignManager"),
+      verifier: address("verifier"),
       pauser: address("pauser"),
     },
   }

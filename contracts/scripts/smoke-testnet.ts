@@ -32,6 +32,7 @@ function normalizeKey(raw: string): Hex {
 const rpcUrl = requireEnv("BSC_TESTNET_RPC_URL")
 const funderKey = normalizeKey(requireEnv("DEPLOYER_PRIVATE_KEY"))
 const managerKey = normalizeKey(requireEnv("CAMPAIGN_MANAGER_PRIVATE_KEY"))
+const verifierKey = normalizeKey(requireEnv("VERIFIER_PRIVATE_KEY"))
 
 const deployedPath = fileURLToPath(
   new URL("../ignition/deployments/chain-97/deployed_addresses.json", import.meta.url),
@@ -48,6 +49,7 @@ const artifact = JSON.parse(readFileSync(artifactPath, "utf8")) as VaultArtifact
 
 const funder = privateKeyToAccount(funderKey)
 const manager = privateKeyToAccount(managerKey)
+const verifier = privateKeyToAccount(verifierKey)
 
 const publicClient = createPublicClient({ chain: bscTestnet, transport: http(rpcUrl) })
 const managerWallet = createWalletClient({
@@ -60,12 +62,24 @@ const funderWallet = createWalletClient({
   chain: bscTestnet,
   transport: http(rpcUrl),
 })
+const verifierWallet = createWalletClient({
+  account: verifier,
+  chain: bscTestnet,
+  transport: http(rpcUrl),
+})
+
 const campaignId = BigInt(Date.now() % 1_000_000_000)
+const milestoneId = 1n
 const targetAmount = parseEther("1")
 const fundAmount = parseEther("0.02")
+const requested = parseEther("0.01")
 const recipient = funder.address
 
 const externalRef = keccak256(stringToHex(`campaign-${campaignId}`))
+const evidenceHash = keccak256(stringToHex("evidence-v1"))
+const assessmentRef = keccak256(stringToHex("assessment-v1"))
+const policyRef = keccak256(stringToHex("policy-v1"))
+const idempotencyKey = keccak256(stringToHex(`release-${campaignId}-${milestoneId}`))
 
 async function write(
   label: string,
@@ -93,6 +107,7 @@ async function write(
 console.log("Vault:", vaultAddress)
 console.log("Manager:", manager.address)
 console.log("Funder: ", funder.address)
+console.log("Verifier:", verifier.address)
 console.log("CampaignId:", campaignId.toString())
 console.log("")
 
@@ -104,6 +119,27 @@ await write("registerCampaign", managerWallet, "registerCampaign", [
 ])
 
 await write("fundCampaign", funderWallet, "fundCampaign", [campaignId], fundAmount)
+
+await write("submitMilestone", managerWallet, "submitMilestone", [
+  campaignId,
+  milestoneId,
+  requested,
+  evidenceHash,
+])
+
+await write("verifyMilestone", verifierWallet, "verifyMilestone", [
+  campaignId,
+  milestoneId,
+  true,
+  assessmentRef,
+  policyRef,
+])
+
+await write("releaseFunds", verifierWallet, "releaseFunds", [
+  campaignId,
+  milestoneId,
+  idempotencyKey,
+])
 
 const state = await publicClient.readContract({
   address: vaultAddress,

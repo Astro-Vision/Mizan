@@ -115,7 +115,7 @@ export async function scrapeBNPB(
       .reverse()[0],
   })
 
-  let filteredResult = rawResults
+  const filteredResult = rawResults
 
   const itemsWithHash = filteredResult.map((item) => ({
     item,

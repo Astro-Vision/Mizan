@@ -256,6 +256,17 @@ model Milestone {
   aiVerificationNote String? // AI agent's reasoning/output
   aiConfidence       Float?
 
+  proofVersion       Int @default(0)
+  verificationSource String?
+  approvedById       Int?
+  approvedBy         User? @relation("MilestoneApprover", fields: [approvedById], references: [id])
+  approvedAt         TimestamptzString?
+  rejectionReason    String?
+  pendingTxHash      String?
+  pendingTxStage     String?
+  releaseKey         String? @unique
+  processingAt       TimestamptzString?
+
   disbursementRequestedAt TimestamptzString?
   contractMilestoneId     String?
   disbursementTxHash      String?
@@ -264,6 +275,22 @@ model Milestone {
   updatedAt temporal.updatedAtString()
 
   @@index([campaignId])
+  @@unique([campaignId, order])
+}
+
+model MilestoneStatusHistory {
+  id Int @id @default(autoincrement())
+  milestoneId Int
+  milestone Milestone @relation(fields: [milestoneId], references: [id])
+  actorId Int?
+  actor User? @relation(fields: [actorId], references: [id])
+  fromStatus MilestoneStatus
+  toStatus MilestoneStatus
+  proofVersion Int
+  note String?
+  createdAt TimestamptzString @default(now())
+
+  @@index([milestoneId])
 }
 
 enum MilestoneStatus {

@@ -23,11 +23,7 @@ export default function PrivyProviderWrapper({ children }: { children: React.Rea
                     "email",
                     "wallet",
                     "google",
-                    "apple",
-                    "github",
-                    "discord",
-                    "telegram",
-                    "tiktok"
+                    "discord"
                 ],
                 "embeddedWallets": {
                     "showWalletUIs": true,

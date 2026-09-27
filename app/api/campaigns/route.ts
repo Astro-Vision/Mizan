@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import { DASHBOARD_SESSION_COOKIE, readDashboardSession } from "@/src/lib/auth-session"
 import { campaignInputSchema } from "@/src/lib/beneficiary/validation"
 import { db } from "@/src/prisma/db"
+import { createCampaignWithMilestones } from "@/src/lib/beneficiary/campaign-mutations"
 
 export async function POST(request: Request) {
   try {
@@ -15,21 +16,8 @@ export async function POST(request: Request) {
     if (!user || user.role !== "BENEFICIARY" || !community) return NextResponse.json({ error: "Akun ini belum terhubung ke organisasi manapun." }, { status: 403 })
     const parsed = campaignInputSchema.safeParse(await request.json())
     if (!parsed.success) return NextResponse.json({ error: "Input kampanye tidak valid.", details: parsed.error.flatten() }, { status: 400 })
-    const campaign = await db.orm.public.Campaign.create({
-      title: parsed.data.title,
-      organizerName: community.name,
-      communityId: community.id,
-      category: parsed.data.category,
-      source: "MANUAL",
-      reviewStatus: "PENDING_REVIEW",
-      status: "ACTIVE",
-      recipientWallet: parsed.data.recipientWallet,
-      targetAmountWei: parsed.data.targetAmountWei,
-      currency: parsed.data.currency,
-      aiDraft: { description: parsed.data.description },
-    })
-    await Promise.all(parsed.data.milestones.map((milestone, index) => db.orm.public.Milestone.create({ campaignId: campaign.id, order: index + 1, description: milestone.description, amountWei: milestone.amountWei, status: "PENDING" })))
-    return NextResponse.json({ ...campaign, source: "MANUAL", reviewStatus: "PENDING_REVIEW" }, { status: 201 })
+    const campaign = await createCampaignWithMilestones(parsed.data, community)
+    return NextResponse.json(campaign, { status: 201 })
   } catch {
     return NextResponse.json({ error: "Terjadi kesalahan saat membuat kampanye." }, { status: 500 })
   }

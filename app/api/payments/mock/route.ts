@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { syncCampaignFunding } from "@/src/lib/payments/campaign-funding"
 import { getPrivyProfile } from "@/src/lib/privy/user-data"
 import { getPrivyUserFromIdentityToken } from "@/src/lib/privy/server"
 import { db } from "@/src/prisma/db"
@@ -75,7 +76,7 @@ export async function POST(request: Request) {
       idempotencyKey: input.idempotencyKey,
     })
 
-    const totalFundedWei = await getCampaignTotalWei(input.campaignId)
+    const totalFundedWei = await syncCampaignFunding(input.campaignId)
     return NextResponse.json({
       ok: true,
       payment: serializePayment(payment),
@@ -87,16 +88,6 @@ export async function POST(request: Request) {
     console.error("Mock payment failed", error)
     return errorResponse("MOCK_PAYMENT_FAILED", 500)
   }
-}
-
-async function getCampaignTotalWei(campaignId: number) {
-  const payments = await db.orm.public.CampaignPayment.where({
-    campaignId,
-  }).all()
-  return payments
-    .filter((payment) => payment.status === "CONFIRMED")
-    .reduce((total, payment) => total + BigInt(payment.amountWei), BigInt(0))
-    .toString()
 }
 
 function serializePayment(payment: {

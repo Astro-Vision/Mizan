@@ -36,6 +36,10 @@
       "model": "Milestone",
       "namespace": "public"
     },
+    "milestoneStatusHistory": {
+      "model": "MilestoneStatusHistory",
+      "namespace": "public"
+    },
     "post": {
       "model": "Post",
       "namespace": "public"
@@ -695,7 +699,7 @@
                 }
               },
               "category": {
-                "nullable": false,
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -901,21 +905,6 @@
                 },
                 "to": {
                   "model": "Community",
-                  "namespace": "public"
-                }
-              },
-              "milestones": {
-                "cardinality": "1:N",
-                "on": {
-                  "localFields": [
-                    "id"
-                  ],
-                  "targetFields": [
-                    "campaignId"
-                  ]
-                },
-                "to": {
-                  "model": "Milestone",
                   "namespace": "public"
                 }
               },
@@ -1647,6 +1636,20 @@
                   "kind": "scalar"
                 }
               },
+              "approvedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "approvedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "campaignId": {
                 "nullable": false,
                 "type": {
@@ -1703,6 +1706,27 @@
                   "kind": "scalar"
                 }
               },
+              "pendingTxHash": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "pendingTxStage": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "processingAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "proofImageUrl": {
                 "nullable": true,
                 "type": {
@@ -1711,6 +1735,27 @@
                 }
               },
               "proofNote": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "proofVersion": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "rejectionReason": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "releaseKey": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -1736,9 +1781,31 @@
                   "codecId": "pg/timestamptz-string@1",
                   "kind": "scalar"
                 }
+              },
+              "verificationSource": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
+              "approvedBy": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "approvedById"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
               "campaign": {
                 "cardinality": "N:1",
                 "on": {
@@ -1766,6 +1833,12 @@
                 "amountWei": {
                   "column": "amountWei"
                 },
+                "approvedAt": {
+                  "column": "approvedAt"
+                },
+                "approvedById": {
+                  "column": "approvedById"
+                },
                 "campaignId": {
                   "column": "campaignId"
                 },
@@ -1790,21 +1863,176 @@
                 "order": {
                   "column": "order"
                 },
+                "pendingTxHash": {
+                  "column": "pendingTxHash"
+                },
+                "pendingTxStage": {
+                  "column": "pendingTxStage"
+                },
+                "processingAt": {
+                  "column": "processingAt"
+                },
                 "proofImageUrl": {
                   "column": "proofImageUrl"
                 },
                 "proofNote": {
                   "column": "proofNote"
                 },
+                "proofVersion": {
+                  "column": "proofVersion"
+                },
+                "rejectionReason": {
+                  "column": "rejectionReason"
+                },
+                "releaseKey": {
+                  "column": "releaseKey"
+                },
                 "status": {
                   "column": "status"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
+                },
+                "verificationSource": {
+                  "column": "verificationSource"
                 }
               },
               "namespaceId": "public",
               "table": "milestone"
+            }
+          },
+          "MilestoneStatusHistory": {
+            "fields": {
+              "actorId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "fromStatus": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "MilestoneStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "milestoneId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "note": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "proofVersion": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "toStatus": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "MilestoneStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              }
+            },
+            "relations": {
+              "actor": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "actorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              },
+              "milestone": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "milestoneId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Milestone",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "actorId": {
+                  "column": "actorId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "fromStatus": {
+                  "column": "fromStatus"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "milestoneId": {
+                  "column": "milestoneId"
+                },
+                "note": {
+                  "column": "note"
+                },
+                "proofVersion": {
+                  "column": "proofVersion"
+                },
+                "toStatus": {
+                  "column": "toStatus"
+                }
+              },
+              "namespaceId": "public",
+              "table": "milestoneStatusHistory"
             }
           },
           "Post": {
@@ -2946,7 +3174,7 @@
                 "category": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
-                  "nullable": false,
+                  "nullable": true,
                   "valueSet": {
                     "entityKind": "valueSet",
                     "entityName": "CampaignCategory",
@@ -3747,6 +3975,16 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "approvedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "approvedById": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "campaignId": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
@@ -3795,12 +4033,46 @@
                   "nativeType": "int4",
                   "nullable": false
                 },
+                "pendingTxHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "pendingTxStage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "processingAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
                 "proofImageUrl": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
                 },
                 "proofNote": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "proofVersion": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "rejectionReason": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "releaseKey": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -3824,6 +4096,11 @@
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "verificationSource": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -3842,15 +4119,185 @@
                     "namespaceId": "public",
                     "tableName": "campaign"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "approvedById"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "milestone"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
                 }
               ],
               "indexes": [
+                {
+                  "columns": [
+                    "approvedById"
+                  ],
+                  "name": "milestone_approvedById_idx_01ef8410",
+                  "prefix": "milestone_approvedById_idx",
+                  "unique": false
+                },
                 {
                   "columns": [
                     "campaignId"
                   ],
                   "name": "milestone_campaignId_idx_3aacd648",
                   "prefix": "milestone_campaignId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "releaseKey"
+                  ]
+                },
+                {
+                  "columns": [
+                    "campaignId",
+                    "order"
+                  ]
+                }
+              ]
+            },
+            "milestoneStatusHistory": {
+              "checks": [
+                {
+                  "expression": "\"fromStatus\" IN ('PENDING', 'PROOF_SUBMITTED', 'AI_VERIFIED', 'REJECTED', 'DISBURSEMENT_REQUESTED', 'DISBURSED')",
+                  "name": "milestoneStatusHistory_fromStatus_check_49e2df2a",
+                  "prefix": "milestoneStatusHistory_fromStatus_check"
+                },
+                {
+                  "expression": "\"toStatus\" IN ('PENDING', 'PROOF_SUBMITTED', 'AI_VERIFIED', 'REJECTED', 'DISBURSEMENT_REQUESTED', 'DISBURSED')",
+                  "name": "milestoneStatusHistory_toStatus_check_c9a83606",
+                  "prefix": "milestoneStatusHistory_toStatus_check"
+                }
+              ],
+              "columns": {
+                "actorId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "fromStatus": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "MilestoneStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "milestoneId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "note": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "proofVersion": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "toStatus": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "MilestoneStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "milestoneId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "milestoneStatusHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "milestone"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "actorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "milestoneStatusHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "actorId"
+                  ],
+                  "name": "milestoneStatusHistory_actorId_idx_a58f6b4b",
+                  "prefix": "milestoneStatusHistory_actorId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "milestoneId"
+                  ],
+                  "name": "milestoneStatusHistory_milestoneId_idx_f1dac854",
+                  "prefix": "milestoneStatusHistory_milestoneId_idx",
                   "unique": false
                 }
               ],
@@ -4660,7 +5107,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "015a4cd27c4d70e1e3d16b0f6b9f73166f47bd2cb174045f017e00de2dd0af65",
+    "storageHash": "a982af13e8f97c8dc825491aabf012e37005da3aeaa09119215c441920b1ab47",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",

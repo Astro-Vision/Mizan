@@ -6,7 +6,9 @@ import type { CampaignFormState } from "@/src/lib/campaign-workflow"
 import { decimalBnbToWei } from "@/src/lib/payments/validation"
 import { db } from "@/src/prisma/db"
 import { requireBeneficiaryCommunity } from "@/src/lib/beneficiary/access"
-import { campaignInputSchema } from "@/src/lib/beneficiary/validation"
+import { campaignInputSchema, weiString } from "@/src/lib/beneficiary/validation"
+import { createCampaignWithMilestones, editableCampaign } from "@/src/lib/beneficiary/campaign-mutations"
+import { summarizeConfirmedPayments } from "@/src/lib/payments/campaign-funding-summary"
 import { formatCampaignCategory } from "@/src/lib/beneficiary/campaign-presentation"
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -82,8 +84,9 @@ function validateBeneficiaryForm(formData: FormData): {
     errors.recipientWallet = "Wallet penerima harus address EVM yang valid (0x…)."
 
   const targetAmountWei = decimalBnbToWei(targetInput)
-  if (!targetAmountWei || targetAmountWei === "0")
+  if (!weiString.safeParse(targetAmountWei).success)
     errors.target = "Target dana harus lebih besar dari nol."
+  if (currency !== "BNB") errors.currency = "Settlement hanya mendukung BNB."
 
   return {
     errors,
@@ -201,8 +204,10 @@ export async function getBeneficiaryCampaigns(): Promise<BeneficiaryCampaign[]> 
     rows.map(async (row) => {
       const milestones = await db.orm.public.Milestone
         .where({ campaignId: row.id })
+        .orderBy((m) => m.order.asc())
         .all()
-      const presentation = toPresentation(row)
+      const funding = summarizeConfirmedPayments(await db.orm.public.CampaignPayment.where({ campaignId: row.id }).all())
+      const presentation = toPresentation({ ...row, ...funding })
       return {
         ...presentation,
         nextMilestone:
@@ -220,10 +225,11 @@ export async function getBeneficiaryCampaignById(
   if (!Number.isInteger(numId) || numId <= 0) return null
   const row = await db.orm.public.Campaign.first({ id: numId })
   if (!row || row.communityId !== community.id) return null
-  const milestones = await db.orm.public.Milestone.where({ campaignId: row.id }).all()
+  const milestones = await db.orm.public.Milestone.where({ campaignId: row.id }).orderBy((m) => m.order.asc()).all()
+  const funding = summarizeConfirmedPayments(await db.orm.public.CampaignPayment.where({ campaignId: row.id }).all())
   return row
     ? {
-      ...toPresentation(row),
+      ...toPresentation({ ...row, ...funding }),
       nextMilestone: milestones.find((milestone) => milestone.status !== "DISBURSED")?.description ?? null,
     }
     : null
@@ -243,7 +249,6 @@ export async function createBeneficiaryCampaign(
         return null
       }
     })
-    .filter((value): value is { description: string; amountWei: string } => value !== null)
   const parsed = campaignInputSchema.safeParse({
     title: formData.get("title"),
     category: formData.get("category"),
@@ -265,35 +270,7 @@ export async function createBeneficiaryCampaign(
   }
 
   const data = parsed.data
-  const campaign = await db.orm.public.Campaign.create({
-    title: data.title,
-    organizerName: community.name,
-    category: data.category as "ZAKAT" | "DONASI_UMUM" | "WAKAF" | "BENCANA",
-    communityId: community.id,
-    raisedAmountWei: "0",
-    targetAmountWei: data.targetAmountWei,
-    currency: data.currency,
-    donorCount: 0,
-    status: "ACTIVE",
-    source: "MANUAL",
-    reviewStatus: "PENDING_REVIEW",
-    aiDraft: { description: data.description, category: data.category, createdBy: "BENEFICIARY" },
-    recipientWallet: data.recipientWallet.toLowerCase(),
-    image: data.image || null,
-    location: data.location || null,
-    summary: data.description,
-    daysLeft: data.daysLeft ?? 0,
-  })
-
-  await Promise.all(data.milestones.map((milestone, index) =>
-    db.orm.public.Milestone.create({
-      campaignId: campaign.id,
-      order: index + 1,
-      description: milestone.description,
-      amountWei: milestone.amountWei,
-      status: "PENDING",
-    }),
-  ))
+  const campaign = await createCampaignWithMilestones(data, community)
 
   revalidatePath("/beneficiary/campaigns")
   redirect(`/beneficiary/campaigns/${campaign.id}?created=1`)
@@ -305,6 +282,7 @@ export async function updateBeneficiaryCampaign(
   _prev: BeneficiaryCampaignFormState,
   formData: FormData,
 ): Promise<BeneficiaryCampaignFormState> {
+  const { community } = await requireBeneficiaryCommunity()
   const { errors, data } = validateBeneficiaryForm(formData)
   if (Object.keys(errors).length > 0) {
     return { success: false, message: "Periksa kembali isian formulir.", errors }
@@ -314,7 +292,7 @@ export async function updateBeneficiaryCampaign(
   if (!Number.isInteger(numId) || numId <= 0)
     return { success: false, message: "ID kampanye tidak valid." }
 
-  const existing = await db.orm.public.Campaign.first({ id: numId })
+  const existing = await db.orm.public.Campaign.where({ id: numId, communityId: community.id }).first()
   if (!existing) return { success: false, message: "Kampanye tidak ditemukan." }
   if (existing.reviewStatus !== "AI_DRAFT" && existing.reviewStatus !== "REJECTED")
     return {
@@ -322,8 +300,10 @@ export async function updateBeneficiaryCampaign(
       message: "Kampanye hanya dapat diedit saat berstatus Draft atau Ditolak.",
     }
 
-  // TODO(auth): verify the campaign belongs to the current user's Community
-  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
+  await db.transaction(async (tx) => {
+  const { milestones } = await editableCampaign(tx, numId, community.id)
+  if (milestones.length === 0 || milestones.reduce((sum, m) => sum + BigInt(m.amountWei), BigInt(0)) > BigInt(data.targetAmountWei)) throw new Error("Total milestone tidak boleh melebihi target dan minimal satu milestone wajib ada.")
+  await tx.orm.public.Campaign.where({ id: numId, communityId: community.id }).update({
     title: data.title,
     organizerName: data.organizerName,
     targetAmountWei: data.targetAmountWei,
@@ -340,6 +320,7 @@ export async function updateBeneficiaryCampaign(
     reviewStatus: existing.reviewStatus === "REJECTED" ? "AI_DRAFT" : existing.reviewStatus,
     rejectionReason: existing.reviewStatus === "REJECTED" ? null : existing.rejectionReason,
   })
+  })
 
   revalidatePath("/beneficiary/campaigns")
   redirect("/beneficiary/campaigns")
@@ -349,11 +330,12 @@ export async function updateBeneficiaryCampaign(
 export async function deleteBeneficiaryCampaign(
   id: string,
 ): Promise<BeneficiaryCampaignFormState> {
+  const { community } = await requireBeneficiaryCommunity()
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0)
     return { success: false, message: "ID kampanye tidak valid." }
 
-  const existing = await db.orm.public.Campaign.first({ id: numId })
+  const existing = await db.orm.public.Campaign.where({ id: numId, communityId: community.id }).first()
   if (!existing) return { success: false, message: "Kampanye tidak ditemukan." }
   if (existing.reviewStatus !== "AI_DRAFT")
     return {
@@ -361,8 +343,11 @@ export async function deleteBeneficiaryCampaign(
       message: "Hanya kampanye berstatus Draft yang dapat dihapus.",
     }
 
-  // TODO(auth): verify ownership before deleting
-  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).delete()
+  await db.transaction(async (tx) => {
+    await editableCampaign(tx, numId, community.id)
+    await tx.orm.public.Milestone.where({ campaignId: numId }).delete()
+    await tx.orm.public.Campaign.where({ id: numId, communityId: community.id }).delete()
+  })
   revalidatePath("/beneficiary/campaigns")
   return { success: true, message: "Kampanye berhasil dihapus." }
 }
@@ -377,17 +362,20 @@ export async function deleteBeneficiaryCampaign(
  * Transition: DRAFT → PENDING_REVIEW
  */
 export async function submitForReview(id: string): Promise<CampaignFormState> {
+  const { community } = await requireBeneficiaryCommunity()
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0)
     return { success: false, message: "ID kampanye tidak valid." }
 
-  const row = await db.orm.public.Campaign.first({ id: numId })
+  const row = await db.orm.public.Campaign.where({ id: numId, communityId: community.id }).first()
   if (!row) return { success: false, message: "Kampanye tidak ditemukan." }
   if (row.reviewStatus !== "AI_DRAFT")
     return { success: false, message: "Hanya kampanye draft yang dapat diajukan untuk review." }
 
-  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
-    reviewStatus: "PENDING_REVIEW",
+  await db.transaction(async (tx) => {
+    const { milestones } = await editableCampaign(tx, numId, community.id)
+    if (!milestones.length || milestones.reduce((s, m) => s + BigInt(m.amountWei), BigInt(0)) > BigInt(row.targetAmountWei)) throw new Error("Milestone tidak valid.")
+    await tx.orm.public.Campaign.where({ id: numId, communityId: community.id }).update({ reviewStatus: "PENDING_REVIEW" })
   })
   revalidatePath("/beneficiary/campaigns")
   return { success: true, message: "Kampanye berhasil diajukan untuk review admin." }
@@ -399,8 +387,8 @@ export async function submitForReview(id: string): Promise<CampaignFormState> {
  */
 export async function manageMilestones(id: string): Promise<CampaignFormState> {
   // TODO: navigate to /beneficiary/campaigns/[id]/milestone when page is built
-  void id
-  return { success: true, message: "Fitur kelola milestone belum tersedia." }
+  if (!await getBeneficiaryCampaignById(id)) return { success: false, message: "Kampanye tidak ditemukan." }
+  redirect(`/beneficiary/campaigns/${id}/milestones`)
 }
 
 /**
@@ -409,8 +397,7 @@ export async function manageMilestones(id: string): Promise<CampaignFormState> {
  */
 export async function uploadProof(id: string): Promise<CampaignFormState> {
   // TODO: navigate to /beneficiary/campaigns/[id]/bukti when page is built
-  void id
-  return { success: true, message: "Fitur upload bukti belum tersedia." }
+  return manageMilestones(id)
 }
 
 /**
@@ -419,6 +406,6 @@ export async function uploadProof(id: string): Promise<CampaignFormState> {
  */
 export async function requestWithdrawal(id: string): Promise<CampaignFormState> {
   // TODO: validate that all milestones are met before allowing withdrawal
-  void id
-  return { success: true, message: "Fitur ajukan pencairan belum tersedia." }
+  if (!await getBeneficiaryCampaignById(id)) return { success: false, message: "Kampanye tidak ditemukan." }
+  redirect(`/beneficiary/campaigns/${id}/disbursement`)
 }

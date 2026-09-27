@@ -1,6 +1,7 @@
 import "server-only"
 
 import { db } from "@/src/prisma/db"
+import { summarizeConfirmedPayments } from "@/src/lib/payments/campaign-funding-summary"
 import type { Campaign } from "@/src/lib/site-data"
 import { toCategoryLabel } from "@/src/lib/campaign-category"
 
@@ -74,10 +75,25 @@ type CampaignRow = {
   currency: string
   donorCount: number
   reviewStatus: string
+  recipientWallet?: string | null
 }
 
-function toCard(row: CampaignRow): Campaign {
+/** Shape consumed by `CampaignPayment` on public + benefactor pages. */
+export type PublicCampaignPayment = {
+  id: string
+  title: string
+  organizerName: string
+  targetAmountWei: string
+  recipientWallet: string | null
+}
+
+function toCard(
+  row: CampaignRow,
+  funding?: { raisedAmountWei: string; donorCount: number },
+): Campaign {
   const organizer = row.organizerName || "Komunitas Mizan"
+  const raisedAmountWei = funding?.raisedAmountWei ?? row.raisedAmountWei
+  const donorCount = funding?.donorCount ?? row.donorCount
 
   return {
     id: String(row.id),
@@ -85,10 +101,10 @@ function toCard(row: CampaignRow): Campaign {
     judul: row.title,
     penyelenggara: organizer,
     lokasi: row.location ?? "Indonesia",
-    terkumpul: weiToBnbNumber(row.raisedAmountWei),
+    terkumpul: weiToBnbNumber(raisedAmountWei),
     target: weiToBnbNumber(row.targetAmountWei),
     satuan: toSatuan(row.currency),
-    donatur: row.donorCount,
+    donatur: donorCount,
     sisaHari: row.daysLeft,
     terverifikasi: row.reviewStatus === "APPROVED",
     ringkas: row.summary ?? "",
@@ -129,25 +145,51 @@ export async function getPublicCampaigns(): Promise<Campaign[]> {
     .orderBy((campaign) => campaign.createdAt.desc())
     .all()
 
-  return rows.map((row) => toCard(row as CampaignRow))
+  return Promise.all(
+    rows.map(async (row) => {
+      const typed = row as CampaignRow
+      const payments = await db.orm.public.CampaignPayment.where({
+        campaignId: typed.id,
+      }).all()
+      return toCard(typed, summarizeConfirmedPayments(payments))
+    }),
+  )
 }
 
 /**
  * A single public campaign by its numeric id. Returns null when the id is
  * invalid, the campaign does not exist, or it is not publicly visible.
  */
-export async function getPublicCampaignById(
-  id: string
-): Promise<Campaign | null> {
+export async function getPublicCampaignById(id: string): Promise<{
+  campaign: Campaign
+  payment: PublicCampaignPayment
+} | null> {
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0) return null
 
-  const row = await db.orm.public.Campaign.select(...PUBLIC_SELECT, "status")
+  const row = await db.orm.public.Campaign.select(
+    ...PUBLIC_SELECT,
+    "status",
+    "recipientWallet",
+  )
     .where({ id: numId })
     .first()
 
   if (!row) return null
   if (row.reviewStatus !== "APPROVED" || row.status !== "ACTIVE") return null
 
-  return toCard(row as CampaignRow)
+  const typed = row as CampaignRow
+  const payments = await db.orm.public.CampaignPayment.where({
+    campaignId: typed.id,
+  }).all()
+  return {
+    campaign: toCard(typed, summarizeConfirmedPayments(payments)),
+    payment: {
+      id: String(typed.id),
+      title: typed.title,
+      organizerName: typed.organizerName,
+      targetAmountWei: typed.targetAmountWei,
+      recipientWallet: typed.recipientWallet ?? null,
+    },
+  }
 }

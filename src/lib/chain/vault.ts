@@ -1,13 +1,54 @@
 const DEFAULT_RPC_URL = "https://data-seed-prebsc-1-s1.bnbchain.org:8545"
 const VAULT_ADDRESS = "0xE8e0eE10f620464d9CD475c6A2Ba9dC13B9623de"
 const DEMO_CAMPAIGN_ID = "804936431"
-// The selector is unchanged in v2; only the return tuple was simplified.
+// The selector is unchanged across contract versions. The milestone contract
+// returns the full seven-field campaign state tuple.
 const GET_CAMPAIGN_STATE_SELECTOR = "0x25733cfe"
 const WEI_PER_BNB = BigInt("1000000000000000000")
 export const BSC_TESTNET_CHAIN_ID = 97
 export const FUND_CAMPAIGN_SELECTOR = "0x92bd38bc"
+export const FUNDS_COMMITTED_TOPIC =
+  "0xe72af613afdcb3fe47a74607156d56e5df709549b16af489b7ad68f85818e132"
 export const FUNDS_TRANSFERRED_TOPIC =
   "0x9e7e670dfaf0c6118e2929a9e97c2388d37975b64297543c14f2a67b53454022"
+
+export type FundingEventLog = { topics?: string[]; data?: string }
+
+export function parseFundingEvent(log: FundingEventLog) {
+  const topics = log.topics ?? []
+  if (topics.length < 4 || !log.data) return null
+
+  try {
+    const topic = topics[0].toLowerCase()
+    const campaignId = BigInt(topics[1]).toString()
+    const funder = `0x${topics[3].slice(-40)}`.toLowerCase()
+
+    if (topic === FUNDS_COMMITTED_TOPIC) {
+      if (log.data.length < 130) return null
+      return {
+        kind: "committed" as const,
+        campaignId,
+        funder,
+        amountWei: BigInt(`0x${wordAt(log.data, 0)}`).toString(),
+      }
+    }
+
+    if (topic === FUNDS_TRANSFERRED_TOPIC) {
+      if (log.data.length < 194) return null
+      return {
+        kind: "transferred" as const,
+        campaignId,
+        funder,
+        recipient: `0x${wordAt(log.data, 0).slice(-40)}`.toLowerCase(),
+        amountWei: BigInt(`0x${wordAt(log.data, 1)}`).toString(),
+      }
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
 
 export type CampaignChainState = {
   vaultAddress: string
@@ -16,7 +57,6 @@ export type CampaignChainState = {
   targetAmount: bigint
   fundedAmount: bigint
   contributionCount: bigint
-  // Kept as zero/derived compatibility fields for existing dashboard consumers.
   releasedAmount: bigint
   reservedAmount: bigint
   availableAmount: bigint
@@ -86,6 +126,25 @@ export async function getDemoCampaignState(): Promise<CampaignChainState> {
   if (payload.error || !payload.result || payload.result === "0x") {
     throw new Error(payload.error?.message || "getCampaignState gagal")
   }
+
+  const wordCount = (payload.result.length - 2) / 64
+  if (wordCount >= 7) {
+    return {
+      vaultAddress,
+      campaignId: campaignId.toString(),
+      recipient: wordToAddress(wordAt(payload.result, 0)),
+      targetAmount: wordToBigInt(wordAt(payload.result, 1)),
+      fundedAmount: wordToBigInt(wordAt(payload.result, 2)),
+      contributionCount: BigInt(0),
+      releasedAmount: wordToBigInt(wordAt(payload.result, 3)),
+      reservedAmount: wordToBigInt(wordAt(payload.result, 4)),
+      availableAmount: wordToBigInt(wordAt(payload.result, 5)),
+      active: wordToBigInt(wordAt(payload.result, 6)) === BigInt(1),
+      explorerUrl: `https://testnet.bscscan.com/address/${vaultAddress}`,
+    }
+  }
+
+  if (wordCount < 5) throw new Error("getCampaignState mengembalikan tuple tidak dikenal")
 
   return {
     vaultAddress,

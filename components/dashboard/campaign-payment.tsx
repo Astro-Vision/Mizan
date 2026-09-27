@@ -4,6 +4,7 @@ import * as React from "react"
 import { useIdentityToken, useWallets } from "@privy-io/react-auth"
 import { cn } from "@/src/lib/utils"
 import { BSC_TESTNET_CHAIN_ID, encodeFundCampaign } from "@/src/lib/chain/vault"
+import { PAYMENTS_CHANGED_EVENT } from "@/src/lib/payments/events"
 import { decimalBnbToWei } from "@/src/lib/payments/validation"
 
 export type PaymentCampaign = {
@@ -117,6 +118,7 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
         setMessage(body.status === "PENDING" ? "Transaksi menunggu konfirmasi." : `Payment terkonfirmasi: ${hash}`)
       }
       setAmount("")
+      window.dispatchEvent(new Event(PAYMENTS_CHANGED_EVENT))
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Payment gagal")
     } finally {

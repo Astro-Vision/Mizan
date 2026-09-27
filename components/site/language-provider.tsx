@@ -292,23 +292,22 @@ const ENGLISH: Record<string, string> = {
   Terverifikasi: "Verified",
 }
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = React.useState<Language>(() => {
-    if (typeof window === "undefined") return "id"
-    const saved = window.localStorage.getItem("mizan-language")
-    return saved === "id" || saved === "en" ? saved : "id"
-  })
-
-  React.useEffect(() => {
-    document.documentElement.lang = language
-    window.localStorage.setItem("mizan-language", language)
-  }, [language])
+export function LanguageProvider({
+  children,
+  initialLanguage = "id",
+}: {
+  children: React.ReactNode
+  initialLanguage?: Language
+}) {
+  const [language, setLanguageState] =
+    React.useState<Language>(initialLanguage)
 
   const value = React.useMemo(
     () => ({
       language,
       setLanguage: (nextLanguage: Language) => {
         setLanguageState(nextLanguage)
+        document.documentElement.lang = nextLanguage
         window.localStorage.setItem("mizan-language", nextLanguage)
         document.cookie = `mizan-language=${nextLanguage}; path=/; max-age=31536000; samesite=lax`
       },

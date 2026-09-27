@@ -42,8 +42,6 @@ export async function verifyMilestoneProof(input: {
     const body = isPdf
       ? await buildPdfVerificationRequest(input, baseUrl, apiKey, flowId)
       : await buildMilestoneVerificationPayload(payloadInput)
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 30_000)
 
     const response = await fetch(`${baseUrl}/api/v1/run/${flowId}?stream=false`, {
       method: "POST",
@@ -53,10 +51,9 @@ export async function verifyMilestoneProof(input: {
         "x-api-key": apiKey,
       },
       body: JSON.stringify(body),
-      signal: controller.signal,
+      signal: AbortSignal.timeout(30_000),
     })
 
-    clearTimeout(timeout)
 
     if (!response.ok) {
       const text = await response.text().catch(() => "")
@@ -74,7 +71,7 @@ export async function verifyMilestoneProof(input: {
 
     return parseLangflowResponse(messageText)
   } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") {
+    if (error instanceof DOMException && ["AbortError", "TimeoutError"].includes(error.name)) {
       console.error("Langflow API timeout (30s)")
       return { verified: false, confidence: 0, reasoning: "Verifikasi AI timeout — coba lagi nanti." }
     }
@@ -119,6 +116,7 @@ async function uploadPdfToLangflow(
       "x-api-key": apiKey,
     },
     body: formData,
+    signal: AbortSignal.timeout(30_000),
   })
 
   if (!response.ok) {
@@ -158,7 +156,7 @@ function getLangflowFilePath(data: unknown): string | null {
  * Expects JSON with keys: verified (bool), confidence (0–1), reasoning (string).
  * Falls back to heuristics if the response isn't valid JSON.
  */
-function parseLangflowResponse(text: string): LangflowVerificationResult {
+export function parseLangflowResponse(text: string): LangflowVerificationResult {
   if (!text) {
     return { verified: false, confidence: 0, reasoning: "Tidak ada respons dari AI." }
   }
@@ -170,24 +168,20 @@ function parseLangflowResponse(text: string): LangflowVerificationResult {
     const jsonStr = jsonMatch?.[1] ?? text
     const parsed = JSON.parse(jsonStr)
 
-    const verified = parsed.verified === true || parsed.verified === "true"
-    const confidence = typeof parsed.confidence === "number"
-      ? Math.max(0, Math.min(1, parsed.confidence))
-      : 0
+    if (!parsed || typeof parsed.verified !== "boolean" || typeof parsed.confidence !== "number" || !Number.isFinite(parsed.confidence) || parsed.confidence < 0 || parsed.confidence > 1) {
+      return { verified: false, confidence: 0, reasoning: "Respons AI tidak valid; membutuhkan review admin." }
+    }
+    const verified = parsed.verified
+    const confidence = parsed.confidence
     const reasoning = typeof parsed.reasoning === "string"
       ? parsed.reasoning
       : String(parsed.reasoning ?? text)
 
     return { verified, confidence, reasoning }
   } catch {
-    // Fallback: treat the raw text as reasoning, use heuristics
-    const lower = text.toLowerCase()
-    const hasPositive = lower.includes("verified") || lower.includes("valid") || lower.includes("approved") || lower.includes("terverifikasi")
-    const hasNegative = lower.includes("rejected") || lower.includes("invalid") || lower.includes("ditolak")
-
     return {
-      verified: hasPositive && !hasNegative,
-      confidence: hasPositive && !hasNegative ? 0.7 : 0.3,
+      verified: false,
+      confidence: 0,
       reasoning: text.slice(0, 500),
     }
   }

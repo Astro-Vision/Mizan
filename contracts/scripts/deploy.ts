@@ -14,6 +14,7 @@ try {
   const expected = parameters.MizanFundingVaultModule
   const grants = [
     [await vault.read.CAMPAIGN_MANAGER_ROLE(), expected.campaignManager],
+    [await vault.read.VERIFIER_ROLE(), expected.verifier],
     [await vault.read.PAUSER_ROLE(), expected.pauser],
   ] as const
   for (const [role, recipient] of grants) {

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import {
-  FUNDS_TRANSFERRED_TOPIC,
   getConfiguredVaultAddress,
+  parseFundingEvent,
 } from "@/src/lib/chain/vault"
+import { syncCampaignFunding } from "@/src/lib/payments/campaign-funding"
 import { getPrivyProfile } from "@/src/lib/privy/user-data"
 import { getPrivyUserFromIdentityToken } from "@/src/lib/privy/server"
 import { db } from "@/src/prisma/db"
@@ -86,29 +87,19 @@ export async function POST(request: Request) {
     }
 
     const event = receipt.logs?.find(
-      (log) =>
-        log.address?.toLowerCase() ===
-          getConfiguredVaultAddress().toLowerCase() &&
-        log.topics?.[0]?.toLowerCase() === FUNDS_TRANSFERRED_TOPIC
+      (log) => log.address?.toLowerCase() === getConfiguredVaultAddress().toLowerCase(),
     )
-    if (
-      !event?.topics ||
-      event.topics.length < 4 ||
-      !event.data ||
-      event.data.length < 194
-    ) {
+    const fundingEvent = event ? parseFundingEvent(event) : null
+    if (!fundingEvent) {
       return error("FUNDING_EVENT_NOT_FOUND", 422)
     }
 
-    const eventCampaignId = BigInt(event.topics[1]).toString()
-    const eventFunder = `0x${event.topics[3].slice(-40)}`.toLowerCase()
-    const eventRecipient = `0x${wordAt(event.data, 0).slice(-40)}`.toLowerCase()
-    const eventAmountWei = BigInt(`0x${wordAt(event.data, 1)}`).toString()
     if (
-      eventCampaignId !== String(input.campaignId) ||
-      eventFunder !== donorWallet ||
-      eventRecipient !== campaign.recipientWallet?.toLowerCase() ||
-      eventAmountWei !== input.amountWei
+      fundingEvent.campaignId !== String(input.campaignId) ||
+      fundingEvent.funder !== donorWallet ||
+      fundingEvent.amountWei !== input.amountWei ||
+      (fundingEvent.kind === "transferred" &&
+        fundingEvent.recipient !== campaign.recipientWallet?.toLowerCase())
     ) {
       return error("FUNDING_EVENT_MISMATCH", 422)
     }
@@ -126,7 +117,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       payment: serializePayment(payment),
-      totalFundedWei: await getCampaignTotalWei(input.campaignId),
+      totalFundedWei: await syncCampaignFunding(input.campaignId),
     })
   } catch (error) {
     if (error instanceof z.ZodError)
@@ -160,21 +151,6 @@ async function readReceipt(transactionHash: string) {
   if (payload.error)
     throw new Error(payload.error.message || "Receipt RPC gagal")
   return payload.result ?? null
-}
-
-async function getCampaignTotalWei(campaignId: number) {
-  const payments = await db.orm.public.CampaignPayment.where({
-    campaignId,
-  }).all()
-  return payments
-    .filter((payment) => payment.status === "CONFIRMED")
-    .reduce((total, payment) => total + BigInt(payment.amountWei), BigInt(0))
-    .toString()
-}
-
-function wordAt(data: string, index: number) {
-  const start = 2 + index * 64
-  return data.slice(start, start + 64)
 }
 
 function serializePayment(payment: {

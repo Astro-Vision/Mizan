@@ -13,25 +13,9 @@ export async function requireBeneficiaryCommunity() {
     redirect("/")
   }
 
-  let user = await db.orm.public.User.where({ privyId: session.privyId }).first()
-  if (!user) {
-    user = session.role === "ADMIN"
-      ? await db.orm.public.User.where({ role: "ADMIN" }).first()
-      : await db.orm.public.User.where({ role: "BENEFICIARY" }).first()
-  }
-
-  if (!user) {
+  const user = await db.orm.public.User.where({ privyId: session.privyId }).first()
+  if (!user || user.role !== session.role) {
     redirect("/")
-  }
-
-  // Admin bypass
-  if (session.role === "ADMIN") {
-    const allCommunities = await db.orm.public.Community.all()
-    const community = allCommunities[0] ?? null
-    if (!community) {
-      throw new Error("Tidak ada organisasi di sistem.")
-    }
-    return { session, user, community, memberRole: "OWNER" as const }
   }
 
   // Find ACTIVE membership

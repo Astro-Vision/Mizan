@@ -38,6 +38,11 @@ export async function GET(request: Request) {
       })
     )
 
+    rows.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+
     return NextResponse.json({ ok: true, payments: rows })
   } catch (error) {
     console.error("Payment history failed", error)

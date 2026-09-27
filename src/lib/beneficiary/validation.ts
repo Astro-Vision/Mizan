@@ -1,11 +1,11 @@
 import { z } from "zod"
 
-const weiString = z.string().regex(/^\d+$/, "Nominal harus berupa angka wei yang valid.").refine(
-  (value) => BigInt(value) > BigInt(0),
-  "Nominal harus lebih besar dari nol.",
+export const weiString = z.string().refine(
+  (value) => /^\d{1,78}$/.test(value) && BigInt(value) > BigInt(0) && BigInt(value) < BigInt(2) ** BigInt(256),
+  "Nominal harus integer wei positif dalam rentang uint256.",
 )
 
-const milestoneSchema = z.object({
+export const milestoneSchema = z.object({
   description: z.string().trim().min(1, "Deskripsi milestone wajib diisi."),
   amountWei: weiString,
 })
@@ -17,13 +17,14 @@ export const campaignInputSchema = z
     description: z.string().trim().min(1, "Deskripsi kampanye wajib diisi."),
     targetAmountWei: weiString,
     recipientWallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Alamat dompet tidak valid."),
-    currency: z.enum(["BNB", "USDT"]).default("BNB"),
+    currency: z.literal("BNB").default("BNB"),
     image: z.string().trim().max(1000, "URL gambar terlalu panjang.").optional(),
     location: z.string().trim().max(200, "Lokasi terlalu panjang.").optional(),
     daysLeft: z.coerce.number().int().min(0).max(3650).optional(),
     milestones: z.array(milestoneSchema).min(1, "Minimal satu milestone wajib diisi."),
   })
   .superRefine((value, context) => {
+    if (!weiString.safeParse(value.targetAmountWei).success || value.milestones.some((m) => !weiString.safeParse(m.amountWei).success)) return
     const total = value.milestones.reduce((sum, milestone) => sum + BigInt(milestone.amountWei), BigInt(0))
     if (total > BigInt(value.targetAmountWei)) {
       context.addIssue({

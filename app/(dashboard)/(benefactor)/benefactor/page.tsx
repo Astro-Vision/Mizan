@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 
 import { CampaignPayment, type PaymentCampaign } from "@/components/dashboard/campaign-payment"
 import { PaymentHistory } from "@/components/dashboard/payment-history"
@@ -84,8 +85,20 @@ export default async function DonaturPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-h3 text-ink">Riwayat transaksi wallet</h2>
-        <p className="mt-1 text-sm text-ink-muted">Payment MOCK dan ONCHAIN milik wallet Privy yang sedang login.</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-h3 text-ink">Riwayat transaksi wallet</h2>
+            <p className="mt-1 text-sm text-ink-muted">
+              Payment MOCK dan ONCHAIN milik wallet Privy yang sedang login.
+            </p>
+          </div>
+          <Link
+            href="/benefactor/riwayat"
+            className="text-sm font-semibold text-primary-purple hover:text-brand-violet"
+          >
+            Lihat semua
+          </Link>
+        </div>
         <PaymentHistory />
       </section>
     </div>

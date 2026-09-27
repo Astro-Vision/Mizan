@@ -1,5 +1,6 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { requireBeneficiaryCommunity } from "@/src/lib/beneficiary/access"
 import { getMilestoneProofUrl } from "@/src/lib/storage"
 import { db } from "@/src/prisma/db"
@@ -33,8 +34,20 @@ export async function requestMilestoneDisbursement(milestoneId: string) {
   if (!milestone) return { success: false, message: "Milestone tidak ditemukan." }
   const campaign = await db.orm.public.Campaign.first({ id: milestone.campaignId })
   if (!campaign || campaign.communityId !== community.id) return { success: false, message: "Akses ditolak." }
+
+  if (milestone.status !== "AI_VERIFIED") {
+    return { success: false, message: "Milestone belum siap diajukan untuk pencairan." }
+  }
+
+  await db.orm.public.Milestone.where((row) => row.id.eq(id)).update({
+    status: "DISBURSEMENT_REQUESTED",
+    disbursementRequestedAt: new Date().toISOString(),
+  })
+  revalidatePath(`/beneficiary/campaigns/${campaign.id}/milestones`)
+  revalidatePath(`/beneficiary/campaigns/${campaign.id}/disbursement`)
+
   return {
-    success: false,
-    message: "Pengajuan pencairan diproses oleh admin setelah pemeriksaan bukti.",
+    success: true,
+    message: "Pengajuan pencairan dikirim ke admin.",
   }
 }

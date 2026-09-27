@@ -1,6 +1,14 @@
 
-export function groupAnalysesByEvent(analyses: any[]): any[][] {
-  const groups = new Map<string, any[]>()
+type Analysis = {
+  isDisaster: boolean
+  validationStatus?: string
+  disasterType?: string
+  province?: string
+  locationName?: string
+}
+
+export function groupAnalysesByEvent(analyses: Analysis[]): Analysis[][] {
+  const groups = new Map<string, Analysis[]>()
 
   for (const a of analyses) {
     if (!a.isDisaster) continue

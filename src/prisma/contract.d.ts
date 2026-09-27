@@ -38,7 +38,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'015a4cd27c4d70e1e3d16b0f6b9f73166f47bd2cb174045f017e00de2dd0af65'>;
+  StorageHashBase<'a982af13e8f97c8dc825491aabf012e37005da3aeaa09119215c441920b1ab47'>;
 export type ExecutionHash =
   ExecutionHashBase<'5959d3a2b1162f4bce871e11ac93bd7e24560c7db45a82dde74c3fc2b48f7abf'>;
 export type ProfileHash =
@@ -284,7 +284,6 @@ export type FieldOutputTypes = {
       readonly title: CodecTypes['pg/text@1']['output'];
       readonly organizerName: CodecTypes['pg/text@1']['output'];
       readonly communityId: CodecTypes['pg/int4@1']['output'] | null;
-      readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA';
       readonly source: 'AI_MOCK' | 'MANUAL';
       readonly aiDraft: CodecTypes['pg/json@1']['output'] | null;
       readonly aiReference: CodecTypes['pg/text@1']['output'] | null;
@@ -383,11 +382,42 @@ export type FieldOutputTypes = {
       readonly proofNote: CodecTypes['pg/text@1']['output'] | null;
       readonly aiVerificationNote: CodecTypes['pg/text@1']['output'] | null;
       readonly aiConfidence: CodecTypes['pg/float8@1']['output'] | null;
+      readonly proofVersion: CodecTypes['pg/int4@1']['output'];
+      readonly verificationSource: CodecTypes['pg/text@1']['output'] | null;
+      readonly approvedById: CodecTypes['pg/int4@1']['output'] | null;
+      readonly approvedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly rejectionReason: CodecTypes['pg/text@1']['output'] | null;
+      readonly pendingTxHash: CodecTypes['pg/text@1']['output'] | null;
+      readonly pendingTxStage: CodecTypes['pg/text@1']['output'] | null;
+      readonly releaseKey: CodecTypes['pg/text@1']['output'] | null;
+      readonly processingAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly disbursementRequestedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly contractMilestoneId: CodecTypes['pg/text@1']['output'] | null;
       readonly disbursementTxHash: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+    };
+    readonly MilestoneStatusHistory: {
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly milestoneId: CodecTypes['pg/int4@1']['output'];
+      readonly actorId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly fromStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
+      readonly toStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
+      readonly proofVersion: CodecTypes['pg/int4@1']['output'];
+      readonly note: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     };
     readonly Post: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -504,7 +534,6 @@ export type FieldInputTypes = {
       readonly title: CodecTypes['pg/text@1']['input'];
       readonly organizerName: CodecTypes['pg/text@1']['input'];
       readonly communityId: CodecTypes['pg/int4@1']['input'] | null;
-      readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA';
       readonly source: 'AI_MOCK' | 'MANUAL';
       readonly aiDraft: CodecTypes['pg/json@1']['input'] | null;
       readonly aiReference: CodecTypes['pg/text@1']['input'] | null;
@@ -603,11 +632,42 @@ export type FieldInputTypes = {
       readonly proofNote: CodecTypes['pg/text@1']['input'] | null;
       readonly aiVerificationNote: CodecTypes['pg/text@1']['input'] | null;
       readonly aiConfidence: CodecTypes['pg/float8@1']['input'] | null;
+      readonly proofVersion: CodecTypes['pg/int4@1']['input'];
+      readonly verificationSource: CodecTypes['pg/text@1']['input'] | null;
+      readonly approvedById: CodecTypes['pg/int4@1']['input'] | null;
+      readonly approvedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly rejectionReason: CodecTypes['pg/text@1']['input'] | null;
+      readonly pendingTxHash: CodecTypes['pg/text@1']['input'] | null;
+      readonly pendingTxStage: CodecTypes['pg/text@1']['input'] | null;
+      readonly releaseKey: CodecTypes['pg/text@1']['input'] | null;
+      readonly processingAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly disbursementRequestedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly contractMilestoneId: CodecTypes['pg/text@1']['input'] | null;
       readonly disbursementTxHash: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+    };
+    readonly MilestoneStatusHistory: {
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly milestoneId: CodecTypes['pg/int4@1']['input'];
+      readonly actorId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly fromStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
+      readonly toStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
+      readonly proofVersion: CodecTypes['pg/int4@1']['input'];
+      readonly note: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
     };
     readonly Post: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -725,7 +785,7 @@ export type StorageColumnTypes = {
       readonly aiReference: CodecTypes['pg/text@1']['output'] | null;
       readonly approvedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly approvedById: CodecTypes['pg/int4@1']['output'] | null;
-      readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA';
+      readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA' | null;
       readonly communityId: CodecTypes['pg/int4@1']['output'] | null;
       readonly contractCampaignId: CodecTypes['pg/text@1']['output'] | null;
       readonly contractTransactionHash: CodecTypes['pg/text@1']['output'] | null;
@@ -809,6 +869,8 @@ export type StorageColumnTypes = {
       readonly aiConfidence: CodecTypes['pg/float8@1']['output'] | null;
       readonly aiVerificationNote: CodecTypes['pg/text@1']['output'] | null;
       readonly amountWei: CodecTypes['pg/text@1']['output'];
+      readonly approvedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly approvedById: CodecTypes['pg/int4@1']['output'] | null;
       readonly campaignId: CodecTypes['pg/int4@1']['output'];
       readonly contractMilestoneId: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -817,8 +879,14 @@ export type StorageColumnTypes = {
       readonly disbursementTxHash: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly order: CodecTypes['pg/int4@1']['output'];
+      readonly pendingTxHash: CodecTypes['pg/text@1']['output'] | null;
+      readonly pendingTxStage: CodecTypes['pg/text@1']['output'] | null;
+      readonly processingAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly proofImageUrl: CodecTypes['pg/text@1']['output'] | null;
       readonly proofNote: CodecTypes['pg/text@1']['output'] | null;
+      readonly proofVersion: CodecTypes['pg/int4@1']['output'];
+      readonly rejectionReason: CodecTypes['pg/text@1']['output'] | null;
+      readonly releaseKey: CodecTypes['pg/text@1']['output'] | null;
       readonly status:
         | 'PENDING'
         | 'PROOF_SUBMITTED'
@@ -827,6 +895,29 @@ export type StorageColumnTypes = {
         | 'DISBURSEMENT_REQUESTED'
         | 'DISBURSED';
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly verificationSource: CodecTypes['pg/text@1']['output'] | null;
+    };
+    readonly milestoneStatusHistory: {
+      readonly actorId: CodecTypes['pg/int4@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly fromStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
+      readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly milestoneId: CodecTypes['pg/int4@1']['output'];
+      readonly note: CodecTypes['pg/text@1']['output'] | null;
+      readonly proofVersion: CodecTypes['pg/int4@1']['output'];
+      readonly toStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
     };
     readonly post: {
       readonly authorId: CodecTypes['pg/int4@1']['output'];
@@ -944,7 +1035,7 @@ export type StorageColumnInputTypes = {
       readonly aiReference: CodecTypes['pg/text@1']['input'] | null;
       readonly approvedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly approvedById: CodecTypes['pg/int4@1']['input'] | null;
-      readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA';
+      readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA' | null;
       readonly communityId: CodecTypes['pg/int4@1']['input'] | null;
       readonly contractCampaignId: CodecTypes['pg/text@1']['input'] | null;
       readonly contractTransactionHash: CodecTypes['pg/text@1']['input'] | null;
@@ -1028,6 +1119,8 @@ export type StorageColumnInputTypes = {
       readonly aiConfidence: CodecTypes['pg/float8@1']['input'] | null;
       readonly aiVerificationNote: CodecTypes['pg/text@1']['input'] | null;
       readonly amountWei: CodecTypes['pg/text@1']['input'];
+      readonly approvedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly approvedById: CodecTypes['pg/int4@1']['input'] | null;
       readonly campaignId: CodecTypes['pg/int4@1']['input'];
       readonly contractMilestoneId: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -1036,8 +1129,14 @@ export type StorageColumnInputTypes = {
       readonly disbursementTxHash: CodecTypes['pg/text@1']['input'] | null;
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly order: CodecTypes['pg/int4@1']['input'];
+      readonly pendingTxHash: CodecTypes['pg/text@1']['input'] | null;
+      readonly pendingTxStage: CodecTypes['pg/text@1']['input'] | null;
+      readonly processingAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly proofImageUrl: CodecTypes['pg/text@1']['input'] | null;
       readonly proofNote: CodecTypes['pg/text@1']['input'] | null;
+      readonly proofVersion: CodecTypes['pg/int4@1']['input'];
+      readonly rejectionReason: CodecTypes['pg/text@1']['input'] | null;
+      readonly releaseKey: CodecTypes['pg/text@1']['input'] | null;
       readonly status:
         | 'PENDING'
         | 'PROOF_SUBMITTED'
@@ -1046,6 +1145,29 @@ export type StorageColumnInputTypes = {
         | 'DISBURSEMENT_REQUESTED'
         | 'DISBURSED';
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly verificationSource: CodecTypes['pg/text@1']['input'] | null;
+    };
+    readonly milestoneStatusHistory: {
+      readonly actorId: CodecTypes['pg/int4@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly fromStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
+      readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly milestoneId: CodecTypes['pg/int4@1']['input'];
+      readonly note: CodecTypes['pg/text@1']['input'] | null;
+      readonly proofVersion: CodecTypes['pg/int4@1']['input'];
+      readonly toStatus:
+        | 'PENDING'
+        | 'PROOF_SUBMITTED'
+        | 'AI_VERIFIED'
+        | 'REJECTED'
+        | 'DISBURSEMENT_REQUESTED'
+        | 'DISBURSED';
     };
     readonly post: {
       readonly authorId: CodecTypes['pg/int4@1']['input'];
@@ -1312,11 +1434,6 @@ type ContractBase = Omit<
                   readonly nativeType: 'int4';
                   readonly codecId: 'pg/int4@1';
                   readonly nullable: true;
-                };
-                readonly category: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
                 };
                 readonly source: {
                   readonly nativeType: 'text';
@@ -1942,6 +2059,55 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/float8@1';
                   readonly nullable: true;
                 };
+                readonly proofVersion: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                };
+                readonly verificationSource: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly approvedById: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly approvedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
+                readonly rejectionReason: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly pendingTxHash: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly pendingTxStage: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly releaseKey: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly processingAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
                 readonly disbursementRequestedAt: {
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
@@ -1970,12 +2136,21 @@ type ContractBase = Omit<
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [];
+              uniques: readonly [
+                { readonly columns: readonly ['releaseKey'] },
+                { readonly columns: readonly ['campaignId', 'order'] },
+              ];
               indexes: readonly [
                 {
                   readonly name: 'milestone_campaignId_idx_3aacd648';
                   readonly prefix: 'milestone_campaignId_idx';
                   readonly columns: readonly ['campaignId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'milestone_approvedById_idx_01ef8410';
+                  readonly prefix: 'milestone_approvedById_idx';
+                  readonly columns: readonly ['approvedById'];
                   readonly unique: false;
                 },
               ];
@@ -1989,6 +2164,109 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'campaign';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'milestone';
+                    readonly columns: readonly ['approvedById'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly milestoneStatusHistory: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'function';
+                    readonly expression: 'autoincrement()';
+                  };
+                };
+                readonly milestoneId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly actorId: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: true;
+                };
+                readonly fromStatus: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly toStatus: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly proofVersion: {
+                  readonly nativeType: 'int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                };
+                readonly note: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'milestoneStatusHistory_milestoneId_idx_f1dac854';
+                  readonly prefix: 'milestoneStatusHistory_milestoneId_idx';
+                  readonly columns: readonly ['milestoneId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'milestoneStatusHistory_actorId_idx_a58f6b4b';
+                  readonly prefix: 'milestoneStatusHistory_actorId_idx';
+                  readonly columns: readonly ['actorId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'milestoneStatusHistory';
+                    readonly columns: readonly ['milestoneId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'milestone';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'milestoneStatusHistory';
+                    readonly columns: readonly ['actorId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'user';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -2627,6 +2905,10 @@ type ContractBase = Omit<
       readonly model: 'CampaignPayment';
     };
     readonly milestone: { readonly namespace: 'public' & NamespaceId; readonly model: 'Milestone' };
+    readonly milestoneStatusHistory: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'MilestoneStatusHistory';
+    };
     readonly source: { readonly namespace: 'public' & NamespaceId; readonly model: 'Source' };
     readonly rawCapture: {
       readonly namespace: 'public' & NamespaceId;
@@ -2811,10 +3093,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
-              readonly category: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
               readonly source: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -2937,17 +3215,6 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['id'];
                 };
               };
-              readonly milestones: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Milestone';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['campaignId'];
-                };
-              };
               readonly payments: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -2968,7 +3235,6 @@ type ContractBase = Omit<
                 readonly title: { readonly column: 'title' };
                 readonly organizerName: { readonly column: 'organizerName' };
                 readonly communityId: { readonly column: 'communityId' };
-                readonly category: { readonly column: 'category' };
                 readonly source: { readonly column: 'source' };
                 readonly aiDraft: { readonly column: 'aiDraft' };
                 readonly aiReference: { readonly column: 'aiReference' };
@@ -3380,6 +3646,48 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
               };
+              readonly proofVersion: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly verificationSource: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly approvedById: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly approvedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly rejectionReason: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly pendingTxHash: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly pendingTxStage: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly releaseKey: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly processingAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
               readonly disbursementRequestedAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -3411,6 +3719,14 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly approvedBy: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['approvedById'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
               readonly campaign: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -3437,11 +3753,94 @@ type ContractBase = Omit<
                 readonly proofNote: { readonly column: 'proofNote' };
                 readonly aiVerificationNote: { readonly column: 'aiVerificationNote' };
                 readonly aiConfidence: { readonly column: 'aiConfidence' };
+                readonly proofVersion: { readonly column: 'proofVersion' };
+                readonly verificationSource: { readonly column: 'verificationSource' };
+                readonly approvedById: { readonly column: 'approvedById' };
+                readonly approvedAt: { readonly column: 'approvedAt' };
+                readonly rejectionReason: { readonly column: 'rejectionReason' };
+                readonly pendingTxHash: { readonly column: 'pendingTxHash' };
+                readonly pendingTxStage: { readonly column: 'pendingTxStage' };
+                readonly releaseKey: { readonly column: 'releaseKey' };
+                readonly processingAt: { readonly column: 'processingAt' };
                 readonly disbursementRequestedAt: { readonly column: 'disbursementRequestedAt' };
                 readonly contractMilestoneId: { readonly column: 'contractMilestoneId' };
                 readonly disbursementTxHash: { readonly column: 'disbursementTxHash' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly MilestoneStatusHistory: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly milestoneId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly actorId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly fromStatus: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly toStatus: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly proofVersion: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly note: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly actor: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['actorId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly milestone: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Milestone';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['milestoneId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'milestoneStatusHistory';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly milestoneId: { readonly column: 'milestoneId' };
+                readonly actorId: { readonly column: 'actorId' };
+                readonly fromStatus: { readonly column: 'fromStatus' };
+                readonly toStatus: { readonly column: 'toStatus' };
+                readonly proofVersion: { readonly column: 'proofVersion' };
+                readonly note: { readonly column: 'note' };
+                readonly createdAt: { readonly column: 'createdAt' };
               };
             };
           };

@@ -6,7 +6,7 @@ export const resolveMilestoneVerificationStatus = (result: {
   verified: boolean
   confidence: number
 }): MilestoneVerificationStatus => {
-  if (result.verified && result.confidence >= AI_CONFIDENCE_THRESHOLD) {
+  if (result.verified === true && Number.isFinite(result.confidence) && result.confidence >= AI_CONFIDENCE_THRESHOLD && result.confidence <= 1) {
     return "AI_VERIFIED"
   }
 

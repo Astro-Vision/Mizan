@@ -38,6 +38,19 @@ export function getRoleDashboardPath(role?: string | null): string | null {
   }
 }
 
+export function getExplorePath(role?: string | null): string {
+  switch (role) {
+    case "ADMIN":
+      return "/admin/campaigns"
+    case "BENEFACTOR":
+      return "/benefactor/jelajahi"
+    case "BENEFICIARY":
+      return "/beneficiary/campaigns"
+    default:
+      return "/campaigns"
+  }
+}
+
 export function getPostAuthRedirectPath(
   nextPath: string | null,
   role?: string | null,

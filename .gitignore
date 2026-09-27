@@ -39,6 +39,8 @@ pnpm-debug.log*
 next-env.d.ts
 node_modules/
 dist/
+/contracts/artifacts/
+/contracts/cache/
 .env
 .claude/
 .cursor/

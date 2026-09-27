@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
+import { cookies } from "next/headers"
 
 import "./globals.css"
 import { cn } from "../src/lib/utils"
@@ -66,14 +67,17 @@ export const viewport: Viewport = {
   themeColor: "#F8F3F9",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const savedLanguage = (await cookies()).get("mizan-language")?.value
+  const language = savedLanguage === "en" ? "en" : "id"
+
   return (
     <html
-      lang="id"
+      lang={language}
       suppressHydrationWarning
       className={cn(
         "antialiased",
@@ -84,7 +88,9 @@ export default function RootLayout({
     >
       <body className="min-h-dvh bg-canvas text-ink">
         <PrivyProviderWrapper>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider initialLanguage={language}>
+            {children}
+          </LanguageProvider>
         </PrivyProviderWrapper>
       </body>
     </html>

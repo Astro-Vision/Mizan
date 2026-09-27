@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import {
   getDashboardPath,
+  getExplorePath,
   getOnboardingUserType,
   getPostAuthRedirectPath,
   getRoleDashboardPath,
@@ -39,6 +40,16 @@ describe("role dashboard routing", () => {
     expect(getRoleDashboardPath("BENEFICIARY")).toBe("/beneficiary")
     expect(getRoleDashboardPath("USER")).toBeNull()
     expect(getRoleDashboardPath(null)).toBeNull()
+  })
+
+  it.each([
+    ["ADMIN", "/admin/campaigns"],
+    ["BENEFACTOR", "/benefactor/jelajahi"],
+    ["BENEFICIARY", "/beneficiary/campaigns"],
+    ["USER", "/campaigns"],
+    [null, "/campaigns"],
+  ])("routes explore for %s to %s", (role, expectedPath) => {
+    expect(getExplorePath(role)).toBe(expectedPath)
   })
 
   it("resolves the generic dashboard callback to the beneficiary dashboard", () => {

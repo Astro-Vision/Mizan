@@ -4,6 +4,7 @@ import * as React from "react"
 import { useIdentityToken } from "@privy-io/react-auth"
 import { ArrowUpRight } from "lucide-react"
 import { EXPLORER_URL } from "@/src/lib/dashboard-data"
+import { PAYMENTS_CHANGED_EVENT } from "@/src/lib/payments/events"
 
 type PaymentRow = {
   id: number
@@ -33,27 +34,41 @@ export function PaymentHistory() {
 
   React.useEffect(() => {
     if (!identityToken) {
+      setPayments([])
+      setMessage("Login diperlukan untuk melihat riwayat wallet ini.")
       return
     }
 
     let cancelled = false
-    fetch("/api/payments/history", {
-      headers: { "privy-id-token": identityToken },
-    })
-      .then(async (response) => {
-        const body = (await response.json()) as { payments?: PaymentRow[]; error?: string }
-        if (!response.ok) throw new Error(body.error || "Riwayat payment gagal dimuat")
-        if (!cancelled) {
-          setPayments(body.payments ?? [])
-          setMessage(body.payments?.length ? "" : "Belum ada payment dari wallet ini.")
-        }
-      })
-      .catch((error: unknown) => {
-        if (!cancelled) setMessage(error instanceof Error ? error.message : "Riwayat payment gagal dimuat")
-      })
 
+    async function load() {
+      try {
+        const response = await fetch("/api/payments/history", {
+          headers: { "privy-id-token": identityToken! },
+        })
+        const body = (await response.json()) as {
+          payments?: PaymentRow[]
+          error?: string
+        }
+        if (!response.ok) throw new Error(body.error || "Riwayat payment gagal dimuat")
+        if (cancelled) return
+        setPayments(body.payments ?? [])
+        setMessage(body.payments?.length ? "" : "Belum ada payment dari wallet ini.")
+      } catch (error: unknown) {
+        if (!cancelled) {
+          setMessage(error instanceof Error ? error.message : "Riwayat payment gagal dimuat")
+        }
+      }
+    }
+
+    void load()
+    const onChanged = () => {
+      void load()
+    }
+    window.addEventListener(PAYMENTS_CHANGED_EVENT, onChanged)
     return () => {
       cancelled = true
+      window.removeEventListener(PAYMENTS_CHANGED_EVENT, onChanged)
     }
   }, [identityToken])
 
@@ -73,7 +88,8 @@ export function PaymentHistory() {
               </p>
             </div>
             <p className="shrink-0 font-mono text-sm tabular-nums text-ink">
-              {formatWei(payment.amountWei)} <span className="text-xs text-ink-muted">BNB</span>
+              {formatWei(payment.amountWei).replace(".", ",")}{" "}
+              <span className="text-xs text-ink-muted">BNB</span>
             </p>
             {payment.transactionHash ? (
               <a

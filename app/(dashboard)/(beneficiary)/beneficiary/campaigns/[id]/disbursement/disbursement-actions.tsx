@@ -4,16 +4,12 @@ import { useActionState } from "react"
 import { Loader2, Banknote } from "lucide-react"
 import { requestMilestoneDisbursement } from "../milestones/actions"
 
-type DisbursementResult = { success: boolean; message: string } | null
-
 export function DisbursementActions({
   milestoneId,
-  campaignId,
 }: {
   milestoneId: string
-  campaignId: string
 }) {
-  const action = async (_prev: DisbursementResult) => {
+  const action = async () => {
     return requestMilestoneDisbursement(milestoneId)
   }
 

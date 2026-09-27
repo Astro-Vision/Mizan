@@ -15,6 +15,10 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 
+import {
+  CampaignPayment,
+  type PaymentCampaign,
+} from "@/components/dashboard/campaign-payment"
 import { SitePreferences } from "@/components/site/layout/site-preferences"
 import { useLanguage } from "@/components/site/language-provider"
 import {
@@ -27,7 +31,13 @@ import { SITE, type Campaign } from "@/src/lib/site-data"
 import { mzBtn } from "@/components/site/ui/mz-button"
 import { presentase } from "@/src/lib/site-data"
 
-export function CampaignDetail({ campaign }: { campaign: Campaign }) {
+export function CampaignDetail({
+  campaign,
+  payment,
+}: {
+  campaign: Campaign
+  payment: PaymentCampaign
+}) {
   const [currency, setCurrency] = useState<DisplayCurrency>("BNB")
   const { rates, loading } = useMarketRates()
   const { t } = useLanguage()
@@ -204,27 +214,29 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
                 "Setiap donasi masuk ke kontrak pintar dan bisa ditelusuri melalui alamat kontrak publik. Penyaluran dilakukan berdasarkan bukti yang dapat diperiksa."
               )}
             </p>
-          </div>
 
-          <div className="rounded-2xl border border-line-soft bg-very-light-purple p-6">
-            <p className="text-sm font-semibold text-ink">
-              {t("Profil komunitas")}
-            </p>
-            <p className="mt-3 text-sm leading-7 text-ink-muted">
-              {t(campaign.komunitas.bio)}
-            </p>
-            <div className="mt-5 flex items-center justify-between border-t border-line-soft pt-5 text-xs text-ink-muted">
-              <span>{t(campaign.komunitas.tipe)}</span>
-              <span className="inline-flex items-center gap-1 font-semibold text-primary-purple">
-                <BadgeCheck
-                  className="size-3.5"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-                {t("Terverifikasi")}
-              </span>
+            <div className="mt-8 rounded-2xl border border-line-soft bg-very-light-purple p-6">
+              <p className="text-sm font-semibold text-ink">
+                {t("Profil komunitas")}
+              </p>
+              <p className="mt-3 text-sm leading-7 text-ink-muted">
+                {t(campaign.komunitas.bio)}
+              </p>
+              <div className="mt-5 flex items-center justify-between border-t border-line-soft pt-5 text-xs text-ink-muted">
+                <span>{t(campaign.komunitas.tipe)}</span>
+                <span className="inline-flex items-center gap-1 font-semibold text-primary-purple">
+                  <BadgeCheck
+                    className="size-3.5"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+                  {t("Terverifikasi")}
+                </span>
+              </div>
             </div>
           </div>
+
+          <CampaignPayment campaigns={[payment]} />
         </div>
       </section>
 

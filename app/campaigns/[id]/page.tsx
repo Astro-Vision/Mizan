@@ -14,14 +14,14 @@ export default async function CampaignDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const campaign = await getPublicCampaignById(id)
+  const detail = await getPublicCampaignById(id)
 
-  if (!campaign) notFound()
+  if (!detail) notFound()
 
   return (
     <>
       <SiteHeader />
-      <CampaignDetail campaign={campaign} />
+      <CampaignDetail campaign={detail.campaign} payment={detail.payment} />
       <SiteFooter />
     </>
   )
