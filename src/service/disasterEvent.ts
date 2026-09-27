@@ -25,3 +25,5 @@ export async function createDisasterEvent(data: CreateDisasterEventInput) {
     disasterType: data.disasterType,
   })
 }
+
+export type SeverityLevel = "RENDAH" | "SEDANG" | "TINGGI" | "KRITIS"

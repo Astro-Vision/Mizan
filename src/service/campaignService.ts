@@ -1,4 +1,34 @@
 
-export function createCampaign() {
+// Harus match struktur `JsonValue` yang di-generate ORM kalian untuk field Json.
+// TODO: idealnya import langsung tipe JsonValue yang di-generate ORM kalian
+// (biasanya di-export dari package client-nya) daripada didefinisikan manual
 
+import { CreateDraftCampaignInput } from "../lib/type/campaignType"
+import { db } from "../prisma/db"
+
+
+
+export async function draftCampaignExistsByReference(aiReference: string): Promise<boolean> {
+  const existing = await db.orm.public.Campaign.where({ aiReference }).all()
+  return existing.length > 0
 }
+
+export async function createDraftCampaign(input: CreateDraftCampaignInput) {
+  return db.orm.public.Campaign.create({
+    title: input.title,
+    organizerName: input.organizerName,
+
+    source: "AI_MOCK",
+    aiDraft: input.aiDraftPayload,
+    aiReference: input.aiReference,
+    aiConfidence: input.aiConfidence,
+
+    reviewStatus: "AI_DRAFT",
+
+    targetAmountWei: input.targetAmountWei,
+    raisedAmountWei: "0",
+    currency: "BNB",
+  })
+}
+
+  

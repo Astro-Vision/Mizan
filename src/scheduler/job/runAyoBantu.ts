@@ -1,4 +1,4 @@
-import { searchNews } from "@/src/agents/tools/news/searchNews"
+import { scrapeAyobantu } from "@/src/agents/tools/scrape/scrapeAyoBantu"
 import { createContentHash } from "@/src/lib/hash"
 import {
   completeScrapeJob,
@@ -9,19 +9,19 @@ import { db } from "@/src/prisma/db"
 import { createRawCapture } from "@/src/service/rawCapturedService"
 import { createScrapeJob } from "@/src/service/scrapeServices"
 
-export async function runNews() {
-  const today = new Date().toISOString().split("T")[0]
+export async function runAyoBantu() {
+  const date = new Date()
 
   const job = await createScrapeJob({
-    startDate: today,
-    endDate: today,
+    startDate: date.toISOString(),
+    endDate: date.toISOString(),
     totalSources: 1,
   })
 
   try {
     await startScrapeJob(job.id)
 
-    const results = await searchNews({ startDate: today, endDate: today })
+    const results = await scrapeAyobantu({maxPages: 20})
 
     let created = 0
     let duplicates = 0
@@ -33,9 +33,9 @@ export async function runNews() {
       try {
         const existingHash = await db.orm.public.RawCapture.where({
           contentHash,
-        })
-        
-        if(existingHash) {
+        }).first()
+
+        if (existingHash) {
           duplicates++
 
           continue
@@ -44,24 +44,24 @@ export async function runNews() {
         await createRawCapture({
           sourceId: item.sourceId,
           url: item.url,
-          authorName: item.sourceName,
+          authorName: item.campaigner,
           contentText: content,
-          contentHash: createContentHash(content),
-          publishedAt: item.publishedAt.toISOString(),
+          contentHash,
+          publishedAt: new Date().toISOString(),
         })
+
         created++
-      } catch (captureErr) {
-        console.error(`Gagal createRawCapture untuk item News:`, captureErr)
+        
+      } catch (error) {
+        console.error(`Gagal createRawCapture untuk item AyoBantu:`, error)
       }
     }
 
     await completeScrapeJob(job.id)
 
-    console.log(`[News job] scraped: ${results.length}, created: ${created}`)
-
     return { scraped: results.length, created }
   } catch (error) {
-    console.error("[News job] gagal:", error)
+    console.error("[AyoBantu job] gagal:", error)
     await failScrapeJob(job.id, error)
     throw error
   }

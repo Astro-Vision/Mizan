@@ -178,6 +178,10 @@
                 "value": "KEKERINGAN"
               },
               {
+                "name": "ANGIN_PUTING_BELIUNG",
+                "value": "ANGIN_PUTING_BELIUNG"
+              },
+              {
                 "name": "LAINNYA",
                 "value": "LAINNYA"
               }
@@ -1424,6 +1428,13 @@
                   "kind": "scalar"
                 }
               },
+              "campaignCheckedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "capturedAt": {
                 "nullable": false,
                 "type": {
@@ -1527,6 +1538,9 @@
                 },
                 "authorVerified": {
                   "column": "authorVerified"
+                },
+                "campaignCheckedAt": {
+                  "column": "campaignCheckedAt"
                 },
                 "capturedAt": {
                   "column": "capturedAt"
@@ -2331,8 +2345,8 @@
             "analysis": {
               "checks": [
                 {
-                  "expression": "\"disasterType\" IN ('GEMPA_BUMI', 'BANJIR', 'TANAH_LONGSOR', 'KARHUTLA', 'TSUNAMI', 'ERUPSI_GUNUNG_API', 'KEKERINGAN', 'LAINNYA')",
-                  "name": "analysis_disasterType_check_77cea590",
+                  "expression": "\"disasterType\" IN ('GEMPA_BUMI', 'BANJIR', 'TANAH_LONGSOR', 'KARHUTLA', 'TSUNAMI', 'ERUPSI_GUNUNG_API', 'KEKERINGAN', 'ANGIN_PUTING_BELIUNG', 'LAINNYA')",
+                  "name": "analysis_disasterType_check_0ba89e00",
                   "prefix": "analysis_disasterType_check"
                 }
               ],
@@ -3041,8 +3055,8 @@
             "disasterEvent": {
               "checks": [
                 {
-                  "expression": "\"disasterType\" IN ('GEMPA_BUMI', 'BANJIR', 'TANAH_LONGSOR', 'KARHUTLA', 'TSUNAMI', 'ERUPSI_GUNUNG_API', 'KEKERINGAN', 'LAINNYA')",
-                  "name": "disasterEvent_disasterType_check_77cea590",
+                  "expression": "\"disasterType\" IN ('GEMPA_BUMI', 'BANJIR', 'TANAH_LONGSOR', 'KARHUTLA', 'TSUNAMI', 'ERUPSI_GUNUNG_API', 'KEKERINGAN', 'ANGIN_PUTING_BELIUNG', 'LAINNYA')",
+                  "name": "disasterEvent_disasterType_check_0ba89e00",
                   "prefix": "disasterEvent_disasterType_check"
                 },
                 {
@@ -3265,6 +3279,11 @@
                   },
                   "nativeType": "bool",
                   "nullable": false
+                },
+                "campaignCheckedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
                 },
                 "capturedAt": {
                   "codecId": "pg/timestamptz-string@1",
@@ -3961,6 +3980,7 @@
                 "TSUNAMI",
                 "ERUPSI_GUNUNG_API",
                 "KEKERINGAN",
+                "ANGIN_PUTING_BELIUNG",
                 "LAINNYA"
               ]
             },
@@ -4030,7 +4050,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "7036377a389f83a4c2b8286346fca85693937a3b0a9a04e7c00dd97e89e85a81",
+    "storageHash": "469b5e8dc45125020f014e26a27c9e6eb91e621f0a1758d32f1b83a87d925823",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",

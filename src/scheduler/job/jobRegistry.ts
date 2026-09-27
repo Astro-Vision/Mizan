@@ -1,9 +1,11 @@
 // src/scheduler/scheduler.executor.ts
 
-import { runAnalysis } from "./runAnalysis"
-import { runBmkg } from "./runBmkg"
 import { runBnpb } from "./runBnpb"
 import { runNews } from "./runNews"
+import { runAnalysisDisaster } from "./runAnalysisDisaster"
+import { runBmkg } from "./runBmkg"
+import { runAyoBantu } from "./runAyoBantu"
+import { runAnalysisCampaign } from "./runAnalysisCampaign"
 
 type JobHandler = () => Promise<unknown>
 
@@ -11,7 +13,9 @@ const jobs: Record<string, JobHandler> = {
   NEWS: runNews,
   BMKG: runBmkg,
   BNPB: runBnpb,
-  ANALYSIS: runAnalysis,
+  ANALYSIS: runAnalysisDisaster,
+  AYOBANTU: runAyoBantu,
+  ANALYSISCAMPAIGN: runAnalysisCampaign
 }
 
 

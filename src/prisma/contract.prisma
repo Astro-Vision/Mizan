@@ -122,7 +122,7 @@ model Campaign {
 
   source       CampaignSource       @default(AI_MOCK)
   aiDraft      Json?
-  aiReference  String?
+  aiReference  String? 
   aiConfidence Float?
 
   reviewStatus    CampaignReviewStatus @default(AI_DRAFT)
@@ -264,6 +264,8 @@ model RawCapture {
   analysis Analysis?
 
   capturedAt TimestamptzString @default(now())
+  campaignCheckedAt TimestamptzString?
+
 
   @@index([sourceId])
   @@index([capturedAt])
@@ -345,6 +347,7 @@ enum DisasterType {
   TSUNAMI
   ERUPSI_GUNUNG_API
   KEKERINGAN
+  ANGIN_PUTING_BELIUNG
   LAINNYA
 }
 

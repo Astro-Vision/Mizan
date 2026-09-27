@@ -1,3 +1,5 @@
+
+// ================PROMPT_BENCANA================
 export const DISASTER_AGENT_PROMPT = `
 # ROLE
 
@@ -185,3 +187,4 @@ Do not add exact coordinates unless explicitly provided.
 Return ONLY the JSON array. Do not wrap it in markdown code fences.
 Do not add any text before or after the JSON array.
 `;
+//================PROMPT_BENCANA================

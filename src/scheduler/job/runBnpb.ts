@@ -38,8 +38,6 @@ export async function runBnpb() {
         if (existingHash) {
           duplicates++
 
-          console.log(`[News job] Duplicate contentHash: ${contentHash}`)
-
           continue
         }
 

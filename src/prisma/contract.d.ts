@@ -38,7 +38,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'7036377a389f83a4c2b8286346fca85693937a3b0a9a04e7c00dd97e89e85a81'>;
+  StorageHashBase<'469b5e8dc45125020f014e26a27c9e6eb91e621f0a1758d32f1b83a87d925823'>;
 export type ExecutionHash =
   ExecutionHashBase<'96eed982e8f3204899cb79bab41a43fda13ccba682660a0b5845cd3c237741bd'>;
 export type ProfileHash =
@@ -259,6 +259,7 @@ export type FieldOutputTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly confidenceScore: CodecTypes['pg/float8@1']['output'];
@@ -336,6 +337,7 @@ export type FieldOutputTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly severityLevel: 'RENDAH' | 'SEDANG' | 'TINGGI' | 'KRITIS' | null;
@@ -369,6 +371,7 @@ export type FieldOutputTypes = {
       readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly contentHash: CodecTypes['pg/text@1']['output'];
       readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['output'];
+      readonly campaignCheckedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
     };
     readonly Scheduler: {
       readonly id: CodecTypes['pg/text@1']['output'];
@@ -451,6 +454,7 @@ export type FieldInputTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly confidenceScore: CodecTypes['pg/float8@1']['input'];
@@ -528,6 +532,7 @@ export type FieldInputTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly severityLevel: 'RENDAH' | 'SEDANG' | 'TINGGI' | 'KRITIS' | null;
@@ -561,6 +566,7 @@ export type FieldInputTypes = {
       readonly publishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly contentHash: CodecTypes['pg/text@1']['input'];
       readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['input'];
+      readonly campaignCheckedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
     };
     readonly Scheduler: {
       readonly id: CodecTypes['pg/text@1']['input'];
@@ -642,6 +648,7 @@ export type StorageColumnTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly eventId: CodecTypes['pg/text@1']['output'] | null;
@@ -721,6 +728,7 @@ export type StorageColumnTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly firstDetectedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -744,6 +752,7 @@ export type StorageColumnTypes = {
     readonly rawCapture: {
       readonly authorName: CodecTypes['pg/text@1']['output'] | null;
       readonly authorVerified: CodecTypes['pg/bool@1']['output'];
+      readonly campaignCheckedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly contentHash: CodecTypes['pg/text@1']['output'];
       readonly contentText: CodecTypes['pg/text@1']['output'];
@@ -834,6 +843,7 @@ export type StorageColumnInputTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly eventId: CodecTypes['pg/text@1']['input'] | null;
@@ -913,6 +923,7 @@ export type StorageColumnInputTypes = {
         | 'TSUNAMI'
         | 'ERUPSI_GUNUNG_API'
         | 'KEKERINGAN'
+        | 'ANGIN_PUTING_BELIUNG'
         | 'LAINNYA'
         | null;
       readonly firstDetectedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -936,6 +947,7 @@ export type StorageColumnInputTypes = {
     readonly rawCapture: {
       readonly authorName: CodecTypes['pg/text@1']['input'] | null;
       readonly authorVerified: CodecTypes['pg/bool@1']['input'];
+      readonly campaignCheckedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly capturedAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly contentHash: CodecTypes['pg/text@1']['input'];
       readonly contentText: CodecTypes['pg/text@1']['input'];
@@ -1776,6 +1788,11 @@ type ContractBase = Omit<
                   readonly nullable: false;
                   readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
                 };
+                readonly campaignCheckedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: true;
+                };
               };
               primaryKey: { readonly columns: readonly ['id'] };
               uniques: readonly [{ readonly columns: readonly ['contentHash'] }];
@@ -2258,6 +2275,7 @@ type ContractBase = Omit<
                 'TSUNAMI',
                 'ERUPSI_GUNUNG_API',
                 'KEKERINGAN',
+                'ANGIN_PUTING_BELIUNG',
                 'LAINNYA',
               ];
             };
@@ -3026,6 +3044,13 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-string@1';
                 };
               };
+              readonly campaignCheckedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
             };
             readonly relations: {
               readonly analysis: {
@@ -3066,6 +3091,7 @@ type ContractBase = Omit<
                 readonly publishedAt: { readonly column: 'publishedAt' };
                 readonly contentHash: { readonly column: 'contentHash' };
                 readonly capturedAt: { readonly column: 'capturedAt' };
+                readonly campaignCheckedAt: { readonly column: 'campaignCheckedAt' };
               };
             };
           };
@@ -3616,6 +3642,7 @@ type ContractBase = Omit<
               { readonly name: 'TSUNAMI'; readonly value: 'TSUNAMI' },
               { readonly name: 'ERUPSI_GUNUNG_API'; readonly value: 'ERUPSI_GUNUNG_API' },
               { readonly name: 'KEKERINGAN'; readonly value: 'KEKERINGAN' },
+              { readonly name: 'ANGIN_PUTING_BELIUNG'; readonly value: 'ANGIN_PUTING_BELIUNG' },
               { readonly name: 'LAINNYA'; readonly value: 'LAINNYA' },
             ];
           };

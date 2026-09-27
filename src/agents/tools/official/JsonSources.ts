@@ -59,7 +59,7 @@ export async function fetchJsonSources() {
   const newItems = itemsWithHash.filter((x) => !existingHashSet.has(x.hash))
 
   console.log(
-    `JSON_SOURCES: ${rawResults.length} total, ${newItems.length} baru, ${
+    `BMKG SOURCES: ${rawResults.length} total, ${newItems.length} baru, ${
       rawResults.length - newItems.length
     } sudah ada (skip)`
   )
