@@ -8,15 +8,9 @@ export interface AiCampaignDraft {
 }
 
 type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | { [key: string]: JsonValue }
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
 
 type campaignCategory = "ZAKAT" | "DONASI_UMUM" | "WAKAF" | "BENCANA"
-
 
 export interface CreateDraftCampaignInput {
   title: string
@@ -26,4 +20,8 @@ export interface CreateDraftCampaignInput {
   aiConfidence: number
   targetAmountWei: string
   category: campaignCategory
+  summary: string
+  location?: string
+  days: number
+  image?: string
 }

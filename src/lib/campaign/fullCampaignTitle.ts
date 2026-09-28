@@ -1,5 +1,10 @@
 import * as cheerio from "cheerio"
 
+export interface CampaignDetail {
+  title: string
+  daysLeftText?: number
+}
+
 function cleanCampaignTitle(title: string): string {
   return title
     .replace(/\s+/g, " ")
@@ -8,11 +13,10 @@ function cleanCampaignTitle(title: string): string {
     .trim()
 }
 
-
 export async function getFullCampaignTitle(
   url: string,
   fallbackTitle: string
-): Promise<string> {
+): Promise<CampaignDetail> {
   try {
     const response = await fetch(url, {
       headers: {
@@ -27,38 +31,51 @@ export async function getFullCampaignTitle(
         `[AyoBantu] gagal fetch detail title ${url}: ${response.status}`
       )
 
-      return fallbackTitle
+      return {
+        title: fallbackTitle,
+      }
     }
 
     const html = await response.text()
     const $ = cheerio.load(html)
 
-    /**
-     * Prioritas:
-     *
-     * 1. og:title
-     * 2. twitter:title
-     * 3. <title>
-     * 4. heading campaign
-     * 5. fallback dari listing
-     */
+
+
+    const $daysLeft = $(".info-additional li")
+      .filter((_, el) => $(el).text().toLowerCase().includes("hari lagi"))
+      .first()
+
+    const daysText = $daysLeft.find("strong").first().text().trim()
+
+    const daysLeftText = daysText ? parseInt(daysText, 10) : 0
+
+  
 
     const ogTitle = $('meta[property="og:title"]').attr("content")?.trim()
 
     if (ogTitle && !ogTitle.endsWith("...")) {
-      return cleanCampaignTitle(ogTitle)
+      return {
+        title: cleanCampaignTitle(ogTitle),
+        daysLeftText,
+      }
     }
 
     const twitterTitle = $('meta[name="twitter:title"]').attr("content")?.trim()
 
     if (twitterTitle && !twitterTitle.endsWith("...")) {
-      return cleanCampaignTitle(twitterTitle)
+      return {
+        title: cleanCampaignTitle(twitterTitle),
+        daysLeftText,
+      }
     }
 
     const documentTitle = $("title").first().text().trim()
 
     if (documentTitle && !documentTitle.endsWith("...")) {
-      return cleanCampaignTitle(documentTitle)
+      return {
+        title: cleanCampaignTitle(documentTitle),
+        daysLeftText,
+      }
     }
 
     const heading = $("h1, h2, h3, h4, h5, h6")
@@ -76,13 +93,21 @@ export async function getFullCampaignTitle(
       .trim()
 
     if (heading && !heading.endsWith("...")) {
-      return cleanCampaignTitle(heading)
+      return {
+        title: cleanCampaignTitle(heading),
+        daysLeftText,
+      }
     }
 
-    return fallbackTitle
+    return {
+      title: fallbackTitle,
+      daysLeftText,
+    }
   } catch (error) {
     console.warn(`[AyoBantu] gagal mengambil full title ${url}:`, error)
 
-    return fallbackTitle
+    return {
+      title: fallbackTitle,
+    }
   }
 }

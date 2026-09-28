@@ -125,12 +125,6 @@ export async function runAnalysisCampaign() {
 
       const hasDisasterMatch = hasDisasterTypeMatch || hasDisasterLocationMatch
 
-      console.log("[debug] hasDisasterTypeMatch:", hasDisasterTypeMatch)
-      console.log("[debug] hasDisasterLocationMatch:", hasDisasterLocationMatch)
-      console.log("[debug] hasDisasterMatch:", hasDisasterMatch)
-
-      console.log("====================================\n")
-
       let relatedEvents: RelatedDisasterEvent[]
 
       try {
@@ -221,7 +215,6 @@ export async function runAnalysisCampaign() {
         }
       }
 
-      // Semua konteks off-chain disimpan di aiDraft (Json), bukan sebagai kolom baru.
       const aiDraftPayload = {
         ...aiDraft,
         source: "ayobantu",
@@ -234,9 +227,11 @@ export async function runAnalysisCampaign() {
         sourceRaisedAmountIdr: extraction.collectedAmount,
         sourceTargetAmountIdr: extraction.targetAmount,
         daysLeftText: item.daysLeftText ?? null,
+        summary: extraction.description,
+        location: extraction.location,
+        campaignerUrl: item.campaignerUrl ?? null,
       }
 
-      // 9. Campaign Service -> Campaign DB
       const campaign = await createDraftCampaign({
         title: aiDraft.title || extraction.title,
         organizerName:
@@ -246,6 +241,10 @@ export async function runAnalysisCampaign() {
         aiConfidence: aiDraft.confidenceScore,
         targetAmountWei,
         category: toCategoryCode(extraction.category) ?? "BENCANA",
+        summary: aiDraft.summary,
+        location: aiDraft.location,
+        days: extraction.daysLeftText,
+        image: item.image,
       })
 
       await markCaptureChecked(capture.id)

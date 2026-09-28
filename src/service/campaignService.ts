@@ -25,5 +25,9 @@ export async function createDraftCampaign(input: CreateDraftCampaignInput) {
     currency: "BNB",
 
     category: input.category,
+    summary: input.summary,
+    location: input.location,
+    daysLeft: input.days,
+    image: input.image,
   })
 }

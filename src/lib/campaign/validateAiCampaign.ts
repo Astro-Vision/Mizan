@@ -5,6 +5,7 @@ export interface AiCampaignDraft {
   confidenceScore: number   // 0-1
   flaggedReasons: string[]
   matchedDisasterEventId: string | null
+  location?: string
 }
 
 
