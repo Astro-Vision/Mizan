@@ -2,10 +2,10 @@
 
 import { ArrowRight, ExternalLink, ShieldCheck } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { MizanMark } from "@/components/site/ui/mizan-mark"
 import { useLanguage } from "@/components/site/language-provider"
 import { NAV, SITE, TESTNET_NOTICE } from "@/src/lib/site-data"
 
@@ -41,7 +41,13 @@ export function SiteFooter() {
                 className="inline-flex items-center gap-2 text-primary-purple"
                 aria-label={t("Mizan — kembali ke beranda")}
               >
-                <MizanMark className="size-8" />
+                <Image
+                  src="/Logomark.png"
+                  alt=""
+                  width={32}
+                  height={32}
+                  className="size-8 object-contain"
+                />
                 <span className="text-xl font-extrabold tracking-[-0.04em]">
                   Mizan
                 </span>
