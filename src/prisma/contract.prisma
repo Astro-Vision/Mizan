@@ -49,6 +49,7 @@ model User {
   communityMemberships CommunityMember[]
   approvedCampaigns    Campaign[]        @relation("CampaignApprover")
   campaignPayments     CampaignPayment[]
+  disbursementRequests DisbursementRequest[]
 
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
@@ -94,9 +95,16 @@ model Community {
 
   legalDocumentUrl   String? // e.g. SK Kemenag / akta / NIB scan, reviewed by Admin during verification
   registrationNumber String? // NPWP / nomor izin LAZ, free-text since format varies by institution type
+  description        String?
+  logoUrl            String?
+  websiteUrl         String?
+  contactEmail       String?
+  contactPhone       String?
+  address            String?
 
   members   CommunityMember[]
   campaigns Campaign[]
+  disbursementRequests DisbursementRequest[]
 
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
@@ -259,11 +267,53 @@ model Milestone {
   disbursementRequestedAt TimestamptzString?
   contractMilestoneId     String?
   disbursementTxHash      String?
+  disbursementRequests    DisbursementRequest[]
 
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
 
   @@index([campaignId])
+}
+
+enum DisbursementRequestStatus {
+  SUBMITTED
+  AI_VERIFIED
+  PROOF_SUBMITTED
+  REJECTED
+  DISBURSEMENT_REQUESTED
+  DISBURSED
+}
+
+model DisbursementRequest {
+  id                Int                        @id @default(autoincrement())
+  milestoneId       Int
+  milestone         Milestone                  @relation(fields: [milestoneId], references: [id])
+  communityId       Int
+  community         Community                  @relation(fields: [communityId], references: [id])
+  requestedByUserId Int
+  requestedByUser   User                       @relation(fields: [requestedByUserId], references: [id])
+
+  requestedAmountWei String
+  description        String
+  region             String                     @default("Indonesia")
+  items              Json
+
+  documentStoragePath String
+  documentFileName    String
+  documentMimeType    String
+  signatureStoragePath String?
+
+  langflowDecision   String?
+  langflowConfidence Float?
+  langflowOutput     Json?
+  status             DisbursementRequestStatus @default(SUBMITTED)
+
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@index([milestoneId])
+  @@index([communityId])
+  @@index([status])
 }
 
 enum MilestoneStatus {
@@ -475,6 +525,4 @@ policy_insert audit_logs_langflow {
   target    = AuditLog
   roles     = [anon, authenticated]
   withCheck = "true"
-
-  @@map("langflow")
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useActionState, useState } from "react"
-import { Upload, Loader2, FileText } from "lucide-react"
+import { Upload, Loader2, FileText, Download } from "lucide-react"
 import { submitProof } from "./actions"
 
 type ProofResult = { success: boolean; message: string } | null
@@ -12,6 +12,9 @@ export function ProofForm({
   milestoneId: string
 }) {
   const [preview, setPreview] = useState<{ url: string; isPdf: boolean } | null>(null)
+  const [proofNote, setProofNote] = useState("")
+  const [templateLoading, setTemplateLoading] = useState(false)
+  const [templateMessage, setTemplateMessage] = useState<string | null>(null)
 
   const action = async (_prev: ProofResult, formData: FormData) => {
     return submitProof(milestoneId, formData)
@@ -21,11 +24,36 @@ export function ProofForm({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file && (file.type.startsWith("image/") || file.type === "application/pdf")) {
+    if (file && (file.type.startsWith("image/") || file.type === "application/pdf" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
       const url = URL.createObjectURL(file)
-      setPreview({ url, isPdf: file.type === "application/pdf" })
+      setPreview({ url, isPdf: !file.type.startsWith("image/") })
     } else {
       setPreview(null)
+    }
+  }
+
+  const handleDownloadTemplate = async () => {
+    setTemplateLoading(true)
+    setTemplateMessage(null)
+    try {
+      const query = new URLSearchParams({ milestoneId, proofNote })
+      const response = await fetch(`/api/beneficiary/milestones/proof-template?${query.toString()}`)
+      if (!response.ok) {
+        const result = await response.json() as { error?: string }
+        throw new Error(result.error || "Template gagal dibuat.")
+      }
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement("a")
+      anchor.href = url
+      anchor.download = `bukti-milestone-${milestoneId}.docx`
+      anchor.click()
+      URL.revokeObjectURL(url)
+      setTemplateMessage("Template berhasil diunduh. Tanda tangani dokumen lalu upload kembali di bawah.")
+    } catch (error) {
+      setTemplateMessage(error instanceof Error ? error.message : "Template gagal dibuat.")
+    } finally {
+      setTemplateLoading(false)
     }
   }
 
@@ -51,15 +79,15 @@ export function ProofForm({
           <input
             name="proofFile"
             type="file"
-            accept="image/*,.pdf,application/pdf"
+            accept="image/*,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             required
             disabled={isPending}
             onChange={handleFileChange}
-            className="block min-h-12 w-full rounded-[6px] border border-line-ui bg-surface px-3 py-3 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-700 disabled:opacity-50"
+            className="block min-h-12 w-full rounded-[6px] border border-line-ui bg-surface px-3 py-3 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-700 disabled:opacity-50 cursor-pointer"
           />
         </div>
         <span className="mt-2 block text-xs text-ink-muted">
-          Upload gambar kuitansi/dokumentasi atau file PDF. Maks 5 MB.
+          Upload gambar kuitansi/dokumentasi, PDF, atau DOCX bertanda tangan. Maks 10 MB.
         </span>
       </label>
 
@@ -90,16 +118,33 @@ export function ProofForm({
           name="proofNote"
           rows={4}
           disabled={isPending}
+          value={proofNote}
+          onChange={(event) => setProofNote(event.target.value)}
           className="mt-2 w-full rounded-[6px] border border-line-ui bg-surface px-4 py-3 text-sm disabled:opacity-50"
           placeholder="Jelaskan kapan dan kepada siapa dana disalurkan."
         />
       </label>
 
+      <div className="rounded-[10px] border border-brand-200 bg-brand-50 p-4">
+        <p className="text-sm font-medium text-ink">Template dokumen bukti</p>
+        <p className="mt-1 text-xs leading-5 text-ink-muted">Isi catatan penggunaan dana di atas terlebih dahulu, unduh template, tanda tangani, lalu upload kembali sebagai bukti.</p>
+        <button
+          type="button"
+          onClick={() => void handleDownloadTemplate()}
+          disabled={isPending || templateLoading}
+          className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-[10px] border border-brand-300 bg-surface px-4 text-sm font-medium text-brand-700 disabled:opacity-50 cursor-pointer"
+        >
+          {templateLoading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+          Unduh template dokumen
+        </button>
+        {templateMessage ? <p className="mt-2 text-xs text-ink-muted" role="status">{templateMessage}</p> : null}
+      </div>
+
       {/* Submit button */}
       <button
         type="submit"
         disabled={isPending}
-        className="inline-flex min-h-12 items-center gap-2 rounded-[10px] bg-brand-700 px-5 text-sm font-medium text-white transition-colors hover:bg-brand-800 disabled:opacity-50"
+        className="inline-flex min-h-12 items-center gap-2 rounded-[10px] bg-brand-700 px-5 text-sm font-medium text-white transition-colors hover:bg-brand-800 disabled:opacity-50 cursor-pointer"
       >
         {isPending ? (
           <>

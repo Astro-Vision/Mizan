@@ -1,6 +1,7 @@
 import "server-only"
 
 import { db } from "@/src/prisma/db"
+import { getDisbursementDocumentUrl } from "@/src/lib/storage"
 import type { Campaign } from "@/src/lib/site-data"
 import { toCategoryLabel } from "@/src/lib/campaign-category"
 
@@ -62,6 +63,7 @@ function initials(name: string): string {
 // The shape returned by `db.orm.public.Campaign` reads we perform below.
 type CampaignRow = {
   id: number
+  communityId: number | null
   title: string
   organizerName: string
   category: string
@@ -94,6 +96,7 @@ function toCard(row: CampaignRow): Campaign {
     ringkas: row.summary ?? "",
     gambar: row.image || DEFAULT_COVER,
     komunitas: {
+      id: row.communityId ? String(row.communityId) : undefined,
       nama: organizer,
       tipe: "Komunitas terverifikasi",
       bio: row.summary
@@ -106,6 +109,7 @@ function toCard(row: CampaignRow): Campaign {
 
 const PUBLIC_SELECT = [
   "id",
+  "communityId",
   "title",
   "organizerName",
   "category",
@@ -147,7 +151,114 @@ export async function getPublicCampaignById(
     .first()
 
   if (!row) return null
-  if (row.reviewStatus !== "APPROVED" || row.status !== "ACTIVE") return null
+  if (row.reviewStatus !== "APPROVED" || !["ACTIVE", "COMPLETED", "CLOSED"].includes(row.status)) return null
 
   return toCard(row as CampaignRow)
+}
+
+export type PublicOrganization = {
+  id: string
+  name: string
+  description: string | null
+  logoUrl: string | null
+  websiteUrl: string | null
+  contactEmail: string | null
+  contactPhone: string | null
+  address: string | null
+  walletAddress: string
+  registrationNumber: string | null
+  legalDocumentUrl: string | null
+  verificationStatus: string
+  campaigns: Campaign[]
+  disbursementHistory: PublicDisbursementHistoryItem[]
+}
+
+export type PublicDisbursementHistoryItem = {
+  id: string
+  milestone: string
+  amountWei: string
+  currency: string
+  description: string
+  region: string
+  items: Array<{ name: string; quantity: number; unit: string }>
+  createdAt: string
+  documentUrl: string | null
+}
+
+const toPublicDisbursement = async (
+  request: { id: number; milestoneId: number; requestedAmountWei: string; description: string; region: string; items: unknown; createdAt: string; documentStoragePath: string },
+  milestone: { description: string },
+  currency: string,
+): Promise<PublicDisbursementHistoryItem> => {
+  const rawItems = Array.isArray(request.items) ? request.items : []
+  const items = rawItems.flatMap((item) => {
+    if (!item || typeof item !== "object") return []
+    const value = item as Record<string, unknown>
+    if (typeof value.name !== "string" || typeof value.unit !== "string" || typeof value.quantity !== "number") return []
+    return [{ name: value.name, quantity: value.quantity, unit: value.unit }]
+  })
+  const documentUrl = await getDisbursementDocumentUrl(request.documentStoragePath).catch((error) => {
+    console.error("Public disbursement document URL refresh failed:", error)
+    return null
+  })
+  return {
+    id: String(request.id),
+    milestone: milestone.description,
+    amountWei: request.requestedAmountWei,
+    currency,
+    description: request.description,
+    region: request.region,
+    items,
+    createdAt: request.createdAt,
+    documentUrl,
+  }
+}
+
+export async function getPublicDisbursementHistoryForCampaign(campaignId: number): Promise<PublicDisbursementHistoryItem[]> {
+  const milestones = await db.orm.public.Milestone.where({ campaignId }).all()
+  const milestoneIds = new Set(milestones.map((milestone) => milestone.id))
+  const campaign = await db.orm.public.Campaign.first({ id: campaignId })
+  if (!campaign) return []
+  const requests = await db.orm.public.DisbursementRequest.where({ status: "DISBURSED" }).all()
+  const visible = requests.filter((request) => milestoneIds.has(request.milestoneId))
+  return Promise.all(visible.map((request) => {
+    const milestone = milestones.find((value) => value.id === request.milestoneId)
+    return toPublicDisbursement(request, milestone ?? { description: "Milestone" }, campaign.currency)
+  }))
+}
+
+export async function getPublicDisbursementHistoryForOrganization(communityId: number): Promise<PublicDisbursementHistoryItem[]> {
+  const campaigns = await db.orm.public.Campaign.where({ communityId, reviewStatus: "APPROVED" }).all()
+  const histories = await Promise.all(campaigns.map((campaign) => getPublicDisbursementHistoryForCampaign(campaign.id)))
+  return histories.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+}
+
+export async function getPublicOrganizationById(id: string): Promise<PublicOrganization | null> {
+  const organizationId = Number(id)
+  if (!Number.isInteger(organizationId) || organizationId <= 0) return null
+
+  const community = await db.orm.public.Community.first({ id: organizationId })
+  if (!community) return null
+
+  const campaignRows = await db.orm.public.Campaign.select(...PUBLIC_SELECT)
+    .where({ communityId: organizationId, reviewStatus: "APPROVED", status: "ACTIVE" })
+    .orderBy((campaign) => campaign.createdAt.desc())
+    .all()
+
+  return {
+    id: String(community.id),
+    name: community.name,
+    description: community.description,
+    logoUrl: community.logoUrl,
+    websiteUrl: community.websiteUrl,
+    contactEmail: community.contactEmail,
+    contactPhone: community.contactPhone,
+    address: community.address,
+    walletAddress: community.walletAddress,
+    registrationNumber: community.registrationNumber,
+    legalDocumentUrl: community.legalDocumentUrl,
+    verificationStatus: community.verificationStatus,
+    campaigns: campaignRows.map((row) => toCard(row as CampaignRow)),
+    disbursementHistory: await getPublicDisbursementHistoryForOrganization(organizationId),
+  }
 }

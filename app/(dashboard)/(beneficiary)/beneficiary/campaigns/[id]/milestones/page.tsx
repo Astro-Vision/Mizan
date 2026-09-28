@@ -64,7 +64,6 @@ export default async function MilestonesPage({
   const { id } = await params
   const result = await getMilestones(id)
   if (!result) notFound()
-  console.log("dari mile", result)
 
   return (
     <div className="mx-auto max-w-[840px]">

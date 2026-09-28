@@ -6,6 +6,7 @@ import { getMilestoneProofUrl, uploadMilestoneProof } from "@/src/lib/storage"
 import { verifyMilestoneProof } from "@/src/lib/langflow"
 import { resolveMilestoneVerificationStatus } from "@/src/lib/milestone-verification"
 import { db } from "@/src/prisma/db"
+import { validateDisbursementDocumentFile } from "@/src/lib/disbursement"
 
 export async function submitProof(milestoneId: string, formData: FormData) {
   const { community } = await requireBeneficiaryCommunity()
@@ -28,8 +29,16 @@ export async function submitProof(milestoneId: string, formData: FormData) {
   if (!(file instanceof File) || file.size === 0) {
     return { success: false, message: "File bukti wajib diunggah." }
   }
-  if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
-    return { success: false, message: "File bukti harus berupa gambar atau PDF." }
+  if (
+    !file.type.startsWith("image/") &&
+    file.type !== "application/pdf" &&
+    file.type !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    return { success: false, message: "File bukti harus berupa gambar, PDF, atau DOCX." }
+  }
+  if (file.type === "application/pdf" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+    const documentError = await validateDisbursementDocumentFile(file)
+    if (documentError) return { success: false, message: documentError }
   }
 
   // 1. Upload to Supabase Storage

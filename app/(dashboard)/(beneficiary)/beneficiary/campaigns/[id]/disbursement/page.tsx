@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ChevronLeft, ArrowUpRight } from "lucide-react"
 import { notFound } from "next/navigation"
 import { getMilestones } from "../milestones/actions"
+import { DisbursementRequestForm } from "@/components/dashboard/disbursement-request-form"
 
 const EXPLORER_URL = "https://testnet.bscscan.com"
 
@@ -119,9 +120,7 @@ export default async function DisbursementPage({
 
             <div className="shrink-0">
               {milestone.status === "AI_VERIFIED" ? (
-                <span className="inline-flex h-7 items-center rounded-full bg-accent-200/20 px-3 text-[0.8125rem] font-semibold uppercase tracking-[0.02em] text-ink">
-                  Menunggu persetujuan admin
-                </span>
+                <div className="w-full sm:max-w-xl"><span className="inline-flex h-7 items-center rounded-full bg-accent-200/20 px-3 text-[0.8125rem] font-semibold uppercase tracking-[0.02em] text-ink">Siap diajukan</span><DisbursementRequestForm milestoneId={milestone.id} milestoneDescription={milestone.description} currency={result.campaign.currency} /></div>
               ) : (
                 <span
                   className={`inline-flex h-7 items-center rounded-full px-3 text-[0.8125rem] font-semibold uppercase tracking-[0.02em] ${

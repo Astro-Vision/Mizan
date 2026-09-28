@@ -26,11 +26,11 @@ export function SiteHeader() {
           >
             <span data-mz-logo-anchor className="mz-site-logo">
               <Image
-                src="/logo_main1.png"
+                src="/Primary-Logo.png"
                 alt="Mizan"
                 className="mz-site-logo__image"
-                width={2000}
-                height={2000}
+                width={1200}
+                height={400}
                 sizes="162px"
               />
             </span>

@@ -289,6 +289,8 @@ const ENGLISH: Record<string, string> = {
   "Dana yang sampai, bukan sekadar janji.":
     "Funds that arrive, not just promises.",
   "Profil komunitas": "Community profile",
+  "Lihat profil": "View profile",
+  "Lihat profil organisasi": "View organization profile",
   Terverifikasi: "Verified",
 }
 

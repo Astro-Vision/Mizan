@@ -32,6 +32,10 @@
       "model": "DisasterEvent",
       "namespace": "public"
     },
+    "disbursementRequest": {
+      "model": "DisbursementRequest",
+      "namespace": "public"
+    },
     "milestone": {
       "model": "Milestone",
       "namespace": "public"
@@ -247,6 +251,35 @@
               {
                 "name": "LAINNYA",
                 "value": "LAINNYA"
+              }
+            ]
+          },
+          "DisbursementRequestStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "SUBMITTED",
+                "value": "SUBMITTED"
+              },
+              {
+                "name": "AI_VERIFIED",
+                "value": "AI_VERIFIED"
+              },
+              {
+                "name": "PROOF_SUBMITTED",
+                "value": "PROOF_SUBMITTED"
+              },
+              {
+                "name": "REJECTED",
+                "value": "REJECTED"
+              },
+              {
+                "name": "DISBURSEMENT_REQUESTED",
+                "value": "DISBURSEMENT_REQUESTED"
+              },
+              {
+                "name": "DISBURSED",
+                "value": "DISBURSED"
               }
             ]
           },
@@ -1182,8 +1215,29 @@
           },
           "Community": {
             "fields": {
+              "address": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "chainType": {
                 "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "contactEmail": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "contactPhone": {
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
@@ -1193,6 +1247,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -1211,6 +1272,13 @@
                 }
               },
               "legalDocumentUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "logoUrl": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -1257,6 +1325,13 @@
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
+              },
+              "websiteUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -1272,6 +1347,21 @@
                 },
                 "to": {
                   "model": "Campaign",
+                  "namespace": "public"
+                }
+              },
+              "disbursementRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "communityId"
+                  ]
+                },
+                "to": {
+                  "model": "DisbursementRequest",
                   "namespace": "public"
                 }
               },
@@ -1293,11 +1383,23 @@
             },
             "storage": {
               "fields": {
+                "address": {
+                  "column": "address"
+                },
                 "chainType": {
                   "column": "chainType"
                 },
+                "contactEmail": {
+                  "column": "contactEmail"
+                },
+                "contactPhone": {
+                  "column": "contactPhone"
+                },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "description": {
+                  "column": "description"
                 },
                 "id": {
                   "column": "id"
@@ -1307,6 +1409,9 @@
                 },
                 "legalDocumentUrl": {
                   "column": "legalDocumentUrl"
+                },
+                "logoUrl": {
+                  "column": "logoUrl"
                 },
                 "name": {
                   "column": "name"
@@ -1322,6 +1427,9 @@
                 },
                 "walletAddress": {
                   "column": "walletAddress"
+                },
+                "websiteUrl": {
+                  "column": "websiteUrl"
                 }
               },
               "namespaceId": "public",
@@ -1617,6 +1725,249 @@
               "table": "disasterEvent"
             }
           },
+          "DisbursementRequest": {
+            "fields": {
+              "communityId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "description": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "documentFileName": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "documentMimeType": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "documentStoragePath": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "items": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "langflowConfidence": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "langflowDecision": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "langflowOutput": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "milestoneId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "region": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "requestedAmountWei": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "requestedByUserId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "signatureStoragePath": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "DisbursementRequestStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "community": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "communityId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Community",
+                  "namespace": "public"
+                }
+              },
+              "milestone": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "milestoneId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Milestone",
+                  "namespace": "public"
+                }
+              },
+              "requestedByUser": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "requestedByUserId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "communityId": {
+                  "column": "communityId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "description": {
+                  "column": "description"
+                },
+                "documentFileName": {
+                  "column": "documentFileName"
+                },
+                "documentMimeType": {
+                  "column": "documentMimeType"
+                },
+                "documentStoragePath": {
+                  "column": "documentStoragePath"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "items": {
+                  "column": "items"
+                },
+                "langflowConfidence": {
+                  "column": "langflowConfidence"
+                },
+                "langflowDecision": {
+                  "column": "langflowDecision"
+                },
+                "langflowOutput": {
+                  "column": "langflowOutput"
+                },
+                "milestoneId": {
+                  "column": "milestoneId"
+                },
+                "region": {
+                  "column": "region"
+                },
+                "requestedAmountWei": {
+                  "column": "requestedAmountWei"
+                },
+                "requestedByUserId": {
+                  "column": "requestedByUserId"
+                },
+                "signatureStoragePath": {
+                  "column": "signatureStoragePath"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "disbursementRequest"
+            }
+          },
           "Milestone": {
             "fields": {
               "aiConfidence": {
@@ -1744,6 +2095,21 @@
                 },
                 "to": {
                   "model": "Campaign",
+                  "namespace": "public"
+                }
+              },
+              "disbursementRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "milestoneId"
+                  ]
+                },
+                "to": {
+                  "model": "DisbursementRequest",
                   "namespace": "public"
                 }
               }
@@ -2581,6 +2947,21 @@
                 },
                 "to": {
                   "model": "CommunityMember",
+                  "namespace": "public"
+                }
+              },
+              "disbursementRequests": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "requestedByUserId"
+                  ]
+                },
+                "to": {
+                  "model": "DisbursementRequest",
                   "namespace": "public"
                 }
               },
@@ -3462,6 +3843,11 @@
                 }
               ],
               "columns": {
+                "address": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "chainType": {
                   "codecId": "pg/text@1",
                   "default": {
@@ -3471,6 +3857,16 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "contactEmail": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "contactPhone": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "default": {
@@ -3479,6 +3875,11 @@
                   },
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "description": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "id": {
                   "codecId": "pg/int4@1",
@@ -3495,6 +3896,11 @@
                   "nullable": false
                 },
                 "legalDocumentUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "logoUrl": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -3533,6 +3939,11 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "websiteUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [],
@@ -3826,6 +4237,219 @@
                   ],
                   "name": "disasterEvent_validationStatus_idx_e615ae80",
                   "prefix": "disasterEvent_validationStatus_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "disbursementRequest": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('SUBMITTED', 'AI_VERIFIED', 'PROOF_SUBMITTED', 'REJECTED', 'DISBURSEMENT_REQUESTED', 'DISBURSED')",
+                  "name": "disbursementRequest_status_check_4c477efe",
+                  "prefix": "disbursementRequest_status_check"
+                }
+              ],
+              "columns": {
+                "communityId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "description": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "documentFileName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "documentMimeType": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "documentStoragePath": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "items": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": false
+                },
+                "langflowConfidence": {
+                  "codecId": "pg/float8@1",
+                  "nativeType": "float8",
+                  "nullable": true
+                },
+                "langflowDecision": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "langflowOutput": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "milestoneId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "region": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "Indonesia"
+                  },
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "requestedAmountWei": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "requestedByUserId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "signatureStoragePath": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "SUBMITTED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "DisbursementRequestStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "milestoneId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "disbursementRequest"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "milestone"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "communityId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "disbursementRequest"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "community"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "requestedByUserId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "disbursementRequest"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "communityId"
+                  ],
+                  "name": "disbursementRequest_communityId_idx_e2c72225",
+                  "prefix": "disbursementRequest_communityId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "milestoneId"
+                  ],
+                  "name": "disbursementRequest_milestoneId_idx_f1dac854",
+                  "prefix": "disbursementRequest_milestoneId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "requestedByUserId"
+                  ],
+                  "name": "disbursementRequest_requestedByUserId_idx_85281b2d",
+                  "prefix": "disbursementRequest_requestedByUserId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "disbursementRequest_status_idx_e98638ab",
+                  "prefix": "disbursementRequest_status_idx",
                   "unique": false
                 }
               ],
@@ -4795,6 +5419,17 @@
                 "LAINNYA"
               ]
             },
+            "DisbursementRequestStatus": {
+              "kind": "valueSet",
+              "values": [
+                "SUBMITTED",
+                "AI_VERIFIED",
+                "PROOF_SUBMITTED",
+                "REJECTED",
+                "DISBURSEMENT_REQUESTED",
+                "DISBURSED"
+              ]
+            },
             "MilestoneStatus": {
               "kind": "valueSet",
               "values": [
@@ -4872,7 +5507,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "38244996bb2fca1923f2ce73b32979b45f8b44ea38f6415fbe045b5326c4f018",
+    "storageHash": "ce36641292246478d19ec371ca2dbf16634902d1f9e45dd5810ac91944e9bea1",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
@@ -4885,7 +5520,7 @@
     }
   },
   "execution": {
-    "executionHash": "10582aefe5a9a13d73fc634d737e791272126558641b5b76d907a20847bd8968",
+    "executionHash": "f5dd1d18b0b168b1960169be62513ff2844eed38bea961143f2f6038801f6d97",
     "mutations": {
       "defaults": [
         {
@@ -5009,6 +5644,21 @@
             "column": "lastUpdatedAt",
             "namespace": "public",
             "table": "disasterEvent"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "disbursementRequest"
           }
         },
         {

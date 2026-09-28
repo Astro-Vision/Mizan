@@ -34,6 +34,11 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mizan.example.id"),
+  icons: {
+    icon: "/Favicon.png",
+    shortcut: "/Favicon.png",
+    apple: "/Favicon.png",
+  },
   title: {
     default: "Mizan — Zakat & Donasi On-Chain yang Bisa Diaudit",
     template: "%s · Mizan",

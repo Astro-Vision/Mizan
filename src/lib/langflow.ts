@@ -38,8 +38,8 @@ export async function verifyMilestoneProof(input: {
   const payloadInput: MilestoneVerificationPayloadInput = input
 
   try {
-    const isPdf = input.file.type === "application/pdf"
-    const body = isPdf
+    const isDocument = input.file.type === "application/pdf" || input.file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    const body = isDocument
       ? await buildPdfVerificationRequest(input, baseUrl, apiKey, flowId)
       : await buildMilestoneVerificationPayload(payloadInput)
     const controller = new AbortController()

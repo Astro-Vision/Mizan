@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useWallets } from "@privy-io/react-auth"
 import { KeyRound, Building2, Copy, Check, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react"
+import { CommunityProfileModal } from "@/components/community/community-profile-modal"
 
 export default function OnboardingCommunityPage() {
   const router = useRouter()
@@ -25,9 +27,15 @@ export default function OnboardingCommunityPage() {
     id: number
     name: string
     inviteCode: string
+    walletAddress: string
   } | null>(null)
 
   const [copied, setCopied] = useState(false)
+  const { wallets } = useWallets()
+  const ownerWalletAddress = useMemo(
+    () => wallets.find((wallet) => wallet.type === "ethereum")?.address ?? "",
+    [wallets],
+  )
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code)
@@ -79,7 +87,8 @@ export default function OnboardingCommunityPage() {
     }
 
     const evmRegex = /^0x[a-fA-F0-9]{40}$/
-    if (!evmRegex.test(walletAddress.trim())) {
+    const effectiveWalletAddress = walletAddress.trim() || ownerWalletAddress
+    if (!evmRegex.test(effectiveWalletAddress)) {
       setRegisterError("Format alamat dompet EVM tidak valid. Harus diawali '0x' disusul 40 karakter hex.")
       return
     }
@@ -92,7 +101,7 @@ export default function OnboardingCommunityPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          walletAddress: walletAddress.trim(),
+          walletAddress: effectiveWalletAddress,
           registrationNumber: registrationNumber.trim() || undefined,
           legalDocumentUrl: legalDocumentUrl.trim() || undefined,
         }),
@@ -108,6 +117,7 @@ export default function OnboardingCommunityPage() {
         id: data.id,
         name: data.name,
         inviteCode: data.inviteCode,
+        walletAddress: data.walletAddress || effectiveWalletAddress,
       })
     } catch (err) {
       setRegisterError(err instanceof Error ? err.message : "Terjadi kesalahan")
@@ -175,6 +185,11 @@ export default function OnboardingCommunityPage() {
             Bagikan kode ini ke rekan tim supaya mereka bisa gabung ke <strong>{createdCommunity.name}</strong> di Mizan.
           </p>
         </div>
+
+        <CommunityProfileModal
+          community={createdCommunity}
+          onClose={() => router.refresh()}
+        />
 
         <div className="mt-8">
           <button
@@ -302,13 +317,13 @@ export default function OnboardingCommunityPage() {
               id="walletAddress"
               type="text"
               required
-              value={walletAddress}
+              value={walletAddress || ownerWalletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
               placeholder="0x..."
               className="mt-2 h-12 w-full rounded-[6px] border border-line-ui bg-surface px-4 font-mono text-sm text-ink focus:border-brand-500 focus:outline-none"
             />
             <p className="mt-1.5 text-xs text-ink-muted leading-relaxed">
-              Ini alamat wallet organisasi, bukan wallet pribadi kamu. Kalau belum punya, buat dulu wallet multisig (Safe) sebelum lanjut.
+              Default diisi dari wallet owner. Kamu tetap bisa menggantinya dengan wallet treasury organisasi atau wallet multisig (Safe).
             </p>
           </div>
 
