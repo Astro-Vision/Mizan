@@ -23,7 +23,7 @@ export type BeneficiaryCampaign = {
   id: string
   title: string
   description: string
-  category: string
+  category: string | null
   organizerName: string
   recipientWallet: string | null
   targetAmountWei: string
@@ -152,7 +152,7 @@ function toPresentation(row: {
   reviewStatus: string
   status: string
   aiDraft: unknown | null
-  category: string
+  category: string | null
   aiReference: string | null
   createdAt: string
   updatedAt: string
@@ -163,7 +163,7 @@ function toPresentation(row: {
     row.aiDraft && typeof row.aiDraft === "object" ? (row.aiDraft as Record<string, unknown>) : {}
   const description = typeof draft.description === "string" ? draft.description : ""
   const category = formatCampaignCategory(
-    typeof draft.category === "string" && draft.category ? draft.category : row.category,
+    typeof draft.category === "string" && draft.category ? draft.category : row.category ?? "DONASI_UMUM",
   )
   return {
     id: String(row.id),

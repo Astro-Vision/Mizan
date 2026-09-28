@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { getMilestoneProofUrl } from "@/src/lib/storage"
+import { getDisbursementDocumentUrl, getMilestoneProofUrl } from "@/src/lib/storage"
 import { requireAdminSession } from "@/src/lib/beneficiary/access"
 import { db } from "@/src/prisma/db"
 import {
@@ -27,6 +27,8 @@ export type AdminDisbursementItem = {
   aiConfidence: number | null
   disbursementRequestedAt: string | null
   disbursementTxHash: string | null
+  requestDocumentUrl: string | null
+  langflowDecision: string | null
 }
 
 export async function getAdminDisbursements(): Promise<AdminDisbursementItem[]> {
@@ -38,6 +40,16 @@ export async function getAdminDisbursements(): Promise<AdminDisbursementItem[]> 
     const proofUrl = milestone.proofImageUrl
       ? await getMilestoneProofUrl(milestone.proofImageUrl).catch((error) => {
           console.error("Admin proof URL refresh failed:", error)
+          return null
+        })
+      : null
+    const request = await db.orm.public.DisbursementRequest
+      .where({ milestoneId: milestone.id })
+      .orderBy((row) => row.createdAt.desc())
+      .first()
+    const requestDocumentUrl = request?.documentStoragePath
+      ? await getDisbursementDocumentUrl(request.documentStoragePath).catch((error) => {
+          console.error("Admin disbursement document URL refresh failed:", error)
           return null
         })
       : null
@@ -58,6 +70,8 @@ export async function getAdminDisbursements(): Promise<AdminDisbursementItem[]> 
       aiConfidence: milestone.aiConfidence,
       disbursementRequestedAt: milestone.disbursementRequestedAt,
       disbursementTxHash: milestone.disbursementTxHash,
+      requestDocumentUrl,
+      langflowDecision: request?.langflowDecision ?? null,
     }
   }))
 }
@@ -90,14 +104,23 @@ async function applyAdminAction(
       status: "DISBURSEMENT_REQUESTED",
       disbursementRequestedAt: new Date().toISOString(),
     })
+    await db.orm.public.DisbursementRequest.where({ milestoneId: result.milestone.id }).update({
+      status: "DISBURSEMENT_REQUESTED",
+    })
   } else if (action === "REJECT") {
     await db.orm.public.Milestone.where((row) => row.id.eq(result.milestone.id)).update({
+      status: "REJECTED",
+    })
+    await db.orm.public.DisbursementRequest.where({ milestoneId: result.milestone.id }).update({
       status: "REJECTED",
     })
   } else {
     await db.orm.public.Milestone.where((row) => row.id.eq(result.milestone.id)).update({
       status: "DISBURSED",
       disbursementTxHash: txHash?.trim() || null,
+    })
+    await db.orm.public.DisbursementRequest.where({ milestoneId: result.milestone.id }).update({
+      status: "DISBURSED",
     })
   }
 

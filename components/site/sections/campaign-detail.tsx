@@ -116,6 +116,14 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
                   {t(campaign.komunitas.tipe)}
                 </p>
               </div>
+              {campaign.komunitas.id ? (
+                <Link
+                  href={`/organizations/${campaign.komunitas.id}`}
+                  className="ml-auto shrink-0 text-xs font-semibold text-primary-purple hover:underline"
+                >
+                  {t("Lihat profil")}
+                </Link>
+              ) : null}
             </div>
 
             <div className="mt-7 rounded-2xl border border-line-soft bg-surface p-5 shadow-xs sm:p-6">
@@ -210,6 +218,11 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
             <p className="text-sm font-semibold text-ink">
               {t("Profil komunitas")}
             </p>
+            {campaign.komunitas.id ? (
+              <Link href={`/organizations/${campaign.komunitas.id}`} className="mt-3 inline-flex text-sm font-semibold text-primary-purple hover:underline">
+                {t("Lihat profil organisasi")}
+              </Link>
+            ) : null}
             <p className="mt-3 text-sm leading-7 text-ink-muted">
               {t(campaign.komunitas.bio)}
             </p>

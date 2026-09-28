@@ -3,6 +3,7 @@ import { ChevronLeft, Copy } from "lucide-react"
 import { requireBeneficiaryCommunity } from "@/src/lib/beneficiary/access"
 import { db } from "@/src/prisma/db"
 import { TeamMembersSection, type MemberData } from "@/components/community/team-members-section"
+import { CommunityProfileEditor } from "@/components/community/community-profile-editor"
 
 const shorten = (value: string) =>
   value.length > 14 ? `${value.slice(0, 8)}…${value.slice(-6)}` : value
@@ -66,6 +67,7 @@ export default async function BeneficiaryProfilePage() {
             {status}
           </span>
         </div>
+        {memberRole === "OWNER" ? <div className="mt-5"><CommunityProfileEditor community={community} /></div> : null}
 
         <div className="mt-8 border-t border-line-soft pt-6">
           <p className="text-sm font-medium text-ink">Dompet penerima</p>
@@ -89,6 +91,18 @@ export default async function BeneficiaryProfilePage() {
         </div>
       </section>
 
+      <section className="mz-card mt-6 p-5 sm:p-8">
+        <h2 className="text-h2 text-ink">Informasi publik</h2>
+        <p className="mt-2 text-sm text-ink-muted">Data berikut dapat dilihat donatur melalui halaman profil organisasi.</p>
+        <dl className="mt-5 divide-y divide-line-soft">
+          <InfoRow label="Deskripsi" value={community.description || "Belum diisi"} />
+          <InfoRow label="Website" value={community.websiteUrl || "Belum diisi"} />
+          <InfoRow label="Email kontak" value={community.contactEmail || "Belum diisi"} />
+          <InfoRow label="Nomor kontak" value={community.contactPhone || "Belum diisi"} />
+          <InfoRow label="Alamat" value={community.address || "Belum diisi"} />
+        </dl>
+      </section>
+
       {/* Legalitas */}
       <section className="mz-card mt-6 p-5 sm:p-8">
         <h2 className="text-h2 text-ink">Legalitas</h2>
@@ -101,6 +115,7 @@ export default async function BeneficiaryProfilePage() {
             className="mt-2 h-12 w-full rounded-[6px] border border-line-ui bg-surface px-4 text-sm"
             placeholder="Masukkan nomor registrasi"
             defaultValue={community.registrationNumber || ""}
+            disabled={memberRole !== "OWNER"}
           />
         </label>
         <label className="mt-5 block text-sm font-medium text-ink">
@@ -109,14 +124,15 @@ export default async function BeneficiaryProfilePage() {
             type="file"
             accept="application/pdf,image/*"
             className="mt-2 block min-h-12 w-full rounded-[6px] border border-line-ui bg-surface px-3 py-3 text-sm"
+            disabled={memberRole !== "OWNER"}
           />
         </label>
-        <button
+        {memberRole === "OWNER" ? <button
           type="button"
           className="mt-6 min-h-11 rounded-[10px] bg-brand-700 px-5 text-sm font-medium text-white"
         >
           Ajukan perubahan profil
-        </button>
+        </button> : <p className="mt-6 text-xs text-ink-muted">Hanya owner organisasi yang dapat mengubah data profil.</p>}
       </section>
 
       {/* Section Anggota Tim */}
@@ -129,4 +145,8 @@ export default async function BeneficiaryProfilePage() {
       <p className="mt-6 text-xs text-ink-muted">Data testnet — dana tidak nyata.</p>
     </div>
   )
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return <div className="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between sm:gap-4"><dt className="text-sm text-ink-muted">{label}</dt><dd className="whitespace-pre-wrap text-sm text-ink sm:max-w-[65%] sm:text-right">{value}</dd></div>
 }

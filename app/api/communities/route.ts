@@ -11,10 +11,7 @@ import {
 
 const communitySchema = z.object({
   name: z.string().trim().min(1, "Nama lembaga tidak boleh kosong"),
-  walletAddress: z
-    .string()
-    .trim()
-    .regex(/^0x[a-fA-F0-9]{40}$/, "Format alamat dompet EVM tidak valid (0x + 40 karakter hex)"),
+  walletAddress: z.string().trim().optional(),
   registrationNumber: z.string().trim().optional().nullable(),
   legalDocumentUrl: z.string().trim().optional().nullable(),
 })
@@ -40,11 +37,22 @@ export async function POST(req: NextRequest) {
     }
 
     const { name, walletAddress, registrationNumber, legalDocumentUrl } = validation.data
+    const ownerWallet = await db.orm.public.UserWallet
+      .where({ userId: auth.user.id })
+      .orderBy((wallet) => wallet.createdAt.asc())
+      .first()
+    const selectedWallet = walletAddress || ownerWallet?.address || ""
+    if (!/^0x[a-fA-F0-9]{40}$/.test(selectedWallet)) {
+      return NextResponse.json(
+        { error: "Wallet owner belum tersinkron. Hubungkan wallet terlebih dahulu." },
+        { status: 400 },
+      )
+    }
     const inviteCode = generateInviteCode(7)
 
     const community = await db.orm.public.Community.create({
       name,
-      walletAddress,
+      walletAddress: selectedWallet.toLowerCase(),
       registrationNumber: registrationNumber || null,
       legalDocumentUrl: legalDocumentUrl || null,
       inviteCode,
@@ -60,12 +68,12 @@ export async function POST(req: NextRequest) {
     })
 
     const now = new Date().toISOString()
-    const updatedUser = await db.orm.public.User.where({ id: auth.user.id }).update({
+    await db.orm.public.User.where({ id: auth.user.id }).update({
       role: "BENEFICIARY",
       onboardingCompletedAt: now,
     })
 
-    const response = NextResponse.json(community, { status: 201 })
+    const response = NextResponse.json({ ...community, walletAddress: selectedWallet.toLowerCase() }, { status: 201 })
 
     response.cookies.set({
       name: DASHBOARD_SESSION_COOKIE,

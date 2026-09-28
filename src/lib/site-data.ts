@@ -82,6 +82,7 @@ export type Campaign = {
     ringkas: string
     gambar: string
     komunitas: {
+        id?: string
         nama: string
         tipe: string
         bio: string

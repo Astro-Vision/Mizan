@@ -449,7 +449,7 @@ export function BeneficiaryCampaignTable({ campaigns }: BeneficiaryCampaignTable
 
   // derived list of unique categories
   const categories = React.useMemo(
-    () => [...new Set(campaigns.map((c) => c.category))].sort(),
+    () => [...new Set(campaigns.map((c) => c.category).filter((value): value is string => Boolean(value)))].sort(),
     [campaigns],
   )
 
