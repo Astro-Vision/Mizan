@@ -7,8 +7,8 @@ import {
   startScrapeJob,
 } from "@/src/lib/scrapeHelper"
 import { createScrapeJob } from "@/src/service/scrapeServices"
-import { ValidationStatus } from "@/src/service/disasterEvent"
-import { DISASTER_AGENT_PROMPT } from "@/src/lib/prompt"
+import { SeverityLevel, ValidationStatus } from "@/src/service/disasterEvent"
+import { DISASTER_AGENT_PROMPT } from "@/src/lib/prompt/disasterPrompt"
 
 const BATCH_SIZE = 10
 
@@ -28,13 +28,39 @@ async function findOrLinkDisasterEvent(analysis: {
   officialConfirmed: boolean
   title: string
   description?: string
+  city?: string
+  severityLevel?: SeverityLevel
 }) {
   if (analysis.validationStatus === "REJECTED") return
 
-  const existingEvent = await db.orm.public.DisasterEvent.where({
+  const candidateEvents = await db.orm.public.DisasterEvent.where({
     disasterType: analysis.disasterType,
-    province: analysis.province,
-  }).first()
+  })
+    .orderBy((de) => de.firstDetectedAt.desc())
+    .limit(100)
+    .all()
+
+  const existingEvent = candidateEvents.find((event) => {
+    const sameCity =
+      !!analysis.city &&
+      !!event.city &&
+      analysis.city.toLowerCase() === event.city.toLowerCase()
+
+    const sameLocation =
+      !!analysis.locationName &&
+      !!event.locationName &&
+      analysis.locationName.toLowerCase() === event.locationName.toLowerCase()
+
+    if (analysis.city || analysis.locationName) {
+      return sameCity || sameLocation
+    }
+
+    return (
+      !!analysis.province &&
+      !!event.province &&
+      analysis.province.toLowerCase() === event.province.toLowerCase()
+    )
+  })
 
   if (existingEvent) {
     const shouldUpgrade =
@@ -61,6 +87,8 @@ async function findOrLinkDisasterEvent(analysis: {
       locationName: analysis.locationName,
       province: analysis.province,
       officialConfirmed: analysis.officialConfirmed,
+      city: analysis.city,
+      severityLevel: analysis.severityLevel,
     })
 
     await db.orm.public.Analysis.where({
@@ -69,7 +97,8 @@ async function findOrLinkDisasterEvent(analysis: {
   }
 }
 
-export async function runAnalysis() {
+
+export async function runAnalysisDisaster() {
   const date = new Date()
 
   const job = await createScrapeJob({
@@ -81,12 +110,16 @@ export async function runAnalysis() {
   try {
     await startScrapeJob(job.id)
 
-    const unanalyzed = await db.orm.public.RawCapture.where((rc) =>
+    const captures = await db.orm.public.RawCapture.where((rc) =>
       rc.analysis.none()
     )
       .include("source")
-      .limit(BATCH_SIZE)
+      .limit(BATCH_SIZE * 2)
       .all()
+
+    const unanalyzed = captures
+      .filter((capture) => capture.source.name !== "AyoBantu")
+      .slice(0, BATCH_SIZE)
 
     if (unanalyzed.length === 0) {
       console.log("[analysis job] tidak ada capture baru untuk dianalisis")
@@ -103,7 +136,7 @@ export async function runAnalysis() {
     }
 
     const response = await openRouter.chat.completions.create({
-      model: "inclusionai/ling-3.0-flash-vl:free",
+      model: "nvidia/nemotron-3.5-lightning:free",
       messages: [
         { role: "system", content: DISASTER_AGENT_PROMPT },
         { role: "user", content: JSON.stringify(rawData) },
@@ -153,7 +186,7 @@ export async function runAnalysis() {
     await completeScrapeJob(job.id)
 
     console.log(
-      `[analysis job] processed: ${unanalyzed.length}, saved: ${saved}`
+      `[analysis disaster job] processed: ${unanalyzed.length}, saved: ${saved}`
     )
 
     return { processed: unanalyzed.length, saved }

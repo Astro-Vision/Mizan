@@ -159,7 +159,7 @@ model Campaign {
 
   source       CampaignSource       @default(AI_MOCK)
   aiDraft      Json?
-  aiReference  String?
+  aiReference  String? 
   aiConfidence Float?
 
   reviewStatus    CampaignReviewStatus @default(AI_DRAFT)
@@ -345,6 +345,28 @@ model Source {
   @@index([sourceType])
 }
 
+model Scheduler {
+  id          String   @id @default(uuid())
+
+  name        String @unique
+  jobType     String
+
+  cron        String
+
+  isActive    Boolean  @default(true)
+
+  lastRunAt     TimestamptzString?
+  lastFinishedAt TimestamptzString?
+  nextRunAt   TimestamptzString?
+
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+
+  @@index([isActive])
+  @@index([jobType])
+}
+
+
 enum SourceType {
   OFFICIAL // BNPB, BMKG, etc.
   NEWS
@@ -375,6 +397,8 @@ model RawCapture {
   analysis Analysis?
 
   capturedAt TimestamptzString @default(now())
+  campaignCheckedAt TimestamptzString?
+
 
   @@index([sourceId])
   @@index([capturedAt])
@@ -456,6 +480,7 @@ enum DisasterType {
   TSUNAMI
   ERUPSI_GUNUNG_API
   KEKERINGAN
+  ANGIN_PUTING_BELIUNG
   LAINNYA
 }
 
@@ -496,7 +521,6 @@ model AuditLog {
   @@control(observed)
   @@rls
 }
-
 policy_insert audit_logs_langflow {
   target    = AuditLog
   roles     = [anon, authenticated]

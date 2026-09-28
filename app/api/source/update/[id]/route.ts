@@ -1,4 +1,4 @@
-import { createSource, updateSource } from "@/src/service/sourceService"
+import { updateSource } from "@/src/service/sourceService"
 import { NextResponse } from "next/server"
 
 export async function PUT(
@@ -24,14 +24,14 @@ export async function PUT(
       { status: 200 }
     )
   } catch (error) {
-     return NextResponse.json(
+    return NextResponse.json(
       {
         success: false,
         message: "Terjadi kesalahan pada server",
       },
       {
         status: 500,
-      },
-    );
+      }
+    )
   }
 }

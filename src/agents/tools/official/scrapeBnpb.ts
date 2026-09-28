@@ -1,8 +1,8 @@
 import { BNPBResult } from "@/src/lib/type/bnpbType"
+import { db } from "../../../../src/prisma/db"
 import * as cheerio from "cheerio"
+import { createContentHash } from "../../../lib/hash"
 import { parseBnpbDate, parseNumber } from "@/src/lib/parseNumber"
-import { db } from "@/src/prisma/db"
-import { createContentHash } from "@/src/lib/hash"
 
 export interface scrapeBnpbInput {
   startDate?: string
@@ -102,18 +102,6 @@ export async function scrapeBNPB(
     return []
   }
 
-  console.log("Total rows scraped:", rawResults.length)
-  console.log(
-    "Contoh 5 disasterDate mentah:",
-    rawResults.slice(0, 5).map((r) => r.disasterDate)
-  )
-  console.log("Range tanggal terlama-terbaru:", {
-    earliest: rawResults.map((r) => r.disasterDate).sort()[0],
-    latest: rawResults
-      .map((r) => r.disasterDate)
-      .sort()
-      .reverse()[0],
-  })
 
   let filteredResult = rawResults
 

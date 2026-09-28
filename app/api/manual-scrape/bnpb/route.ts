@@ -1,7 +1,10 @@
-
 import { scrapeBNPB } from "@/src/agents/tools/official/scrapeBnpb"
 import { createContentHash } from "@/src/lib/hash"
-import { completeScrapeJob, failScrapeJob, startScrapeJob } from "@/src/lib/scrapeHelper"
+import {
+  completeScrapeJob,
+  failScrapeJob,
+  startScrapeJob,
+} from "@/src/lib/scrapeHelper"
 import { createRawCapture } from "@/src/service/rawCapturedService"
 import { createScrapeJob } from "@/src/service/scrapeServices"
 import { NextResponse } from "next/server"
