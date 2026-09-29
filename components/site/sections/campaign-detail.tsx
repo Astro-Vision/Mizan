@@ -12,38 +12,26 @@ import {
   MapPin,
   ShieldCheck,
   WalletCards,
+  X,
 } from "lucide-react"
 import { useState } from "react"
 
 import { SitePreferences } from "@/components/site/layout/site-preferences"
 import { useLanguage } from "@/components/site/language-provider"
-import {
-  convertAmount,
-  formatCurrency,
-  useMarketRates,
-  type DisplayCurrency,
-} from "@/src/lib/market-rates"
+import { convertAmount, formatCurrency, useMarketRates, type DisplayCurrency } from "@/src/lib/market-rates"
 import { SITE, type Campaign } from "@/src/lib/site-data"
 import { mzBtn } from "@/components/site/ui/mz-button"
 import { presentase } from "@/src/lib/site-data"
+import { CampaignPayment } from "@/components/dashboard/campaign-payment"
 
 export function CampaignDetail({ campaign }: { campaign: Campaign }) {
   const [currency, setCurrency] = useState<DisplayCurrency>("BNB")
+  const [paymentOpen, setPaymentOpen] = useState(false)
   const { rates, loading } = useMarketRates()
   const { t } = useLanguage()
   const pct = presentase(campaign.terkumpul, campaign.target)
-  const collected = convertAmount(
-    campaign.terkumpul,
-    campaign.satuan,
-    currency,
-    rates
-  )
-  const target = convertAmount(
-    campaign.target,
-    campaign.satuan,
-    currency,
-    rates
-  )
+  const collected = convertAmount(campaign.terkumpul, campaign.satuan, currency, rates)
+  const target = convertAmount(campaign.target, campaign.satuan, currency, rates)
 
   return (
     <main className="bg-very-light-purple">
@@ -73,20 +61,12 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
                   {t(campaign.kategori)}
                 </span>
                 <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-white/90">
-                  <MapPin
-                    className="size-4"
-                    strokeWidth={1.7}
-                    aria-hidden="true"
-                  />
+                  <MapPin className="size-4" strokeWidth={1.7} aria-hidden="true" />
                   {campaign.lokasi}
                 </p>
               </div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium backdrop-blur-md">
-                <Clock
-                  className="size-3.5"
-                  strokeWidth={1.7}
-                  aria-hidden="true"
-                />
+                <Clock className="size-3.5" strokeWidth={1.7} aria-hidden="true" />
                 {campaign.sisaHari} {t("hari lagi")}
               </span>
             </div>
@@ -94,9 +74,7 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
 
           <div>
             <p className="mz-overline">{t("Kampanye terverifikasi")}</p>
-            <h1 className="mt-4 text-h1 text-balance text-ink">
-              {t(campaign.judul)}
-            </h1>
+            <h1 className="mt-4 text-h1 text-balance text-ink">{t(campaign.judul)}</h1>
             <p className="mz-prose mt-5 text-ink-body">{t(campaign.ringkas)}</p>
 
             <div className="mt-7 flex items-center gap-3 rounded-2xl border border-line-soft bg-surface p-4 shadow-xs">
@@ -106,15 +84,9 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
               <div className="min-w-0">
                 <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
                   {campaign.komunitas.nama}
-                  <BadgeCheck
-                    className="size-4 text-brand-violet"
-                    strokeWidth={1.8}
-                    aria-hidden="true"
-                  />
+                  <BadgeCheck className="size-4 text-brand-violet" strokeWidth={1.8} aria-hidden="true" />
                 </p>
-                <p className="mt-1 text-xs text-ink-muted">
-                  {t(campaign.komunitas.tipe)}
-                </p>
+                <p className="mt-1 text-xs text-ink-muted">{t(campaign.komunitas.tipe)}</p>
               </div>
               {campaign.komunitas.id ? (
                 <Link
@@ -129,9 +101,7 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
             <div className="mt-7 rounded-2xl border border-line-soft bg-surface p-5 shadow-xs sm:p-6">
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-xs font-medium tracking-[0.08em] text-ink-muted uppercase">
-                    {t("Terkumpul")}
-                  </p>
+                  <p className="text-xs font-medium tracking-[0.08em] text-ink-muted uppercase">{t("Terkumpul")}</p>
                   <p className="mt-2 text-2xl font-bold tracking-tight text-ink">
                     {collected === null
                       ? `${campaign.terkumpul} ${campaign.satuan}`
@@ -142,17 +112,12 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
                   {t("target")}
                   <br />
                   <span className="font-semibold text-ink-body">
-                    {target === null
-                      ? `${campaign.target} ${campaign.satuan}`
-                      : formatCurrency(target, currency)}
+                    {target === null ? `${campaign.target} ${campaign.satuan}` : formatCurrency(target, currency)}
                   </span>
                 </p>
               </div>
               <div className="mt-5 h-3 overflow-hidden rounded-full bg-brand-100">
-                <div
-                  className="h-full rounded-full bg-primary-purple"
-                  style={{ width: `${pct}%` }}
-                />
+                <div className="h-full rounded-full bg-primary-purple" style={{ width: `${pct}%` }} />
               </div>
               <div className="mt-3 flex justify-between text-xs text-ink-muted">
                 <span>
@@ -163,17 +128,14 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
                 </span>
               </div>
 
-              <a
-                href="#donasi"
+              <button
+                type="button"
+                onClick={() => setPaymentOpen(true)}
                 className={mzBtn("primary", "lg", "mt-6 w-full")}
               >
                 {t("Donasi sekarang")}
-                <ArrowRight
-                  className="size-4"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-              </a>
+                <ArrowRight className="size-4" strokeWidth={1.8} aria-hidden="true" />
+              </button>
             </div>
 
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -186,11 +148,7 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
                   key={label}
                   className="flex items-center gap-2 rounded-xl bg-surface/70 px-3 py-3 text-xs font-medium text-ink-muted"
                 >
-                  <Icon
-                    className="size-4 shrink-0 text-brand-violet"
-                    strokeWidth={1.7}
-                    aria-hidden="true"
-                  />
+                  <Icon className="size-4 shrink-0 text-brand-violet" strokeWidth={1.7} aria-hidden="true" />
                   {label}
                 </div>
               ))}
@@ -203,9 +161,7 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
         <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-20">
           <div>
             <p className="mz-overline">Tentang kampanye</p>
-            <h2 className="mt-3 text-h2 text-ink">
-              Dana yang sampai, bukan sekadar janji.
-            </h2>
+            <h2 className="mt-3 text-h2 text-ink">Dana yang sampai, bukan sekadar janji.</h2>
             <p className="mz-prose mt-5 max-w-[60ch] text-ink-body">
               {t(campaign.ringkas)}{" "}
               {t(
@@ -215,25 +171,20 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
           </div>
 
           <div className="rounded-2xl border border-line-soft bg-very-light-purple p-6">
-            <p className="text-sm font-semibold text-ink">
-              {t("Profil komunitas")}
-            </p>
+            <p className="text-sm font-semibold text-ink">{t("Profil komunitas")}</p>
             {campaign.komunitas.id ? (
-              <Link href={`/organizations/${campaign.komunitas.id}`} className="mt-3 inline-flex text-sm font-semibold text-primary-purple hover:underline">
+              <Link
+                href={`/organizations/${campaign.komunitas.id}`}
+                className="mt-3 inline-flex text-sm font-semibold text-primary-purple hover:underline"
+              >
                 {t("Lihat profil organisasi")}
               </Link>
             ) : null}
-            <p className="mt-3 text-sm leading-7 text-ink-muted">
-              {t(campaign.komunitas.bio)}
-            </p>
+            <p className="mt-3 text-sm leading-7 text-ink-muted">{t(campaign.komunitas.bio)}</p>
             <div className="mt-5 flex items-center justify-between border-t border-line-soft pt-5 text-xs text-ink-muted">
               <span>{t(campaign.komunitas.tipe)}</span>
               <span className="inline-flex items-center gap-1 font-semibold text-primary-purple">
-                <BadgeCheck
-                  className="size-3.5"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
+                <BadgeCheck className="size-3.5" strokeWidth={1.8} aria-hidden="true" />
                 {t("Terverifikasi")}
               </span>
             </div>
@@ -244,12 +195,8 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
       <section className="bg-very-light-purple">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-5 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <div>
-            <p className="text-sm font-semibold text-ink">
-              {t("Periksa jejak donasi")}
-            </p>
-            <p className="mt-1 text-sm text-ink-muted">
-              {t("Kontrak publik di BNB Smart Chain Testnet.")}
-            </p>
+            <p className="text-sm font-semibold text-ink">{t("Periksa jejak donasi")}</p>
+            <p className="mt-1 text-sm text-ink-muted">{t("Kontrak publik di BNB Smart Chain Testnet.")}</p>
           </div>
           <a
             href={`${SITE.explorer}/address/${SITE.contract}`}
@@ -258,11 +205,7 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
             className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary-purple hover:text-brand-violet"
           >
             {t("Buka BscScan")}
-            <ExternalLink
-              className="size-4"
-              strokeWidth={1.8}
-              aria-hidden="true"
-            />
+            <ExternalLink className="size-4" strokeWidth={1.8} aria-hidden="true" />
           </a>
         </div>
       </section>
@@ -273,6 +216,44 @@ export function CampaignDetail({ campaign }: { campaign: Campaign }) {
         loading={loading}
         lastUpdatedAt={rates?.lastUpdatedAt ?? null}
       />
+
+      {paymentOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="campaign-payment-title"
+        >
+          <div className="max-h-[90dvh] w-full max-w-xl overflow-y-auto rounded-2xl bg-surface p-2 shadow-xl">
+            <div className="flex items-center justify-between px-4 pt-3">
+              <h2 id="campaign-payment-title" className="text-lg font-semibold text-ink">
+                Donasi untuk {campaign.judul}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setPaymentOpen(false)}
+                className="flex size-10 items-center justify-center rounded-full text-ink-muted hover:bg-surface-sunken"
+                aria-label="Tutup pembayaran"
+              >
+                <X className="size-5" aria-hidden="true" />
+              </button>
+            </div>
+            <CampaignPayment
+              lockedCampaignId={campaign.id}
+              campaigns={[
+                {
+                  id: campaign.id,
+                  contractCampaignId: campaign.contractCampaignId,
+                  title: campaign.judul,
+                  organizerName: campaign.penyelenggara,
+                  targetAmountWei: campaign.targetAmountWei ?? "0",
+                  recipientWallet: campaign.recipientWallet ?? null,
+                },
+              ]}
+            />
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }

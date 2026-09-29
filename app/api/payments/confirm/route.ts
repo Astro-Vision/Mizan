@@ -2,7 +2,9 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import {
   FUNDS_TRANSFERRED_TOPIC,
+  getCampaignState,
   getConfiguredVaultAddress,
+  isCampaignChainReady,
 } from "@/src/lib/chain/vault"
 import { getPrivyProfile } from "@/src/lib/privy/user-data"
 import { getPrivyUserFromIdentityToken } from "@/src/lib/privy/server"
@@ -49,6 +51,9 @@ export async function POST(request: Request) {
     if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "ACTIVE") {
       return error("CAMPAIGN_NOT_ACTIVE", 409)
     }
+    if (!campaign.contractCampaignId || !campaign.recipientWallet) {
+      return error("CAMPAIGN_NOT_REGISTERED", 409)
+    }
 
     const existing = await db.orm.public.CampaignPayment.first({
       idempotencyKey: input.idempotencyKey,
@@ -70,6 +75,12 @@ export async function POST(request: Request) {
       chainType: "ethereum",
     }).first()
     if (!wallet) return error("WALLET_NOT_SYNCED", 409)
+
+    const chainState = await getCampaignState(campaign.contractCampaignId)
+    if (!chainState.active) return error("CAMPAIGN_NOT_ACTIVE_ONCHAIN", 409)
+    if (!isCampaignChainReady(chainState, campaign.recipientWallet)) {
+      return error("CAMPAIGN_RECIPIENT_MISMATCH", 409)
+    }
 
     const receipt = await readReceipt(input.transactionHash)
     if (!receipt) {
@@ -105,7 +116,7 @@ export async function POST(request: Request) {
     const eventRecipient = `0x${wordAt(event.data, 0).slice(-40)}`.toLowerCase()
     const eventAmountWei = BigInt(`0x${wordAt(event.data, 1)}`).toString()
     if (
-      eventCampaignId !== String(input.campaignId) ||
+      eventCampaignId !== campaign.contractCampaignId ||
       eventFunder !== donorWallet ||
       eventRecipient !== campaign.recipientWallet?.toLowerCase() ||
       eventAmountWei !== input.amountWei

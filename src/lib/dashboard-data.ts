@@ -37,6 +37,10 @@ export type CampaignReview = {
   aiReference?: string | null
   aiConfidence?: number | null
   recipientWallet?: string | null
+  contractCampaignId?: string | null
+  contractTransactionHash?: string | null
+  onchainStatus?: "NOT_REGISTERED" | "REGISTERING" | "REGISTERED" | "FAILED"
+  onchainRegistrationError?: string | null
   // Presentation fields shown on the public card / detail page.
   category?: string
   image?: string | null

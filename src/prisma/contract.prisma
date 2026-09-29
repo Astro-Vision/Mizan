@@ -177,6 +177,9 @@ model Campaign {
   donorCount              Int    @default(0)
   contractCampaignId      String?
   contractTransactionHash String?
+  onchainStatus            CampaignOnchainStatus @default(NOT_REGISTERED)
+  onchainRegistrationError String?
+  onchainRegisteredAt      TimestamptzString?
 
   // Presentation fields for the public campaign card / detail page.
   // English column names; the UI maps them to Indonesian labels.
@@ -215,6 +218,13 @@ enum CampaignStatus {
   ACTIVE
   COMPLETED
   CLOSED
+}
+
+enum CampaignOnchainStatus {
+  NOT_REGISTERED
+  REGISTERING
+  REGISTERED
+  FAILED
 }
 
 model CampaignPayment {

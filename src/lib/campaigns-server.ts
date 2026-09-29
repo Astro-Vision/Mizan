@@ -17,12 +17,7 @@ const DEFAULT_COVER = "/background-hero.png"
 
 // Categories the public filter understands. Anything unknown falls back to
 // "Donasi Umum" so the UI never renders an orphan filter chip.
-export const CAMPAIGN_CATEGORIES = [
-  "Zakat",
-  "Donasi Umum",
-  "Wakaf",
-  "Tanggap Bencana",
-] as const
+export const CAMPAIGN_CATEGORIES = ["Zakat", "Donasi Umum", "Wakaf", "Tanggap Bencana"] as const
 
 export type CampaignCategory = (typeof CAMPAIGN_CATEGORIES)[number]
 
@@ -39,9 +34,7 @@ function weiToBnbNumber(value: string | null | undefined): number {
   try {
     const wei = BigInt(value)
     // Scale by 1e6 first to keep 6 fractional digits, then divide back.
-    const scaled = Number(
-      (wei * BigInt(1_000_000)) / BigInt("1000000000000000000")
-    )
+    const scaled = Number((wei * BigInt(1_000_000)) / BigInt("1000000000000000000"))
     return scaled / 1_000_000
   } catch {
     return 0
@@ -76,6 +69,8 @@ type CampaignRow = {
   currency: string
   donorCount: number
   reviewStatus: string
+  contractCampaignId: string | null
+  recipientWallet: string | null
 }
 
 function toCard(row: CampaignRow): Campaign {
@@ -99,11 +94,12 @@ function toCard(row: CampaignRow): Campaign {
       id: row.communityId ? String(row.communityId) : undefined,
       nama: organizer,
       tipe: "Komunitas terverifikasi",
-      bio: row.summary
-        ? row.summary
-        : `${organizer} mengelola penyaluran kampanye ini secara transparan di on-chain.`,
+      bio: row.summary ? row.summary : `${organizer} mengelola penyaluran kampanye ini secara transparan di on-chain.`,
       inisial: initials(organizer),
     },
+    contractCampaignId: row.contractCampaignId,
+    recipientWallet: row.recipientWallet,
+    targetAmountWei: row.targetAmountWei,
   }
 }
 
@@ -122,6 +118,8 @@ const PUBLIC_SELECT = [
   "currency",
   "donorCount",
   "reviewStatus",
+  "contractCampaignId",
+  "recipientWallet",
 ] as const
 
 /**
@@ -140,9 +138,7 @@ export async function getPublicCampaigns(): Promise<Campaign[]> {
  * A single public campaign by its numeric id. Returns null when the id is
  * invalid, the campaign does not exist, or it is not publicly visible.
  */
-export async function getPublicCampaignById(
-  id: string
-): Promise<Campaign | null> {
+export async function getPublicCampaignById(id: string): Promise<Campaign | null> {
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0) return null
 
@@ -186,15 +182,25 @@ export type PublicDisbursementHistoryItem = {
 }
 
 const toPublicDisbursement = async (
-  request: { id: number; milestoneId: number; requestedAmountWei: string; description: string; region: string; items: unknown; createdAt: string; documentStoragePath: string },
+  request: {
+    id: number
+    milestoneId: number
+    requestedAmountWei: string
+    description: string
+    region: string
+    items: unknown
+    createdAt: string
+    documentStoragePath: string
+  },
   milestone: { description: string },
-  currency: string,
+  currency: string
 ): Promise<PublicDisbursementHistoryItem> => {
   const rawItems = Array.isArray(request.items) ? request.items : []
   const items = rawItems.flatMap((item) => {
     if (!item || typeof item !== "object") return []
     const value = item as Record<string, unknown>
-    if (typeof value.name !== "string" || typeof value.unit !== "string" || typeof value.quantity !== "number") return []
+    if (typeof value.name !== "string" || typeof value.unit !== "string" || typeof value.quantity !== "number")
+      return []
     return [{ name: value.name, quantity: value.quantity, unit: value.unit }]
   })
   const documentUrl = await getDisbursementDocumentUrl(request.documentStoragePath).catch((error) => {
@@ -214,21 +220,32 @@ const toPublicDisbursement = async (
   }
 }
 
-export async function getPublicDisbursementHistoryForCampaign(campaignId: number): Promise<PublicDisbursementHistoryItem[]> {
+export async function getPublicDisbursementHistoryForCampaign(
+  campaignId: number
+): Promise<PublicDisbursementHistoryItem[]> {
   const milestones = await db.orm.public.Milestone.where({ campaignId }).all()
   const milestoneIds = new Set(milestones.map((milestone) => milestone.id))
   const campaign = await db.orm.public.Campaign.first({ id: campaignId })
   if (!campaign) return []
-  const requests = await db.orm.public.DisbursementRequest.where({ status: "DISBURSED" }).all()
+  const requests = await db.orm.public.DisbursementRequest.where({
+    status: "DISBURSED",
+  }).all()
   const visible = requests.filter((request) => milestoneIds.has(request.milestoneId))
-  return Promise.all(visible.map((request) => {
+  return Promise.all(
+    visible.map((request) => {
     const milestone = milestones.find((value) => value.id === request.milestoneId)
     return toPublicDisbursement(request, milestone ?? { description: "Milestone" }, campaign.currency)
-  }))
+    })
+  )
 }
 
-export async function getPublicDisbursementHistoryForOrganization(communityId: number): Promise<PublicDisbursementHistoryItem[]> {
-  const campaigns = await db.orm.public.Campaign.where({ communityId, reviewStatus: "APPROVED" }).all()
+export async function getPublicDisbursementHistoryForOrganization(
+  communityId: number
+): Promise<PublicDisbursementHistoryItem[]> {
+  const campaigns = await db.orm.public.Campaign.where({
+    communityId,
+    reviewStatus: "APPROVED",
+  }).all()
   const histories = await Promise.all(campaigns.map((campaign) => getPublicDisbursementHistoryForCampaign(campaign.id)))
   return histories.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 }
@@ -241,7 +258,11 @@ export async function getPublicOrganizationById(id: string): Promise<PublicOrgan
   if (!community) return null
 
   const campaignRows = await db.orm.public.Campaign.select(...PUBLIC_SELECT)
-    .where({ communityId: organizationId, reviewStatus: "APPROVED", status: "ACTIVE" })
+    .where({
+      communityId: organizationId,
+      reviewStatus: "APPROVED",
+      status: "ACTIVE",
+    })
     .orderBy((campaign) => campaign.createdAt.desc())
     .all()
 

@@ -94,6 +94,27 @@
               }
             ]
           },
+          "CampaignOnchainStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "NOT_REGISTERED",
+                "value": "NOT_REGISTERED"
+              },
+              {
+                "name": "REGISTERING",
+                "value": "REGISTERING"
+              },
+              {
+                "name": "REGISTERED",
+                "value": "REGISTERED"
+              },
+              {
+                "name": "FAILED",
+                "value": "FAILED"
+              }
+            ]
+          },
           "CampaignReviewStatus": {
             "codecId": "pg/text@1",
             "members": [
@@ -818,6 +839,33 @@
                   "kind": "scalar"
                 }
               },
+              "onchainRegisteredAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "onchainRegistrationError": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "onchainStatus": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "CampaignOnchainStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
               "organizerName": {
                 "nullable": false,
                 "type": {
@@ -1010,6 +1058,15 @@
                 },
                 "location": {
                   "column": "location"
+                },
+                "onchainRegisteredAt": {
+                  "column": "onchainRegisteredAt"
+                },
+                "onchainRegistrationError": {
+                  "column": "onchainRegistrationError"
+                },
+                "onchainStatus": {
+                  "column": "onchainStatus"
                 },
                 "organizerName": {
                   "column": "organizerName"
@@ -3178,10 +3235,11 @@
           "policy": {
             "audit_logs_langflow": {
               "kind": "policy",
-              "name": "langflow",
+              "name": "audit_logs_langflow_b9fc725d",
               "namespaceId": "public",
               "operation": "insert",
               "permissive": true,
+              "prefix": "audit_logs_langflow",
               "roles": [
                 "anon",
                 "authenticated"
@@ -3396,6 +3454,11 @@
                   "prefix": "campaign_category_check"
                 },
                 {
+                  "expression": "\"onchainStatus\" IN ('NOT_REGISTERED', 'REGISTERING', 'REGISTERED', 'FAILED')",
+                  "name": "campaign_onchainStatus_check_e8263ac8",
+                  "prefix": "campaign_onchainStatus_check"
+                },
+                {
                   "expression": "\"reviewStatus\" IN ('AI_DRAFT', 'PENDING_REVIEW', 'APPROVED', 'REJECTED')",
                   "name": "campaign_reviewStatus_check_8871a79a",
                   "prefix": "campaign_reviewStatus_check"
@@ -3517,6 +3580,31 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
+                },
+                "onchainRegisteredAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "onchainRegistrationError": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "onchainStatus": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "NOT_REGISTERED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "CampaignOnchainStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
                 },
                 "organizerName": {
                   "codecId": "pg/text@1",
@@ -5349,6 +5437,15 @@
                 "BENCANA"
               ]
             },
+            "CampaignOnchainStatus": {
+              "kind": "valueSet",
+              "values": [
+                "NOT_REGISTERED",
+                "REGISTERING",
+                "REGISTERED",
+                "FAILED"
+              ]
+            },
             "CampaignReviewStatus": {
               "kind": "valueSet",
               "values": [
@@ -5507,7 +5604,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ce36641292246478d19ec371ca2dbf16634902d1f9e45dd5810ac91944e9bea1",
+    "storageHash": "26f1a08577ef34964d72e77b2056b17ff7f72446e4bb81325c5458e2741024d6",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
@@ -5520,7 +5617,7 @@
     }
   },
   "execution": {
-    "executionHash": "f5dd1d18b0b168b1960169be62513ff2844eed38bea961143f2f6038801f6d97",
+    "executionHash": "6b86caed6df2d444816aa64eeb669144155278cf4ba015232cd39a02c9ab7a76",
     "mutations": {
       "defaults": [
         {

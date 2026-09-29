@@ -4,13 +4,14 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { cn } from "@/src/lib/utils"
-import { Check, Pencil, Rocket, Trash2, X } from "lucide-react"
+import { Check, ExternalLink, Link2, Pencil, Rocket, Trash2, X } from "lucide-react"
 import type { CampaignReview } from "@/src/lib/dashboard-data"
 import { formatAngka } from "@/src/lib/site-data"
 import {
   approveCampaign,
   deleteCampaign,
   publishCampaign,
+  registerCampaignOnChainAction,
   rejectCampaign,
 } from "@/app/(dashboard)/(admin)/admin/campaigns/actions"
 
@@ -57,15 +58,14 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
         <span className="min-w-0 flex-1 text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
           Kampanye / AI source
         </span>
-        <span className="w-32 text-right text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
-          Target
-        </span>
+        <span className="w-32 text-right text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">Target</span>
         <span className="w-32 text-center text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
           Review
         </span>
-        <span className="w-40 text-center text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
-          Aksi
+        <span className="w-36 text-center text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">
+          On-chain
         </span>
+        <span className="w-40 text-center text-xs font-semibold tracking-[0.08em] text-ink-muted uppercase">Aksi</span>
       </div>
       {campaigns.map((campaign) => (
         <CampaignTableRow key={campaign.id} campaign={campaign} />
@@ -77,6 +77,7 @@ export function CampaignTable({ campaigns }: CampaignTableProps) {
 function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
   const router = useRouter()
   const [busy, setBusy] = React.useState(false)
+  const [message, setMessage] = React.useState<string | null>(null)
   const reviewStatus = campaign.reviewStatus ?? "AI_DRAFT"
   const style = STATUS_STYLES[reviewStatus]
   const title = campaign.title ?? campaign.judul
@@ -84,8 +85,10 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
 
   async function run(action: (id: string) => Promise<unknown>) {
     setBusy(true)
+    setMessage(null)
     try {
-      await action(campaign.id)
+      const result = await action(campaign.id)
+      if (result && typeof result === "object" && "message" in result) setMessage(String(result.message))
       router.refresh()
     } finally {
       setBusy(false)
@@ -95,20 +98,18 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
   return (
     <div className="flex flex-col gap-3 border-b border-line-soft px-6 py-4 last:border-b-0 sm:flex-row sm:items-center sm:gap-4">
       <div className="min-w-0 flex-1">
-        <p className="text-sm leading-[1.3] font-semibold text-ink">
-          {title}
-        </p>
+        <p className="text-sm leading-[1.3] font-semibold text-ink">{title}</p>
         <p className="mt-1 text-xs text-ink-muted">{organizerName}</p>
         <p className="mt-2 text-xs text-ink-muted">
-          Confidence AI:{" "}
-          {campaign.aiConfidence == null
-            ? "—"
-            : `${Math.round(campaign.aiConfidence * 100)}%`}
+          Confidence AI: {campaign.aiConfidence == null ? "—" : `${Math.round(campaign.aiConfidence * 100)}%`}
           {campaign.aiReference ? ` · ${campaign.aiReference}` : ""}
         </p>
         {campaign.recipientWallet ? (
-          <p className="mt-1 truncate font-mono text-[11px] text-ink-muted">
-            Recipient: {campaign.recipientWallet}
+          <p className="mt-1 truncate font-mono text-[11px] text-ink-muted">Recipient: {campaign.recipientWallet}</p>
+        ) : null}
+        {message ? (
+          <p className="mt-1 text-xs text-ink-muted" role="status">
+            {message}
           </p>
         ) : null}
       </div>
@@ -128,6 +129,23 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
         >
           {style.label}
         </span>
+      </div>
+
+      <div className="flex items-center gap-1 sm:w-36 sm:justify-center">
+        <span className="text-xs font-semibold text-ink-muted">
+          {campaign.onchainStatus?.replaceAll("_", " ") ?? "NOT REGISTERED"}
+        </span>
+        {campaign.contractTransactionHash ? (
+          <a
+            href={`https://testnet.bscscan.com/tx/${campaign.contractTransactionHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Lihat transaksi registrasi di BscScan"
+            className="text-brand-700"
+          >
+            <ExternalLink className="size-3.5" aria-hidden="true" />
+          </a>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-1 sm:w-40 sm:justify-center">
@@ -154,6 +172,7 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
           </>
         ) : null}
         {reviewStatus === "APPROVED" ? (
+          <>
           <button
             type="button"
             title="Publish"
@@ -163,6 +182,18 @@ function CampaignTableRow({ campaign }: { campaign: CampaignReview }) {
           >
             <Rocket className="size-4" aria-hidden="true" />
           </button>
+            {!campaign.contractCampaignId && campaign.status === "ACTIVE" ? (
+              <button
+                type="button"
+                title="Register On-chain"
+                disabled={busy || campaign.onchainStatus === "REGISTERING"}
+                onClick={() => void run(registerCampaignOnChainAction)}
+                className="flex size-8 items-center justify-center rounded-[6px] text-brand-700 hover:bg-brand-50 disabled:opacity-50 dark:text-brand-300 dark:hover:bg-brand-950"
+              >
+                <Link2 className="size-4" aria-hidden="true" />
+              </button>
+            ) : null}
+          </>
         ) : null}
         <Link
           href={`/admin/campaigns/${campaign.id}/edit`}

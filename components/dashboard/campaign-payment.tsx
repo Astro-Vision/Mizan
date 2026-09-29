@@ -8,6 +8,7 @@ import { decimalBnbToWei } from "@/src/lib/payments/validation"
 
 export type PaymentCampaign = {
   id: string
+  contractCampaignId?: string | null
   title: string
   organizerName: string
   targetAmountWei: string
@@ -17,10 +18,16 @@ export type PaymentCampaign = {
   penyelenggara?: string
 }
 
-export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] }) {
+export function CampaignPayment({
+  campaigns,
+  lockedCampaignId,
+}: {
+  campaigns: PaymentCampaign[]
+  lockedCampaignId?: string
+}) {
   const { identityToken } = useIdentityToken()
   const { wallets, ready: walletsReady } = useWallets()
-  const [campaignId, setCampaignId] = React.useState(campaigns[0]?.id ?? "")
+  const [campaignId, setCampaignId] = React.useState(lockedCampaignId ?? campaigns[0]?.id ?? "")
   const [amount, setAmount] = React.useState("")
   const [mode, setMode] = React.useState<"MOCK" | "ONCHAIN">("MOCK")
   const [message, setMessage] = React.useState<string | null>(null)
@@ -53,7 +60,10 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
       if (mode === "MOCK") {
         const response = await fetch("/api/payments/mock", {
           method: "POST",
-          headers: { "content-type": "application/json", "privy-id-token": identityToken },
+          headers: {
+            "content-type": "application/json",
+            "privy-id-token": identityToken,
+          },
           body: JSON.stringify({
             campaignId,
             donorWallet: ethereumWallet.address,
@@ -68,10 +78,22 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
         }
         if (!response.ok || !body.ok) throw new Error(body.error || "Mock payment gagal")
         if (body.totalFundedWei) {
-          setTotalFundedWei((current) => ({ ...current, [campaignId]: body.totalFundedWei! }))
+          setTotalFundedWei((current) => ({
+            ...current,
+            [campaignId]: body.totalFundedWei!,
+          }))
         }
         setMessage("Mock payment berhasil dicatat.")
       } else {
+        if (!campaign.contractCampaignId) throw new Error("Campaign belum siap menerima donasi on-chain.")
+        const preflightResponse = await fetch(`/api/campaigns/${campaign.id}/onchain-status`)
+        const preflight = (await preflightResponse.json()) as {
+          active?: boolean
+          recipientMatches?: boolean
+          error?: string
+        }
+        if (!preflightResponse.ok || !preflight.active || !preflight.recipientMatches)
+          throw new Error("Campaign belum aktif atau data penerima on-chain tidak cocok.")
         const contractAddress = process.env.NEXT_PUBLIC_MIZAN_CONTRACT_ADDRESS
         if (!contractAddress) throw new Error("Contract v2 belum dikonfigurasi di client")
         await ethereumWallet.switchChain(BSC_TESTNET_CHAIN_ID)
@@ -80,20 +102,23 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
         if (activeChainId !== "0x61") {
           throw new Error("Wallet belum berada di BSC Testnet. Switch network lalu coba lagi.")
         }
-        const hash = await provider.request({
+        const hash = (await provider.request({
           method: "eth_sendTransaction",
           params: [
             {
               from: ethereumWallet.address,
               to: contractAddress,
-              data: encodeFundCampaign(campaignId),
+              data: encodeFundCampaign(campaign.contractCampaignId),
               value: `0x${BigInt(amountWei).toString(16)}`,
             },
           ],
-        }) as `0x${string}`
+        })) as `0x${string}`
         const response = await fetch("/api/payments/confirm", {
           method: "POST",
-          headers: { "content-type": "application/json", "privy-id-token": identityToken },
+          headers: {
+            "content-type": "application/json",
+            "privy-id-token": identityToken,
+          },
           body: JSON.stringify({
             campaignId,
             donorWallet: ethereumWallet.address,
@@ -112,13 +137,22 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
           throw new Error(body.error || "Konfirmasi on-chain gagal")
         }
         if (body.totalFundedWei) {
-          setTotalFundedWei((current) => ({ ...current, [campaignId]: body.totalFundedWei! }))
+          setTotalFundedWei((current) => ({
+            ...current,
+            [campaignId]: body.totalFundedWei!,
+          }))
         }
         setMessage(body.status === "PENDING" ? "Transaksi menunggu konfirmasi." : `Payment terkonfirmasi: ${hash}`)
       }
       setAmount("")
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Payment gagal")
+      setMessage(
+        typeof error === "object" && error && "code" in error && error.code === 4001
+          ? "Transaksi dibatalkan di wallet."
+          : error instanceof Error
+            ? error.message
+            : "Payment gagal"
+      )
     } finally {
       setBusy(false)
     }
@@ -142,7 +176,11 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
             Campaign
             <select
               value={campaignId}
-              onChange={(event) => setCampaignId(event.target.value)}
+              disabled={Boolean(lockedCampaignId)}
+              onChange={(event) => {
+                setCampaignId(event.target.value)
+                setMode("MOCK")
+              }}
               className="mt-1.5 h-12 w-full rounded-[6px] border border-line-ui bg-surface px-4 text-sm text-ink outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100"
             >
               {campaigns.map((campaign) => (
@@ -169,21 +207,29 @@ export function CampaignPayment({ campaigns }: { campaigns: PaymentCampaign[] })
           </label>
 
           <div className="grid grid-cols-2 gap-2">
-            {(["MOCK", "ONCHAIN"] as const).map((paymentMode) => (
+            {(["MOCK", "ONCHAIN"] as const).map((paymentMode) => {
+              const onchainUnavailable =
+                paymentMode === "ONCHAIN" &&
+                !campaigns.find((campaign) => campaign.id === campaignId)?.contractCampaignId
+              return (
               <button
                 key={paymentMode}
                 type="button"
+                  disabled={onchainUnavailable}
                 onClick={() => setMode(paymentMode)}
                 className={cn(
                   "h-10 rounded-[6px] border text-xs font-semibold",
                   mode === paymentMode
                     ? "border-brand-700 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
                     : "border-line-soft text-ink-muted",
+                    onchainUnavailable && "cursor-not-allowed opacity-50"
                 )}
+                  title={onchainUnavailable ? "Campaign belum terdaftar on-chain" : undefined}
               >
                   {paymentMode === "MOCK" ? "Simulasi DB" : "On-chain BSC Testnet"}
               </button>
-            ))}
+              )
+            })}
           </div>
 
           <button
