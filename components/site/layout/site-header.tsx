@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, Wallet, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 
 import { mzBtn } from "@/components/site/ui/mz-button"
 import { AuthMenu } from "@/components/auth/auth-menu"
@@ -16,9 +16,9 @@ export function SiteHeader() {
   const panelId = "mz-nav-seluler"
 
   return (
-    <header className="mz-site-header sticky top-3 z-50 px-3 sm:px-6">
+    <header className="mz-site-header sticky top-0 z-50 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6">
       <div className="mx-auto max-w-[1240px]">
-        <div className="flex h-16 items-center justify-between gap-4 rounded-full border border-soft-lavender bg-surface px-4 shadow-sm lg:h-[72px] lg:px-7">
+        <div className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-soft-lavender bg-surface px-3 py-2 shadow-sm sm:rounded-full sm:px-4 lg:min-h-[72px] lg:px-7">
           <Link
             href="/"
             className="mz-site-wordmark flex min-h-11 shrink-0 items-center"
@@ -28,7 +28,7 @@ export function SiteHeader() {
               <Image
                 src="/Primary-Logo.png"
                 alt="Mizan"
-                className="mz-site-logo__image"
+                className="mz-site-logo__image bg-transparent"
                 width={1200}
                 height={400}
                 sizes="162px"
@@ -51,8 +51,10 @@ export function SiteHeader() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-2">
-            <AuthMenu />
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+            <div className="hidden lg:flex">
+              <AuthMenu />
+            </div>
 
             <button
               type="button"
@@ -90,18 +92,6 @@ export function SiteHeader() {
                   </li>
                 ))}
               </ul>
-              <a
-                href="#hubungkan"
-                onClick={() => setBuka(false)}
-                className={mzBtn("outline", "md", "mt-3 w-full sm:hidden")}
-              >
-                <Wallet
-                  className="size-4"
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-                {t("Hubungkan Dompet")}
-              </a>
               <div className="mt-3 sm:hidden">
                 <AuthMenu mobile />
               </div>

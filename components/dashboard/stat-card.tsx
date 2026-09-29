@@ -1,3 +1,5 @@
+"use client"
+
 import { cn } from "@/src/lib/utils"
 import type { StatItem } from "@/src/lib/dashboard-data"
 import {
@@ -11,6 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import { useLanguage } from "@/components/site/language-provider"
 
 /**
  * Peta nama ikon ke komponen lucide-react.
@@ -51,6 +54,7 @@ export function StatCard({
   className,
 }: StatCardProps) {
   const Icon = ICON_MAP[stat.icon]
+  const { t } = useLanguage()
 
   return (
     <div
@@ -61,7 +65,9 @@ export function StatCard({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <p className="text-sm leading-[1.55] text-ink-muted">{stat.label}</p>
+          <p className="text-sm leading-[1.55] text-ink-muted">
+            {t(stat.label)}
+          </p>
           <p
             className={cn(
               "mt-2 text-h2 text-ink",
@@ -70,7 +76,7 @@ export function StatCard({
           >
             {stat.value}
             <span className="ml-1.5 text-sm font-normal text-ink-muted">
-              {stat.unit}
+              {t(stat.unit)}
             </span>
           </p>
         </div>

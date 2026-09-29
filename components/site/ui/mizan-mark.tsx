@@ -10,7 +10,7 @@ import Image from "next/image"
 export function MizanMark({ className }: { className?: string }) {
   return (
     <Image
-      src="/Logomark.png"
+      src="/Favicon.png"
       alt=""
       width={24}
       height={24}
@@ -39,7 +39,7 @@ export function MizanIntroLogo({ solid = false }: { solid?: boolean }) {
       alt="Mizan"
       width={1200}
       height={400}
-      className={cn("object-contain", solid && "opacity-90")}
+      className={cn("bg-transparent object-contain", solid && "opacity-90")}
     />
   )
 }

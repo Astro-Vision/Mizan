@@ -8,11 +8,12 @@ import {
   Clock,
   FileText,
   ImageUp,
-  XCircle
+  XCircle,
 } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { getMilestones } from "./actions"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 const STATUS_CONFIG: Record<
   string,
@@ -77,11 +78,13 @@ export default async function MilestonesPage({
 
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <p className="mz-overline">Penyaluran</p>
-          <h1 className="mt-2 text-h1 text-ink">Kelola milestone</h1>
-          <p className="mt-2 text-sm text-ink-muted">
-            {result.campaign.title}
+          <p className="mz-overline">
+            <LocalizedText text="Penyaluran" />
           </p>
+          <h1 className="mt-2 text-h1 text-ink">
+            <LocalizedText text="Kelola milestone" />
+          </h1>
+          <p className="mt-2 text-sm text-ink-muted">{result.campaign.title}</p>
         </div>
       </div>
 
@@ -98,13 +101,13 @@ export default async function MilestonesPage({
               (m) =>
                 m.status === "AI_VERIFIED" ||
                 m.status === "DISBURSEMENT_REQUESTED" ||
-                m.status === "DISBURSED",
+                m.status === "DISBURSED"
             ).length,
           },
           {
             label: "Menunggu",
             value: result.milestones.filter(
-              (m) => m.status === "PROOF_SUBMITTED",
+              (m) => m.status === "PROOF_SUBMITTED"
             ).length,
           },
           {
@@ -117,7 +120,7 @@ export default async function MilestonesPage({
             key={stat.label}
             className="rounded-[10px] border border-line-soft bg-surface p-3 text-center"
           >
-            <p className="font-mono text-lg font-semibold tabular-nums text-ink">
+            <p className="font-mono text-lg font-semibold text-ink tabular-nums">
               {stat.value}
             </p>
             <p className="text-xs text-ink-muted">{stat.label}</p>
@@ -128,7 +131,8 @@ export default async function MilestonesPage({
       {/* Milestone list */}
       <div className="space-y-3">
         {result.milestones.map((milestone) => {
-          const config = STATUS_CONFIG[milestone.status] ?? STATUS_CONFIG.PENDING
+          const config =
+            STATUS_CONFIG[milestone.status] ?? STATUS_CONFIG.PENDING
           const StatusIcon = config.icon
 
           return (
@@ -146,7 +150,7 @@ export default async function MilestonesPage({
                       {milestone.description}
                     </h2>
                     <span
-                      className={`inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-semibold uppercase tracking-[0.02em] ${config.bg} ${config.text}`}
+                      className={`inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-semibold tracking-[0.02em] uppercase ${config.bg} ${config.text}`}
                     >
                       <StatusIcon size={14} strokeWidth={1.5} />
                       {config.label}
@@ -154,7 +158,7 @@ export default async function MilestonesPage({
                   </div>
 
                   {/* Amount */}
-                  <p className="mt-3 text-right font-mono text-sm tabular-nums text-ink">
+                  <p className="mt-3 text-right font-mono text-sm text-ink tabular-nums">
                     {formatWei(milestone.amountWei)}{" "}
                     <span className="text-xs text-ink-muted">
                       {result.campaign.currency}
@@ -224,7 +228,7 @@ export default async function MilestonesPage({
                     <p className="mt-2 text-xs text-ink-muted">
                       Pencairan diajukan:{" "}
                       {new Date(
-                        milestone.disbursementRequestedAt,
+                        milestone.disbursementRequestedAt
                       ).toLocaleDateString("id-ID", {
                         day: "2-digit",
                         month: "short",

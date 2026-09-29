@@ -3,6 +3,7 @@ import { ChevronLeft, ArrowUpRight } from "lucide-react"
 import { notFound } from "next/navigation"
 import { getMilestones } from "../milestones/actions"
 import { DisbursementRequestForm } from "@/components/dashboard/disbursement-request-form"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 const EXPLORER_URL = "https://testnet.bscscan.com"
 
@@ -16,7 +17,7 @@ export default async function DisbursementPage({
   if (!result) notFound()
 
   const eligible = result.milestones.filter((m) =>
-    ["AI_VERIFIED", "DISBURSEMENT_REQUESTED", "DISBURSED"].includes(m.status),
+    ["AI_VERIFIED", "DISBURSEMENT_REQUESTED", "DISBURSED"].includes(m.status)
   )
 
   const totalDisbursedWei = result.milestones
@@ -25,7 +26,7 @@ export default async function DisbursementPage({
 
   const totalEligibleWei = eligible.reduce(
     (sum, m) => sum + BigInt(m.amountWei || "0"),
-    BigInt(0),
+    BigInt(0)
   )
 
   return (
@@ -38,8 +39,12 @@ export default async function DisbursementPage({
         Kembali ke kampanye
       </Link>
 
-      <p className="mz-overline">Penyaluran</p>
-      <h1 className="mt-2 text-h1 text-ink">Ajukan pencairan</h1>
+      <p className="mz-overline">
+        <LocalizedText text="Penyaluran" />
+      </p>
+      <h1 className="mt-2 text-h1 text-ink">
+        <LocalizedText text="Ajukan pencairan" />
+      </h1>
       <p className="mt-3 max-w-2xl text-sm text-ink-muted">
         Milestone yang sudah terverifikasi AI dapat diajukan untuk pencairan
         dana.
@@ -48,8 +53,10 @@ export default async function DisbursementPage({
       {/* Summary */}
       <div className="mt-6 grid grid-cols-2 gap-3">
         <div className="rounded-[10px] border border-line-soft bg-surface p-4">
-          <p className="text-xs text-ink-muted">Total eligible</p>
-          <p className="mt-1 font-mono text-lg font-semibold tabular-nums text-ink">
+          <p className="text-xs text-ink-muted">
+            <LocalizedText text="Total eligible" />
+          </p>
+          <p className="mt-1 font-mono text-lg font-semibold text-ink tabular-nums">
             {formatWei(totalEligibleWei.toString())}{" "}
             <span className="text-sm font-normal text-ink-muted">
               {result.campaign.currency}
@@ -57,8 +64,10 @@ export default async function DisbursementPage({
           </p>
         </div>
         <div className="rounded-[10px] border border-line-soft bg-surface p-4">
-          <p className="text-xs text-ink-muted">Sudah dicairkan</p>
-          <p className="mt-1 font-mono text-lg font-semibold tabular-nums text-brand-700">
+          <p className="text-xs text-ink-muted">
+            <LocalizedText text="Sudah dicairkan" />
+          </p>
+          <p className="mt-1 font-mono text-lg font-semibold text-brand-700 tabular-nums">
             {formatWei(totalDisbursedWei.toString())}{" "}
             <span className="text-sm font-normal text-ink-muted">
               {result.campaign.currency}
@@ -92,7 +101,7 @@ export default async function DisbursementPage({
                 <p className="mt-2 text-xs text-ink-muted">
                   Diajukan:{" "}
                   {new Date(
-                    milestone.disbursementRequestedAt,
+                    milestone.disbursementRequestedAt
                   ).toLocaleDateString("id-ID", {
                     day: "2-digit",
                     month: "short",
@@ -120,10 +129,19 @@ export default async function DisbursementPage({
 
             <div className="shrink-0">
               {milestone.status === "AI_VERIFIED" ? (
-                <div className="w-full sm:max-w-xl"><span className="inline-flex h-7 items-center rounded-full bg-accent-200/20 px-3 text-[0.8125rem] font-semibold uppercase tracking-[0.02em] text-ink">Siap diajukan</span><DisbursementRequestForm milestoneId={milestone.id} milestoneDescription={milestone.description} currency={result.campaign.currency} /></div>
+                <div className="w-full sm:max-w-xl">
+                  <span className="inline-flex h-7 items-center rounded-full bg-accent-200/20 px-3 text-[0.8125rem] font-semibold tracking-[0.02em] text-ink uppercase">
+                    Siap diajukan
+                  </span>
+                  <DisbursementRequestForm
+                    milestoneId={milestone.id}
+                    milestoneDescription={milestone.description}
+                    currency={result.campaign.currency}
+                  />
+                </div>
               ) : (
                 <span
-                  className={`inline-flex h-7 items-center rounded-full px-3 text-[0.8125rem] font-semibold uppercase tracking-[0.02em] ${
+                  className={`inline-flex h-7 items-center rounded-full px-3 text-[0.8125rem] font-semibold tracking-[0.02em] uppercase ${
                     milestone.status === "DISBURSED"
                       ? "bg-brand-50 text-brand-700"
                       : "bg-accent-200/20 text-ink"

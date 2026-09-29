@@ -9,6 +9,7 @@ import {
 } from "@/src/lib/admin-dashboard-server"
 import { getCampaigns } from "./campaigns/actions"
 import { TESTNET_NOTICE } from "@/src/lib/site-data"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 export const metadata: Metadata = {
   title: "Panel Admin",
@@ -27,8 +28,12 @@ export default async function AdminPage() {
     <div className="mx-auto max-w-310">
       {/* Header */}
       <div className="mb-8">
-        <p className="mz-overline">Panel Admin</p>
-        <h1 className="mt-3 text-h1 text-ink">Ringkasan Platform</h1>
+        <p className="mz-overline">
+          <LocalizedText text="Panel Admin" />
+        </p>
+        <h1 className="mt-3 text-h1 text-ink">
+          <LocalizedText text="Ringkasan Platform" />
+        </h1>
         <p className="mt-2 text-sm text-ink-muted">{TESTNET_NOTICE}</p>
       </div>
 
@@ -45,7 +50,9 @@ export default async function AdminPage() {
 
       {/* Kampanye menunggu peninjauan */}
       <section className="mt-12">
-        <h2 className="text-h3 text-ink">Kampanye</h2>
+        <h2 className="text-h3 text-ink">
+          <LocalizedText text="Kampanye" />
+        </h2>
         <p className="mt-1 text-sm text-ink-muted">
           Daftar kampanye beserta status peninjauan.
         </p>
@@ -64,7 +71,9 @@ export default async function AdminPage() {
 
       {/* Aktivitas terbaru */}
       <section className="mt-12">
-        <h2 className="text-h3 text-ink">Aktivitas terbaru</h2>
+        <h2 className="text-h3 text-ink">
+          <LocalizedText text="Aktivitas terbaru" />
+        </h2>
         <p className="mt-1 text-sm text-ink-muted">
           Transaksi dan kejadian terakhir di platform.
         </p>
