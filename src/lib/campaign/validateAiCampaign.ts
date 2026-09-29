@@ -102,7 +102,7 @@ export function validateAiCampaignDraft(
     )
   }
 
- 
+
   if (matchedDisasterEventId && confidenceScore <= LOW_CONFIDENCE_THRESHOLD) {
     console.warn(
       `[validateAiCampaignDraft] Kemungkinan inkonsistensi: matchedDisasterEventId ` +

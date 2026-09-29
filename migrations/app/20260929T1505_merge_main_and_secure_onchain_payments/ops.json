@@ -1,0 +1,86 @@
+[
+  {
+    "id": "unique.campaign.campaign_aiReference_key",
+    "label": "Add unique constraint on \"campaign\" (aiReference)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "campaign_aiReference_key",
+        "table": "campaign"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"campaign_aiReference_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaign_aiReference_key",
+          "public",
+          "\"public\".\"campaign\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"campaign_aiReference_key\"",
+        "sql": "ALTER TABLE \"public\".\"campaign\" ADD CONSTRAINT \"campaign_aiReference_key\" UNIQUE (\"aiReference\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"campaign_aiReference_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaign_aiReference_key",
+          "public",
+          "\"public\".\"campaign\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.campaignPayment.campaignPayment_transactionHash_key",
+    "label": "Add unique constraint on \"campaignPayment\" (transactionHash)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "campaignPayment_transactionHash_key",
+        "table": "campaignPayment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"campaignPayment_transactionHash_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaignPayment_transactionHash_key",
+          "public",
+          "\"public\".\"campaignPayment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"campaignPayment_transactionHash_key\"",
+        "sql": "ALTER TABLE \"public\".\"campaignPayment\" ADD CONSTRAINT \"campaignPayment_transactionHash_key\" UNIQUE (\"transactionHash\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"campaignPayment_transactionHash_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaignPayment_transactionHash_key",
+          "public",
+          "\"public\".\"campaignPayment\""
+        ]
+      }
+    ]
+  }
+]

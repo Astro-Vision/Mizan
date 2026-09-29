@@ -95,13 +95,16 @@ export function CampaignPayment({
         const preflight = (await preflightResponse.json()) as {
           active?: boolean
           recipientMatches?: boolean
+          vaultAddress?: string
           error?: string
         }
         if (!preflightResponse.ok || !preflight.active || !preflight.recipientMatches)
           throw new Error("Campaign belum aktif atau data penerima on-chain tidak cocok.")
         const contractAddress = process.env.NEXT_PUBLIC_MIZAN_CONTRACT_ADDRESS
-        if (!contractAddress)
+        if (!contractAddress || !/^0x[a-fA-F0-9]{40}$/.test(contractAddress))
           throw new Error("Contract v2 belum dikonfigurasi di client")
+        if (preflight.vaultAddress?.toLowerCase() !== contractAddress.toLowerCase())
+          throw new Error("Alamat contract client dan server tidak cocok.")
         await ethereumWallet.switchChain(BSC_TESTNET_CHAIN_ID)
         const provider = await ethereumWallet.getEthereumProvider()
         const activeChainId = await provider.request({ method: "eth_chainId" })
@@ -121,28 +124,43 @@ export function CampaignPayment({
             },
           ],
         })) as `0x${string}`
-        const response = await fetch("/api/payments/confirm", {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "privy-id-token": identityToken,
-          },
-          body: JSON.stringify({
-            campaignId,
-            donorWallet: ethereumWallet.address,
-            amountWei,
-            idempotencyKey,
-            transactionHash: hash,
-          }),
-        })
-        const body = (await response.json()) as {
+        let body: {
           ok?: boolean
           error?: string
           status?: string
           totalFundedWei?: string
+        } = {}
+        let confirmed = false
+        for (let attempt = 0; attempt < 30; attempt += 1) {
+          const response = await fetch("/api/payments/confirm", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+              "privy-id-token": identityToken,
+            },
+            body: JSON.stringify({
+              campaignId,
+              donorWallet: ethereumWallet.address,
+              amountWei,
+              idempotencyKey,
+              transactionHash: hash,
+            }),
+          })
+          body = (await response.json()) as typeof body
+          if (response.status === 202 && body.status === "PENDING") {
+            if (attempt < 29) await new Promise((resolve) => window.setTimeout(resolve, 2_000))
+            continue
+          }
+          if (!response.ok || !body.ok) {
+            throw new Error(body.error || "Konfirmasi on-chain gagal")
+          }
+          confirmed = true
+          break
         }
-        if (!response.ok && response.status !== 202) {
-          throw new Error(body.error || "Konfirmasi on-chain gagal")
+        if (!confirmed) {
+          setMessage(`Transaksi sudah dikirim tetapi masih menunggu konfirmasi: ${hash}`)
+          setAmount("")
+          return
         }
         if (body.totalFundedWei) {
           setTotalFundedWei((current) => ({
@@ -150,11 +168,7 @@ export function CampaignPayment({
             [campaignId]: body.totalFundedWei!,
           }))
         }
-        setMessage(
-          body.status === "PENDING"
-            ? "Transaksi menunggu konfirmasi."
-            : `Payment terkonfirmasi: ${hash}`
-        )
+        setMessage(`Payment terkonfirmasi: ${hash}`)
       }
       setAmount("")
     } catch (error) {

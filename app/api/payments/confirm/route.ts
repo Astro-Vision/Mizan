@@ -59,13 +59,41 @@ export async function POST(request: Request) {
       idempotencyKey: input.idempotencyKey,
     })
     if (existing) {
-      if (existing.transactionHash !== input.transactionHash) {
+      if (
+        existing.campaignId !== input.campaignId ||
+        existing.donorId !== user.id ||
+        existing.donorWallet.toLowerCase() !== donorWallet ||
+        existing.amountWei !== input.amountWei ||
+        existing.mode !== "ONCHAIN" ||
+        existing.transactionHash?.toLowerCase() !== input.transactionHash.toLowerCase()
+      ) {
         return error("IDEMPOTENCY_KEY_REUSED", 409)
       }
       return NextResponse.json({
         ok: true,
         payment: serializePayment(existing),
         idempotent: true,
+      })
+    }
+
+    const existingTransaction = await db.orm.public.CampaignPayment.first({
+      transactionHash: input.transactionHash,
+    })
+    if (existingTransaction) {
+      if (
+        existingTransaction.campaignId !== input.campaignId ||
+        existingTransaction.donorId !== user.id ||
+        existingTransaction.donorWallet.toLowerCase() !== donorWallet ||
+        existingTransaction.amountWei !== input.amountWei ||
+        existingTransaction.mode !== "ONCHAIN"
+      ) {
+        return error("TRANSACTION_ALREADY_RECORDED", 409)
+      }
+      return NextResponse.json({
+        ok: true,
+        payment: serializePayment(existingTransaction),
+        idempotent: true,
+        totalFundedWei: await getCampaignTotalWei(input.campaignId),
       })
     }
 
