@@ -143,7 +143,7 @@ export function BrandIntro() {
         <Image
           src="/Primary-Logo.png"
           alt="Mizan"
-          className="mz-intro-logo__image"
+          className="mz-intro-logo__image bg-transparent"
           width={1200}
           height={400}
           priority

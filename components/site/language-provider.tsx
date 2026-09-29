@@ -17,9 +17,227 @@ const ENGLISH: Record<string, string> = {
   Dashboard: "Dashboard",
   Ringkasan: "Overview",
   "Kampanye Saya": "My Campaigns",
-  "Penyaluran": "Disbursements",
+  "Filter kampanye": "Campaign filter",
+  "Belum ada kampanye": "No campaigns yet",
+  "Buat kampanye pertama untuk mulai mengelola penyaluran organisasi Anda.":
+    "Create your first campaign to start managing your organization's disbursements.",
+  "Dana terkumpul": "Funds raised",
+  "Belum ada milestone": "No milestones yet",
+  "Panel Admin": "Admin Panel",
+  "Ringkasan Platform": "Platform Overview",
+  "Aktivitas terbaru": "Recent activity",
+  "Penyaluran dana": "Fund disbursement",
+  "Tambah Kampanye": "Add Campaign",
+  Kampanye: "Campaigns",
+  "Draft kampanye dibuat oleh AI mock, lalu harus ditinjau admin sebelum aktif.":
+    "Campaign drafts are created by mock AI and must be reviewed by an admin before activation.",
+  "Judul kampanye": "Campaign title",
+  Penyelenggara: "Organizer",
+  "Tipe kampanye": "Campaign type",
+  "Target dana (BNB)": "Funding target (BNB)",
+  "Sisa hari kampanye": "Campaign days remaining",
+  "Wallet komunitas": "Community wallet",
+  "Deskripsi singkat": "Short description",
+  "Gambar sampul": "Cover image",
+  "Hapus gambar": "Remove image",
+  "Belum ada gambar": "No image yet",
+  "Mengunggah…": "Uploading…",
+  "Unggah gambar": "Upload image",
+  "Source / reference AI": "AI source / reference",
+  "Menyimpan…": "Saving…",
+  "Lengkapi nominal dan rincian item dengan format yang valid.":
+    "Complete the amount and item details using a valid format.",
+  "Template gagal dibuat.": "The template could not be created.",
+  "Template berhasil diunduh. Tanda tangani dokumen lalu upload kembali.":
+    "The template was downloaded successfully. Sign the document and upload it again.",
+  "Upload dokumen PDF atau DOCX yang sudah ditandatangani.":
+    "Upload a signed PDF or DOCX document.",
+  "Pengajuan gagal diproses.": "The request could not be processed.",
+  "Pengajuan berhasil diproses dengan status": "Request processed with status",
+  "Kampanye akan diajukan untuk ditinjau Admin sebelum tampil ke publik.":
+    "The campaign will be submitted for Admin review before it appears publicly.",
+  "Total eligible": "Total eligible",
+  "Sudah dicairkan": "Already disbursed",
+  "Kelola milestone": "Manage milestones",
+  "Kirim bukti penggunaan dana": "Submit fund usage proof",
+  "Dokumen pengajuan pencairan": "Disbursement request document",
+  "Isi rincian, unduh template, tanda tangani, lalu upload PDF atau DOCX.":
+    "Fill in the details, download the template, sign it, then upload the PDF or DOCX.",
+  Penyaluran: "Disbursements",
   Donatur: "Donors",
   Pengaturan: "Settings",
+  "Simpan perubahan": "Save changes",
+  Simpan: "Save",
+  Batal: "Cancel",
+  Tutup: "Close",
+  Kembali: "Back",
+  Berikutnya: "Next",
+  Aktif: "Active",
+  "Menunggu Persetujuan": "Awaiting approval",
+  Selesai: "Completed",
+  Ditutup: "Closed",
+  Draft: "Draft",
+  Sebelumnya: "Previous",
+  Buat: "Create",
+  Edit: "Edit",
+  Hapus: "Delete",
+  Filter: "Filter",
+  Semua: "All",
+  "Belum ada data": "No data yet",
+  "Memuat data…": "Loading data…",
+  "Terjadi kesalahan": "Something went wrong",
+  "Coba lagi": "Try again",
+  "Berhasil disimpan": "Saved successfully",
+  "Perubahan berhasil disimpan": "Changes saved successfully",
+  "Kampanye aktif": "Active campaigns",
+  "Total dana": "Total funds",
+  "Total terkumpul": "Total raised",
+  "Total tersalur": "Total disbursed",
+  "Total donatur": "Total donors",
+  "Jumlah donatur": "Donor count",
+  "Kampanye terbaru": "Latest campaigns",
+  "Tidak ada kampanye": "No campaigns",
+  "Belum ada kampanye.": "No campaigns yet.",
+  "Kampanye belum tersedia.": "No campaigns available yet.",
+  "Edit Kampanye": "Edit Campaign",
+  "Detail Kampanye": "Campaign Details",
+  "Campaign tidak ditemukan": "Campaign not found",
+  "Profil organisasi": "Organization profile",
+  "Profil penerima": "Beneficiary profile",
+  "Informasi pribadi": "Personal information",
+  "Data organisasi": "Organization data",
+  "Nomor telepon": "Phone number",
+  "Alamat email": "Email address",
+  "Nomor registrasi": "Registration number",
+  "Alamat wallet": "Wallet address",
+  "Belum diisi": "Not provided",
+  "Status verifikasi": "Verification status",
+  "Belum dimulai": "Not started",
+  "Sedang diproses": "In progress",
+  Milestone: "Milestone",
+  "Daftar milestone": "Milestone list",
+  "Buat milestone": "Create milestone",
+  "Unggah bukti": "Upload proof",
+  "Ajukan pencairan": "Request disbursement",
+  "Kampanye berhasil diperbarui": "Campaign updated successfully",
+  "Kampanye berhasil dihapus": "Campaign deleted successfully",
+  "Dokumen wajib diunggah": "A document is required",
+  "Dokumen pencairan": "Disbursement document",
+  "Transaction hash (opsional)": "Transaction hash (optional)",
+  "Terjadi kesalahan saat memproses milestone.":
+    "An error occurred while processing the milestone.",
+  "Belum ada bukti": "No proof yet",
+  Tahap: "Stage",
+  Opsional: "Optional",
+  "Pilih PDF/DOCX bertanda tangan": "Choose a signed PDF/DOCX",
+  "Unduh template": "Download template",
+  "Kirim untuk dianalisis": "Submit for analysis",
+  "Wilayah pembelian": "Purchase region",
+  "Deskripsi penggunaan dana": "Fund usage description",
+  Item: "Item",
+  Jumlah: "Quantity",
+  "Harga satuan": "Unit price",
+  "Memuat riwayat payment...": "Loading payment history...",
+  "Login diperlukan untuk melihat riwayat wallet ini.":
+    "Login is required to view this wallet history.",
+  "Belum ada payment dari wallet ini.": "No payments from this wallet yet.",
+  "Riwayat payment gagal dimuat": "Payment history could not be loaded",
+  "Buka transaction hash": "Open transaction hash",
+  "Kembali ke ringkasan": "Back to overview",
+  Organisasi: "Organization",
+  "Informasi organisasi yang digunakan saat kampanye ditinjau dan dana disalurkan.":
+    "Organization information used when campaigns are reviewed and funds are disbursed.",
+  "Community ID": "Community ID",
+  "Dompet penerima": "Recipient wallet",
+  "Lihat dompet di BscScan ↗": "View wallet on BscScan ↗",
+  "Informasi publik": "Public information",
+  "Data berikut dapat dilihat donatur melalui halaman profil organisasi.":
+    "Donors can view the following information on the organization profile.",
+  Website: "Website",
+  "Email kontak": "Contact email",
+  "Nomor kontak": "Contact number",
+  Alamat: "Address",
+  Legalitas: "Legal information",
+  "Status verifikasi legalitas dikelola oleh Admin Mizan. Perubahan data akan ditinjau kembali sebelum status berubah.":
+    "Legal verification is managed by Mizan Admin. Data changes will be reviewed before the status changes.",
+  "Masukkan nomor registrasi": "Enter registration number",
+  "Dokumen legalitas": "Legal document",
+  "Ajukan perubahan profil": "Submit profile changes",
+  "Hanya owner organisasi yang dapat mengubah data profil.":
+    "Only the organization owner can edit profile data.",
+  "Data testnet — dana tidak nyata.":
+    "Testnet data — funds have no real value.",
+  "Penerima Manfaat": "Beneficiary",
+  "Kelola kampanye, milestone, bukti penggunaan dana, dan pencairan.":
+    "Manage campaigns, milestones, fund usage proof, and disbursements.",
+  "Ringkasan Dana": "Funds Overview",
+  "Penyaluran & Milestone": "Disbursements & Milestones",
+  "Status verifikasi bukti penyaluran dan pencairan dana.":
+    "Verification status of distribution proof and fund disbursement.",
+  "Campaign terbaru organisasi": "Organization's latest campaigns",
+  "Menampilkan maksimal tiga campaign terbaru. Daftar lengkap tersedia di halaman Campaign Saya.":
+    "Showing up to three latest campaigns. The full list is available on My Campaigns.",
+  "Organisasi ini belum memiliki campaign.":
+    "This organization has no campaigns yet.",
+  Dibuat: "Created",
+  "Menunggu review": "Awaiting review",
+  Disetujui: "Approved",
+  "Dashboard Donatur": "Donor Dashboard",
+  "Ringkasan Donasi": "Donation Overview",
+  "Payment terkonfirmasi": "Confirmed payments",
+  "Progres dihitung dari CampaignPayment berstatus CONFIRMED di database.":
+    "Progress is calculated from CONFIRMED CampaignPayment records in the database.",
+  "Belum ada campaign aktif yang disetujui admin.":
+    "No active campaigns approved by admin yet.",
+  "Riwayat transaksi wallet": "Wallet transaction history",
+  "Payment MOCK dan ONCHAIN milik wallet Privy yang sedang login.":
+    "MOCK and ONCHAIN payments for the currently logged-in Privy wallet.",
+  "Dukung campaign aktif": "Support an active campaign",
+  "Simulasi tersimpan di database tanpa blockchain. On-chain memakai BSC Testnet dan saldo tBNB.":
+    "Simulation is stored in the database without blockchain. On-chain uses BSC Testnet and tBNB balance.",
+  "Belum ada campaign aktif yang siap menerima payment.":
+    "No active campaign is ready to receive payment.",
+  Campaign: "Campaign",
+  "Saldo campaign terkonfirmasi": "Confirmed campaign balance",
+  "Simulasi DB": "DB simulation",
+  "On-chain BSC Testnet": "BSC Testnet on-chain",
+  "Bayar simulasi": "Pay with simulation",
+  "Bayar dengan wallet": "Pay with wallet",
+  "Memproses…": "Processing…",
+  "Login dan wallet Ethereum diperlukan untuk membayar.":
+    "Login and an Ethereum wallet are required to pay.",
+  "Nominal BNB tidak valid. Gunakan maksimal 18 angka desimal.":
+    "Invalid BNB amount. Use up to 18 decimal places.",
+  "Pilih campaign terlebih dahulu.": "Choose a campaign first.",
+  "Mock payment berhasil dicatat.": "Mock payment recorded successfully.",
+  "Transaksi menunggu konfirmasi.": "Transaction is awaiting confirmation.",
+  "Payment gagal": "Payment failed",
+  kampanye: "campaigns",
+  payment: "payments",
+  milestone: "milestones",
+  "Bukti wajib diunggah": "Proof is required",
+  Nominal: "Amount",
+  Satuan: "Unit",
+  Deskripsi: "Description",
+  Kategori: "Category",
+  Lokasi: "Location",
+  "Target dana": "Funding target",
+  "Sisa hari": "Days remaining",
+  "Tanggal dibuat": "Created date",
+  "Terakhir diperbarui": "Last updated",
+  Confidence: "Confidence",
+  Keputusan: "Decision",
+  "Ringkasan dana": "Funds overview",
+  "Dana diterima": "Funds received",
+  "Dana dicairkan": "Funds disbursed",
+  "Donasi masuk": "Incoming donations",
+  "Riwayat donasi": "Donation history",
+  "Donasi saya": "My donations",
+  "Tidak ada riwayat donasi.": "No donation history yet.",
+  "Jelajahi kampanye": "Explore campaigns",
+  "Lihat detail": "View details",
+  "Lihat semua": "View all",
+  "Perbarui profil": "Update profile",
   "Donasi Saya": "My Donations",
   "Jelajahi Kampanye": "Explore Campaigns",
   Admin: "Admin",
@@ -27,6 +245,14 @@ const ENGLISH: Record<string, string> = {
   "Dompet terhubung": "Connected wallet",
   "Salin alamat dompet": "Copy wallet address",
   "Pilih bahasa": "Choose language",
+  "Histori penggunaan dana": "Fund usage history",
+  "Histori penyaluran organisasi": "Organization disbursement history",
+  "Belum ada penyaluran yang dipublikasikan": "No published disbursements yet",
+  "Histori akan muncul setelah milestone selesai disalurkan dan berstatus DISBURSED.":
+    "History will appear after a milestone is disbursed and marked DISBURSED.",
+  penyaluran: "disbursements",
+  Wilayah: "Region",
+  "Tanggal belum tersedia": "Date unavailable",
   Bahasa: "Language",
   Indonesia: "Indonesian",
   Inggris: "English",
@@ -41,7 +267,6 @@ const ENGLISH: Record<string, string> = {
   Ditolak: "Rejected",
   "Siap dicairkan": "Ready for disbursement",
   "Sudah disalurkan": "Disbursed",
-  "Belum ada kampanye": "No campaigns yet",
   "Belum ada milestone.": "No milestones yet.",
   "Belum ada output AI.": "No AI output yet.",
   "Belum ada catatan.": "No note yet.",
@@ -52,10 +277,8 @@ const ENGLISH: Record<string, string> = {
   Tolak: "Reject",
   "Tandai disalurkan": "Mark as disbursed",
   Konfirmasi: "Confirm",
-  "Penyaluran dana": "Fund disbursement",
   "Memuat halaman…": "Loading page…",
   Zakat: "Zakat",
-  Kampanye: "Campaigns",
   "Cara Kerja": "How It Works",
   Transparansi: "Transparency",
   "Tanya Jawab": "FAQ",
@@ -295,11 +518,18 @@ const ENGLISH: Record<string, string> = {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = React.useState<Language>(() => {
-    if (typeof window === "undefined") return "id"
+  // Keep the first render identical on the server and browser. The persisted
+  // preference is applied after hydration to avoid rendering different copy
+  // in SSR and the initial client render.
+  const [language, setLanguageState] = React.useState<Language>("id")
+
+  React.useEffect(() => {
     const saved = window.localStorage.getItem("mizan-language")
-    return saved === "id" || saved === "en" ? saved : "id"
-  })
+    if (saved === "id" || saved === "en") {
+      setLanguageState(saved)
+    }
+    document.documentElement.lang = language
+  }, [])
 
   React.useEffect(() => {
     document.documentElement.lang = language
@@ -315,7 +545,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         document.cookie = `mizan-language=${nextLanguage}; path=/; max-age=31536000; samesite=lax`
       },
       isEnglish: language === "en",
-      t: (text: string) => (language === "en" ? (ENGLISH[text] ?? text) : text),
+      t: (text: string) => translateText(text, language),
     }),
     [language]
   )
@@ -326,6 +556,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     </LanguageContext.Provider>
   )
 }
+
+export const translateText = (text: string, language: Language): string =>
+  language === "en" ? (ENGLISH[text] ?? text) : text
 
 export function useLanguage() {
   const context = React.useContext(LanguageContext)

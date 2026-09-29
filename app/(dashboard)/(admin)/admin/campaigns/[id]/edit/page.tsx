@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { CampaignForm } from "@/components/dashboard/campaign-form"
 import { getCampaignById, updateCampaign } from "../../actions"
 import { TESTNET_NOTICE } from "@/src/lib/site-data"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 export const metadata: Metadata = {
   title: "Edit Kampanye — Panel Admin",
@@ -29,8 +30,12 @@ export default async function EditKampanyePage({
     <div className="mx-auto max-w-[720px]">
       {/* Header */}
       <div className="mb-8">
-        <p className="mz-overline">Panel Admin</p>
-        <h1 className="mt-3 text-h1 text-ink">Edit Kampanye</h1>
+        <p className="mz-overline">
+          <LocalizedText text="Panel Admin" />
+        </p>
+        <h1 className="mt-3 text-h1 text-ink">
+          <LocalizedText text="Edit Kampanye" />
+        </h1>
         <p className="mt-2 text-sm text-ink-muted">{TESTNET_NOTICE}</p>
       </div>
 

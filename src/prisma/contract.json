@@ -3178,10 +3178,11 @@
           "policy": {
             "audit_logs_langflow": {
               "kind": "policy",
-              "name": "langflow",
+              "name": "audit_logs_langflow_b9fc725d",
               "namespaceId": "public",
               "operation": "insert",
               "permissive": true,
+              "prefix": "audit_logs_langflow",
               "roles": [
                 "anon",
                 "authenticated"
@@ -5507,7 +5508,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ce36641292246478d19ec371ca2dbf16634902d1f9e45dd5810ac91944e9bea1",
+    "storageHash": "c65487386100718e08fcdf3f707ea68d08ba8e59f370c899a5095258e00601c2",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
@@ -5520,7 +5521,7 @@
     }
   },
   "execution": {
-    "executionHash": "f5dd1d18b0b168b1960169be62513ff2844eed38bea961143f2f6038801f6d97",
+    "executionHash": "6b86caed6df2d444816aa64eeb669144155278cf4ba015232cd39a02c9ab7a76",
     "mutations": {
       "defaults": [
         {

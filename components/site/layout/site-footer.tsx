@@ -42,7 +42,7 @@ export function SiteFooter() {
                 aria-label={t("Mizan — kembali ke beranda")}
               >
                 <Image
-                  src="/Logomark.png"
+                  src="/Favicon.png"
                   alt=""
                   width={32}
                   height={32}

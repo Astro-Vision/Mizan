@@ -5,6 +5,7 @@ import { ChevronLeft } from "lucide-react"
 import { createBeneficiaryCampaign } from "../actions"
 import { BeneficiaryCampaignCreateForm } from "@/components/dashboard/beneficiary-campaign-create-form"
 import { requireBeneficiaryCommunity } from "@/src/lib/beneficiary/access"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 export const metadata: Metadata = {
   title: "Buat Kampanye — Penerima Manfaat",
@@ -20,15 +21,19 @@ export default async function BuatKampanyePage() {
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
       >
         <ChevronLeft className="size-4" strokeWidth={1.5} aria-hidden="true" />
-        Kampanye Saya
+        <LocalizedText text="Kampanye Saya" />
       </Link>
 
       {/* Header */}
       <div className="mb-8">
-        <p className="mz-overline">Penerima Manfaat</p>
-        <h1 className="mt-3 text-h1 text-ink">Buat Kampanye Baru</h1>
+        <p className="mz-overline">
+          <LocalizedText text="Penerima Manfaat" />
+        </p>
+        <h1 className="mt-3 text-h1 text-ink">
+          <LocalizedText text="Buat Kampanye Baru" />
+        </h1>
         <p className="mt-2 text-sm text-ink-muted">
-          Kampanye akan diajukan untuk ditinjau Admin sebelum tampil ke publik.
+          <LocalizedText text="Kampanye akan diajukan untuk ditinjau Admin sebelum tampil ke publik." />
         </p>
       </div>
 

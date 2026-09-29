@@ -1,8 +1,16 @@
 import Link from "next/link"
-import { ChevronLeft, CheckCircle, XCircle, Clock, ImageIcon, FileText } from "lucide-react"
+import {
+  ChevronLeft,
+  CheckCircle,
+  XCircle,
+  Clock,
+  ImageIcon,
+  FileText,
+} from "lucide-react"
 import { notFound } from "next/navigation"
 import { getMilestones } from "../../actions"
 import { ProofForm } from "./proof-form"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 export default async function ProofPage({
   params,
@@ -12,7 +20,7 @@ export default async function ProofPage({
   const { id, milestoneId } = await params
   const result = await getMilestones(id)
   const milestone = result?.milestones.find(
-    (item) => String(item.id) === milestoneId,
+    (item) => String(item.id) === milestoneId
   )
   if (!result || !milestone) notFound()
 
@@ -29,10 +37,14 @@ export default async function ProofPage({
         Kembali ke milestone
       </Link>
 
-      <p className="mz-overline">Bukti penyaluran</p>
-      <h1 className="mt-2 text-h1 text-ink">Kirim bukti penggunaan dana</h1>
+      <p className="mz-overline">
+        <LocalizedText text="Bukti penyaluran" />
+      </p>
+      <h1 className="mt-2 text-h1 text-ink">
+        <LocalizedText text="Kirim bukti penggunaan dana" />
+      </h1>
       <p className="mt-3 text-sm text-ink-muted">{milestone.description}</p>
-      <p className="mt-1 font-mono text-sm tabular-nums text-ink">
+      <p className="mt-1 font-mono text-sm text-ink tabular-nums">
         {formatWei(milestone.amountWei)}{" "}
         <span className="text-xs text-ink-muted">
           {result.campaign.currency}
@@ -49,9 +61,7 @@ export default async function ProofPage({
               className="mt-0.5 shrink-0 text-coral"
             />
             <div>
-              <p className="font-medium">
-                Bukti sebelumnya perlu diperbaiki.
-              </p>
+              <p className="font-medium">Bukti sebelumnya perlu diperbaiki.</p>
               {milestone.aiVerificationNote && (
                 <p className="mt-2 text-ink-muted">
                   Catatan AI: {milestone.aiVerificationNote}
@@ -128,7 +138,9 @@ export default async function ProofPage({
       {/* Show existing proof image if available */}
       {milestone.proofImageUrl && (
         <div className="mt-6">
-          <p className="mb-2 text-sm font-medium text-ink">Bukti yang diunggah</p>
+          <p className="mb-2 text-sm font-medium text-ink">
+            Bukti yang diunggah
+          </p>
           {isPdfUrl(milestone.proofImageUrl) ? (
             <a
               href={milestone.proofImageUrl}

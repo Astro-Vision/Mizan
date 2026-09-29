@@ -190,8 +190,26 @@ export function DashboardShell({
 
         <div className="mt-3 flex items-center justify-between text-xs text-ink-muted">
           <span>{t("Pilih bahasa")}</span>
-          <div className="flex gap-1" role="group" aria-label={t("Pilih bahasa")}>
-            {(["id", "en"] as const).map((value) => <button key={value} type="button" onClick={() => setLanguage(value)} className={cn("rounded px-2 py-1 font-medium", language === value ? "bg-brand-50 text-brand-700" : "hover:bg-surface-sunken")}>{value === "id" ? "ID" : "EN"}</button>)}
+          <div
+            className="flex gap-1"
+            role="group"
+            aria-label={t("Pilih bahasa")}
+          >
+            {(["id", "en"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setLanguage(value)}
+                className={cn(
+                  "rounded px-2 py-1 font-medium",
+                  language === value
+                    ? "bg-brand-50 text-brand-700"
+                    : "hover:bg-surface-sunken"
+                )}
+              >
+                {value === "id" ? "ID" : "EN"}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -231,12 +249,15 @@ export function DashboardShell({
             aria-hidden="true"
           />
           {/* Drawer */}
-          <aside className="relative flex h-full w-64 flex-col bg-surface shadow-lg">
+          <aside
+            className="relative flex h-full w-[min(20rem,calc(100vw-1rem))] flex-col bg-surface pt-[env(safe-area-inset-top)] shadow-lg"
+            aria-label={`${t("Navigasi utama")} ${t(role)}`}
+          >
             <button
               type="button"
               onClick={() => setMobileOpen(false)}
               className="absolute top-4 right-4 flex size-11 items-center justify-center rounded-md text-ink-muted hover:bg-surface-sunken hover:text-ink"
-              aria-label="Tutup menu"
+              aria-label={t("Tutup menu")}
             >
               <X className="size-5" strokeWidth={1.5} aria-hidden="true" />
             </button>
@@ -248,26 +269,28 @@ export function DashboardShell({
       {/* Main column */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Topbar — mobile */}
-        <header className="flex h-16 items-center gap-4 border-b border-line-soft bg-surface px-4 lg:hidden">
+        <header className="sticky top-0 z-40 flex min-h-16 items-center gap-3 border-b border-line-soft bg-surface px-3 pt-[max(0.25rem,env(safe-area-inset-top))] pb-1 sm:gap-4 sm:px-4 lg:hidden">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
             className="flex size-11 items-center justify-center rounded-md text-ink-muted hover:bg-surface-sunken hover:text-ink"
-            aria-label="Buka menu"
+            aria-label={t("Buka menu")}
           >
             <Menu className="size-5" strokeWidth={1.5} aria-hidden="true" />
           </button>
           <Link
             href="/"
             className="flex min-h-11 shrink-0 items-center"
-            aria-label="Mizan — kembali ke beranda"
+            aria-label={t("Mizan — kembali ke beranda")}
           >
             <MizanWordmark />
           </Link>
         </header>
 
         {/* Konten halaman */}
-        <main className="flex-1 p-6 lg:p-8">{children}</main>
+        <main className="flex-1 px-4 py-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
     </div>
   )

@@ -2,14 +2,7 @@
 
 import * as React from "react"
 import { createPortal } from "react-dom"
-import {
-  Coins,
-  Languages,
-  RefreshCw,
-  Settings2,
-  X,
-  type LucideIcon,
-} from "lucide-react"
+import { Coins, RefreshCw, Settings2, X, type LucideIcon } from "lucide-react"
 
 import { useLanguage } from "@/components/site/language-provider"
 import { Button } from "@/components/ui/button"
@@ -33,7 +26,6 @@ const copy = {
     close: "Tutup preferensi",
     title: "Preferensi tampilan",
     currency: "Tampilkan dalam",
-    language: "Bahasa",
     loading: "Memuat kurs harian...",
   },
   en: {
@@ -41,7 +33,6 @@ const copy = {
     close: "Close preferences",
     title: "Display preferences",
     currency: "Display in",
-    language: "Language",
     loading: "Loading daily rates...",
   },
 } as const
@@ -118,12 +109,14 @@ export function SitePreferences({
                 ))}
               </div>
             </PreferenceRow>
-
-            <PreferenceRow icon={Languages} label={labels.language}>
+            <PreferenceRow
+              icon={Settings2}
+              label={language === "en" ? "Language" : "Bahasa"}
+            >
               <div
                 className="flex rounded-xl bg-soft-lavender p-1"
                 role="group"
-                aria-label={labels.language}
+                aria-label={language === "en" ? "Language" : "Bahasa"}
               >
                 {(["id", "en"] as const).map((value) => (
                   <Button

@@ -61,7 +61,7 @@ export function CampaignBrowser({ campaigns, categories }: CampaignBrowserProps)
   }, [campaigns, query, activeCategory])
 
   const chipBase =
-    "inline-flex min-h-9 items-center rounded-full px-4 py-1.5 text-label transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-purple"
+    "inline-flex min-h-11 items-center rounded-full px-4 py-1.5 text-label transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-purple"
   const chipOn = "bg-primary-purple text-white"
   const chipOff =
     "bg-surface text-ink-body border border-line-soft hover:bg-brand-50"
@@ -87,7 +87,7 @@ export function CampaignBrowser({ campaigns, categories }: CampaignBrowserProps)
         </div>
 
         <div
-          className="flex flex-wrap items-center gap-2"
+          className="flex items-center gap-2 overflow-x-auto pb-1"
           role="group"
           aria-label={t("Saring berdasarkan tipe kampanye")}
         >
