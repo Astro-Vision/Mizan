@@ -25,6 +25,7 @@ export async function createDraftCampaign(input: CreateDraftCampaignInput) {
     currency: "BNB",
 
     category: input.category,
+    recipientWallet: process.env.MIZAN_WALLET,
     summary: input.summary,
     location: input.location,
     daysLeft: input.days,

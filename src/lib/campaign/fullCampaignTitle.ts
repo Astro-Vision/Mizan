@@ -49,7 +49,6 @@ export async function getFullCampaignTitle(
 
     const daysLeftText = daysText ? parseInt(daysText, 10) : 0
 
-  
 
     const ogTitle = $('meta[property="og:title"]').attr("content")?.trim()
 

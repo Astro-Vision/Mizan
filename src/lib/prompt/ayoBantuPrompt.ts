@@ -23,7 +23,7 @@ function relatedEventsBlock(events: RelatedDisasterEvent[]): string {
     .join("\n")
 }
 
-export function buildAyobantuCampaignPrompt(
+export function buildCampaignPrompt(
   input: AyobantuCampaignPromptInput
 ): string {
   return `# ROLE
@@ -82,6 +82,11 @@ Ada hubungan yang cukup kuat berdasarkan informasi campaign dan kandidat event.
 
 0.9 - 1.0
 Hubungan sangat jelas dan didukung langsung oleh informasi campaign.
+
+# PANDUAN MENULIS summary
+
+summary harus lebih deskriptif dan mengalir dibanding sekadar mengulang
+judul campaign, TANPA menambahkan fakta baru yang tidak ada di data campaign.
 
 # DATA CAMPAIGN
 

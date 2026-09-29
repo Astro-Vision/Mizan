@@ -1,5 +1,5 @@
 import { callWithFallback } from "@/src/agents/callWithFallBackModel"
-import { buildAyobantuCampaignPrompt } from "../prompt/ayoBantuPrompt"
+import { buildCampaignPrompt } from "../prompt/ayoBantuPrompt"
 import { RelatedDisasterEvent } from "../type/disasterType"
 import { CampaignExtraction } from "./extractCampaign"
 
@@ -8,7 +8,7 @@ export async function aiCampaign(input: {
   url: string | null
   relatedEvents: RelatedDisasterEvent[]
 }): Promise<unknown | null> {
-  const prompt = buildAyobantuCampaignPrompt({
+  const prompt = buildCampaignPrompt({
     title: input.extraction.title,
     url: input.url,
     authorName: input.extraction.campaigner,

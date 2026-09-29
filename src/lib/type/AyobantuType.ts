@@ -19,11 +19,13 @@ export interface AyobantuResult {
   category?: string
   campaignType: string        
   collectedAmount: number     
-  targetAmount: number | null  
+  targetAmount: number | null 
+  location?: string 
   campaigner?: string
   campaignerUrl?: string
   verified: boolean
-  daysLeftText: number | 0    
+  daysLeftText: number | 0   
+  summary : string
 }
 
 export interface AyobantuStructuredData {

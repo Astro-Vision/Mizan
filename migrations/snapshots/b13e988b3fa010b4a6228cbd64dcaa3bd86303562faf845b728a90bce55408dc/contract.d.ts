@@ -38,7 +38,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'e33a70edfd9f755b7ba63800f32d1f0a2357ecb409682f163aea1fb49c208219'>;
+  StorageHashBase<'b13e988b3fa010b4a6228cbd64dcaa3bd86303562faf845b728a90bce55408dc'>;
 export type ExecutionHash =
   ExecutionHashBase<'10582aefe5a9a13d73fc634d737e791272126558641b5b76d907a20847bd8968'>;
 export type ProfileHash =
@@ -418,6 +418,8 @@ export type FieldOutputTypes = {
       readonly jobType: CodecTypes['pg/text@1']['output'];
       readonly cron: CodecTypes['pg/text@1']['output'];
       readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly isRunning: CodecTypes['pg/bool@1']['output'];
+      readonly lockedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
@@ -652,6 +654,8 @@ export type FieldInputTypes = {
       readonly jobType: CodecTypes['pg/text@1']['input'];
       readonly cron: CodecTypes['pg/text@1']['input'];
       readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly isRunning: CodecTypes['pg/bool@1']['input'];
+      readonly lockedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
@@ -885,9 +889,11 @@ export type StorageColumnTypes = {
       readonly cron: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly isRunning: CodecTypes['pg/bool@1']['output'];
       readonly jobType: CodecTypes['pg/text@1']['output'];
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
+      readonly lockedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly name: CodecTypes['pg/text@1']['output'];
       readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
@@ -1119,9 +1125,11 @@ export type StorageColumnInputTypes = {
       readonly cron: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly isRunning: CodecTypes['pg/bool@1']['input'];
       readonly jobType: CodecTypes['pg/text@1']['input'];
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
+      readonly lockedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
@@ -2239,6 +2247,20 @@ type ContractBase = Omit<
                     readonly kind: 'literal';
                     readonly value: DefaultLiteralValue<'pg/bool@1', true>;
                   };
+                };
+                readonly isRunning: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
+                  };
+                };
+                readonly lockedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: true;
                 };
                 readonly lastRunAt: {
                   readonly nativeType: 'timestamptz';
@@ -3746,6 +3768,17 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
               };
+              readonly isRunning: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
+              readonly lockedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
               readonly lastRunAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -3792,6 +3825,8 @@ type ContractBase = Omit<
                 readonly jobType: { readonly column: 'jobType' };
                 readonly cron: { readonly column: 'cron' };
                 readonly isActive: { readonly column: 'isActive' };
+                readonly isRunning: { readonly column: 'isRunning' };
+                readonly lockedAt: { readonly column: 'lockedAt' };
                 readonly lastRunAt: { readonly column: 'lastRunAt' };
                 readonly lastFinishedAt: { readonly column: 'lastFinishedAt' };
                 readonly nextRunAt: { readonly column: 'nextRunAt' };

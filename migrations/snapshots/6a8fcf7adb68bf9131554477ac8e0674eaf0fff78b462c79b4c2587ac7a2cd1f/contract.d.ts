@@ -38,7 +38,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'e33a70edfd9f755b7ba63800f32d1f0a2357ecb409682f163aea1fb49c208219'>;
+  StorageHashBase<'6a8fcf7adb68bf9131554477ac8e0674eaf0fff78b462c79b4c2587ac7a2cd1f'>;
 export type ExecutionHash =
   ExecutionHashBase<'10582aefe5a9a13d73fc634d737e791272126558641b5b76d907a20847bd8968'>;
 export type ProfileHash =
@@ -418,6 +418,7 @@ export type FieldOutputTypes = {
       readonly jobType: CodecTypes['pg/text@1']['output'];
       readonly cron: CodecTypes['pg/text@1']['output'];
       readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly isRunning: CodecTypes['pg/bool@1']['output'];
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
@@ -652,6 +653,7 @@ export type FieldInputTypes = {
       readonly jobType: CodecTypes['pg/text@1']['input'];
       readonly cron: CodecTypes['pg/text@1']['input'];
       readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly isRunning: CodecTypes['pg/bool@1']['input'];
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly nextRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
@@ -885,6 +887,7 @@ export type StorageColumnTypes = {
       readonly cron: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly isActive: CodecTypes['pg/bool@1']['output'];
+      readonly isRunning: CodecTypes['pg/bool@1']['output'];
       readonly jobType: CodecTypes['pg/text@1']['output'];
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
@@ -1119,6 +1122,7 @@ export type StorageColumnInputTypes = {
       readonly cron: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly isActive: CodecTypes['pg/bool@1']['input'];
+      readonly isRunning: CodecTypes['pg/bool@1']['input'];
       readonly jobType: CodecTypes['pg/text@1']['input'];
       readonly lastFinishedAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly lastRunAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
@@ -2238,6 +2242,15 @@ type ContractBase = Omit<
                   readonly default: {
                     readonly kind: 'literal';
                     readonly value: DefaultLiteralValue<'pg/bool@1', true>;
+                  };
+                };
+                readonly isRunning: {
+                  readonly nativeType: 'bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', false>;
                   };
                 };
                 readonly lastRunAt: {
@@ -3746,6 +3759,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
               };
+              readonly isRunning: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
               readonly lastRunAt: {
                 readonly nullable: true;
                 readonly type: {
@@ -3792,6 +3809,7 @@ type ContractBase = Omit<
                 readonly jobType: { readonly column: 'jobType' };
                 readonly cron: { readonly column: 'cron' };
                 readonly isActive: { readonly column: 'isActive' };
+                readonly isRunning: { readonly column: 'isRunning' };
                 readonly lastRunAt: { readonly column: 'lastRunAt' };
                 readonly lastFinishedAt: { readonly column: 'lastFinishedAt' };
                 readonly nextRunAt: { readonly column: 'nextRunAt' };
