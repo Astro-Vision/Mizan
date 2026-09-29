@@ -9,11 +9,10 @@ import {
   type CampaignReviewStatus,
 } from "@/src/lib/campaign-workflow"
 import { decimalBnbToWei } from "@/src/lib/payments/validation"
-import {
-  toCategoryCode,
-  type CampaignCategoryCode,
-} from "@/src/lib/campaign-category"
+import { toCategoryCode, type CampaignCategoryCode } from "@/src/lib/campaign-category"
 import { db } from "@/src/prisma/db"
+import { requireAdminSession } from "@/src/lib/beneficiary/access"
+import { registerCampaignOnChain } from "@/src/lib/chain/campaign-registration"
 
 function shortText(value: FormDataEntryValue | null, max = 500) {
   return typeof value === "string" ? value.trim().slice(0, max) : ""
@@ -31,28 +30,10 @@ function weiToBnb(value: string | null | undefined): number {
   }
 }
 
-// DB status (CampaignStatus enum) <-> the Indonesian labels the admin UI uses.
-type DbCampaignStatus = "ACTIVE" | "COMPLETED" | "CLOSED"
-type UiCampaignStatus = "menunggu" | "aktif" | "selesai"
-
-function dbStatusToUi(
-  status: string,
-  reviewStatus: CampaignReviewStatus
-): UiCampaignStatus {
-  // A campaign that isn't approved yet reads as "menunggu" regardless of status.
-  if (reviewStatus !== "APPROVED") return "menunggu"
-  if (status === "COMPLETED" || status === "CLOSED") return "selesai"
-  return "aktif"
-}
-
 // Category is stored as an enum CODE in the DB (ZAKAT/DONASI_UMUM/WAKAF/BENCANA).
 // Accepts a code or a label from the form and returns a valid code.
-function normalizeCategoryCode(
-  value: FormDataEntryValue | null
-): CampaignCategoryCode {
-  return (
-    toCategoryCode(typeof value === "string" ? value : null) ?? "DONASI_UMUM"
-  )
+function normalizeCategoryCode(value: FormDataEntryValue | null): CampaignCategoryCode {
+  return toCategoryCode(typeof value === "string" ? value : null) ?? "DONASI_UMUM"
 }
 
 function parseDaysLeft(value: FormDataEntryValue | null): number {
@@ -65,10 +46,7 @@ function parseDaysLeft(value: FormDataEntryValue | null): number {
 function validateCampaignForm(formData: FormData) {
   const errors: Record<string, string> = {}
   const title = shortText(formData.get("title") ?? formData.get("judul"), 160)
-  const organizerName = shortText(
-    formData.get("organizerName") ?? formData.get("penyelenggara"),
-    160
-  )
+  const organizerName = shortText(formData.get("organizerName") ?? formData.get("penyelenggara"), 160)
   const targetInput = shortText(formData.get("target"), 40)
   const recipientWallet = shortText(formData.get("recipientWallet"), 42)
   const aiReference = shortText(formData.get("aiReference"), 500)
@@ -89,8 +67,7 @@ function validateCampaignForm(formData: FormData) {
     errors.penyelenggara = "Nama penyelenggara wajib diisi."
   }
   if (!targetAmountWei || targetAmountWei === "0") {
-    errors.target =
-      "Target BNB harus lebih besar dari nol dan maksimal 18 desimal."
+    errors.target = "Target BNB harus lebih besar dari nol dan maksimal 18 desimal."
   }
   if (!/^0x[a-fA-F0-9]{40}$/.test(recipientWallet)) {
     errors.recipientWallet = "Wallet recipient harus address EVM yang valid."
@@ -98,8 +75,7 @@ function validateCampaignForm(formData: FormData) {
   if (!aiReference) errors.aiReference = "Referensi sumber wajib diisi."
   // Image is optional, but if provided it must look like a URL or a local path.
   if (image && !/^(https?:\/\/|\/)/i.test(image)) {
-    errors.image =
-      "Gambar harus berupa URL (http/https) atau path yang diawali /."
+    errors.image = "Gambar harus berupa URL (http/https) atau path yang diawali /."
   }
 
   return {
@@ -134,6 +110,10 @@ function toReview(row: {
   aiReference: string | null
   aiConfidence: number | null
   recipientWallet: string | null
+  contractCampaignId: string | null
+  contractTransactionHash: string | null
+  onchainStatus: "NOT_REGISTERED" | "REGISTERING" | "REGISTERED" | "FAILED"
+  onchainRegistrationError: string | null
   category: CampaignCategoryCode | null
   image: string | null
   location: string | null
@@ -155,6 +135,10 @@ function toReview(row: {
     aiReference: row.aiReference,
     aiConfidence: row.aiConfidence,
     recipientWallet: row.recipientWallet,
+    contractCampaignId: row.contractCampaignId,
+    contractTransactionHash: row.contractTransactionHash,
+    onchainStatus: row.onchainStatus,
+    onchainRegistrationError: row.onchainRegistrationError,
     category: row.category ?? "DONASI_UMUM",
     image: row.image,
     location: row.location,
@@ -170,15 +154,11 @@ function toReview(row: {
 }
 
 export async function getCampaigns(): Promise<CampaignReview[]> {
-  const rows = await db.orm.public.Campaign.orderBy((c) =>
-    c.createdAt.desc()
-  ).all()
+  const rows = await db.orm.public.Campaign.orderBy((c) => c.createdAt.desc()).all()
   return rows.map(toReview)
 }
 
-export async function getCampaignById(
-  id: string
-): Promise<CampaignReview | null> {
+export async function getCampaignById(id: string): Promise<CampaignReview | null> {
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0) return null
   const row = await db.orm.public.Campaign.first({ id: numId })
@@ -274,9 +254,7 @@ export async function updateCampaign(
 
 export async function approveCampaign(id: string): Promise<CampaignFormState> {
   const numId = Number(id)
-  const campaign = Number.isInteger(numId)
-    ? await db.orm.public.Campaign.first({ id: numId })
-    : null
+  const campaign = Number.isInteger(numId) ? await db.orm.public.Campaign.first({ id: numId }) : null
   if (!campaign) return { success: false, message: "Kampanye tidak ditemukan." }
 
   try {
@@ -297,14 +275,9 @@ export async function approveCampaign(id: string): Promise<CampaignFormState> {
   return { success: true, message: "Campaign disetujui dan siap dipublish." }
 }
 
-export async function rejectCampaign(
-  id: string,
-  formData?: FormData
-): Promise<CampaignFormState> {
+export async function rejectCampaign(id: string, formData?: FormData): Promise<CampaignFormState> {
   const numId = Number(id)
-  const campaign = Number.isInteger(numId)
-    ? await db.orm.public.Campaign.first({ id: numId })
-    : null
+  const campaign = Number.isInteger(numId) ? await db.orm.public.Campaign.first({ id: numId }) : null
   if (!campaign) return { success: false, message: "Kampanye tidak ditemukan." }
 
   try {
@@ -328,9 +301,7 @@ export async function rejectCampaign(
 
 export async function publishCampaign(id: string): Promise<CampaignFormState> {
   const numId = Number(id)
-  const campaign = Number.isInteger(numId)
-    ? await db.orm.public.Campaign.first({ id: numId })
-    : null
+  const campaign = Number.isInteger(numId) ? await db.orm.public.Campaign.first({ id: numId }) : null
   if (!campaign) return { success: false, message: "Kampanye tidak ditemukan." }
   if (campaign.reviewStatus !== "APPROVED") {
     return {
@@ -347,6 +318,60 @@ export async function publishCampaign(id: string): Promise<CampaignFormState> {
   return {
     success: true,
     message: "Campaign aktif dan siap menerima pembayaran.",
+  }
+}
+
+export async function registerCampaignOnChainAction(id: string): Promise<CampaignFormState> {
+  await requireAdminSession()
+  const numId = Number(id)
+  const campaign = Number.isInteger(numId) ? await db.orm.public.Campaign.first({ id: numId }) : null
+
+  if (!campaign) return { success: false, message: "Kampanye tidak ditemukan." }
+  if (campaign.contractCampaignId) return { success: true, message: "Campaign sudah terdaftar on-chain." }
+  if (campaign.onchainStatus === "REGISTERING")
+    return { success: false, message: "Registrasi on-chain sedang diproses." }
+  if (campaign.reviewStatus !== "APPROVED" || campaign.status !== "ACTIVE")
+    return { success: false, message: "Campaign harus approved dan aktif." }
+  if (!campaign.recipientWallet || !/^0x[a-fA-F0-9]{40}$/.test(campaign.recipientWallet))
+    return { success: false, message: "Wallet penerima tidak valid." }
+  if (!/^[1-9]\d*$/.test(campaign.targetAmountWei))
+    return { success: false, message: "Target campaign harus lebih dari nol." }
+
+  await db.orm.public.Campaign.where((row) => row.id.eq(numId)).update({
+    onchainStatus: "REGISTERING",
+    onchainRegistrationError: null,
+  })
+
+  try {
+    const registration = await registerCampaignOnChain({
+      campaignId: String(numId),
+      externalRef: `mizan:campaign:${numId}`,
+      recipient: campaign.recipientWallet,
+      targetAmountWei: campaign.targetAmountWei,
+    })
+    await db.orm.public.Campaign.where((row) => row.id.eq(numId)).update({
+      contractCampaignId: registration.contractCampaignId,
+      contractTransactionHash: registration.transactionHash,
+      onchainStatus: "REGISTERED",
+      onchainRegisteredAt: new Date().toISOString(),
+    })
+    revalidatePath("/admin/campaigns")
+    return { success: true, message: "Campaign berhasil didaftarkan on-chain." }
+  } catch (cause) {
+    const knownMessages = new Set([
+      "MIZAN_MANAGER_PRIVATE_KEY belum dikonfigurasi.",
+      "Transaksi registrasi campaign gagal.",
+    ])
+    const message =
+      cause instanceof Error && knownMessages.has(cause.message)
+        ? cause.message
+        : "Registrasi on-chain gagal. Periksa wallet manager, RPC, dan role kontrak."
+    await db.orm.public.Campaign.where((row) => row.id.eq(numId)).update({
+      onchainStatus: "FAILED",
+      onchainRegistrationError: message,
+    })
+    revalidatePath("/admin/campaigns")
+    return { success: false, message }
   }
 }
 

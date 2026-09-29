@@ -82,6 +82,8 @@ type CampaignRow = {
   currency: string
   donorCount: number
   reviewStatus: string
+  contractCampaignId: string | null
+  recipientWallet: string | null
 }
 
 function toCard(row: CampaignRow): Campaign {
@@ -110,6 +112,9 @@ function toCard(row: CampaignRow): Campaign {
         : `${organizer} mengelola penyaluran kampanye ini secara transparan di on-chain.`,
       inisial: initials(organizer),
     },
+    contractCampaignId: row.contractCampaignId,
+    recipientWallet: row.recipientWallet,
+    targetAmountWei: row.targetAmountWei,
   }
 }
 
@@ -128,6 +133,8 @@ const PUBLIC_SELECT = [
   "currency",
   "donorCount",
   "reviewStatus",
+  "contractCampaignId",
+  "recipientWallet",
 ] as const
 
 /**

@@ -88,6 +88,9 @@ export type Campaign = {
         bio: string
         inisial: string
     }
+    contractCampaignId?: string | null
+    recipientWallet?: string | null
+    targetAmountWei?: string
 }
 
 export const FEATURED: Campaign = {

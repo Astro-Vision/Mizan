@@ -5,7 +5,7 @@ export interface AyobantuType {
   category?: string
   campaignType: string
   collectedAmount: number
-  targetAmount: number | null 
+  targetAmount: number | null
   daysLeftText?: string
   campaignerUrl?: string
 }
@@ -17,14 +17,14 @@ export interface AyobantuResult {
   url: string
   image?: string
   category?: string
-  campaignType: string        
-  collectedAmount: number     
-  targetAmount: number | null 
-  location?: string 
+  campaignType: string
+  collectedAmount: number
+  targetAmount: number | null
+  location?: string
   campaigner?: string
   campaignerUrl?: string
   verified: boolean
-  daysLeftText: number | 0   
+  daysLeftText: number | 0
   summary : string
 }
 
@@ -37,7 +37,7 @@ export interface AyobantuStructuredData {
   daysLeftText?: number
   campaignerUrl?: string
 }
- 
+
 
 export interface AyobantuCampaignPromptInput {
   title: string

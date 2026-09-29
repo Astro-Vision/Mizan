@@ -6,8 +6,7 @@ const GET_CAMPAIGN_STATE_SELECTOR = "0x25733cfe"
 const WEI_PER_BNB = BigInt("1000000000000000000")
 export const BSC_TESTNET_CHAIN_ID = 97
 export const FUND_CAMPAIGN_SELECTOR = "0x92bd38bc"
-export const FUNDS_TRANSFERRED_TOPIC =
-  "0x9e7e670dfaf0c6118e2929a9e97c2388d37975b64297543c14f2a67b53454022"
+export const FUNDS_TRANSFERRED_TOPIC = "0x9e7e670dfaf0c6118e2929a9e97c2388d37975b64297543c14f2a67b53454022"
 
 export type CampaignChainState = {
   vaultAddress: string
@@ -62,11 +61,12 @@ export function encodeFundCampaign(campaignId: string) {
   return `${FUND_CAMPAIGN_SELECTOR}${uint256(BigInt(campaignId))}`
 }
 
-export async function getDemoCampaignState(): Promise<CampaignChainState> {
+export async function getCampaignState(campaignId: string): Promise<CampaignChainState> {
+  if (!/^\d+$/.test(campaignId)) throw new Error("Campaign ID tidak valid")
   const rpcUrl = process.env.BSC_TESTNET_RPC_URL || DEFAULT_RPC_URL
-  const campaignId = BigInt(process.env.MIZAN_DEMO_CAMPAIGN_ID || DEMO_CAMPAIGN_ID)
   const vaultAddress = getConfiguredVaultAddress()
-  const calldata = `${GET_CAMPAIGN_STATE_SELECTOR}${uint256(campaignId)}`
+  const numericCampaignId = BigInt(campaignId)
+  const calldata = `${GET_CAMPAIGN_STATE_SELECTOR}${uint256(numericCampaignId)}`
 
   const response = await fetch(rpcUrl, {
     method: "POST",
@@ -77,7 +77,7 @@ export async function getDemoCampaignState(): Promise<CampaignChainState> {
       method: "eth_call",
       params: [{ to: vaultAddress, data: calldata }, "latest"],
     }),
-    next: { revalidate: 15 },
+    cache: "no-store",
   })
 
   if (!response.ok) throw new Error(`BSC RPC gagal: HTTP ${response.status}`)
@@ -89,7 +89,7 @@ export async function getDemoCampaignState(): Promise<CampaignChainState> {
 
   return {
     vaultAddress,
-    campaignId: campaignId.toString(),
+    campaignId: numericCampaignId.toString(),
     recipient: wordToAddress(wordAt(payload.result, 0)),
     targetAmount: wordToBigInt(wordAt(payload.result, 1)),
     fundedAmount: wordToBigInt(wordAt(payload.result, 2)),
@@ -100,4 +100,12 @@ export async function getDemoCampaignState(): Promise<CampaignChainState> {
     active: wordToBigInt(wordAt(payload.result, 4)) === BigInt(1),
     explorerUrl: `https://testnet.bscscan.com/address/${vaultAddress}`,
   }
+}
+
+export function isCampaignChainReady(state: Pick<CampaignChainState, "active" | "recipient">, recipient: string) {
+  return state.active && state.recipient.toLowerCase() === recipient.toLowerCase()
+}
+
+export function getDemoCampaignState() {
+  return getCampaignState(process.env.MIZAN_DEMO_CAMPAIGN_ID || DEMO_CAMPAIGN_ID)
 }

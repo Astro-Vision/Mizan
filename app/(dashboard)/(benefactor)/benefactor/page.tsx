@@ -15,6 +15,7 @@ export default async function DonaturPage() {
   const campaigns = await getLiveCampaignSnapshots()
   const activeCampaigns: PaymentCampaign[] = campaigns.map((campaign) => ({
     id: campaign.id,
+    contractCampaignId: campaign.contractCampaignId,
     title: campaign.title,
     organizerName: campaign.organizerName,
     targetAmountWei: campaign.targetAmountWei,
@@ -26,9 +27,24 @@ export default async function DonaturPage() {
   const paymentCount = campaigns.reduce((total, campaign) => total + campaign.paymentCount, 0)
 
   const stats = [
-    { label: "Total terkumpul", value: formatWeiBnb(totalFundedWei).replace(".", ","), unit: "BNB", icon: "Wallet" },
-    { label: "Kampanye aktif", value: String(campaigns.length), unit: "kampanye", icon: "Megaphone" },
-    { label: "Payment terkonfirmasi", value: String(paymentCount), unit: "payment", icon: "Users" },
+    {
+      label: "Total terkumpul",
+      value: formatWeiBnb(totalFundedWei).replace(".", ","),
+      unit: "BNB",
+      icon: "Wallet",
+    },
+    {
+      label: "Kampanye aktif",
+      value: String(campaigns.length),
+      unit: "kampanye",
+      icon: "Megaphone",
+    },
+    {
+      label: "Payment terkonfirmasi",
+      value: String(paymentCount),
+      unit: "payment",
+      icon: "Users",
+    },
   ] as const
 
   return (
@@ -60,27 +76,30 @@ export default async function DonaturPage() {
             <p className="rounded-2xl border border-line-soft bg-surface p-5 text-sm text-ink-muted">
               <LocalizedText text="Belum ada campaign aktif yang disetujui admin." />
             </p>
-          ) : campaigns.map((campaign) => {
+          ) : (
+            campaigns.map((campaign) => {
             const target = BigInt(campaign.targetAmountWei || "0")
             const funded = BigInt(campaign.fundedAmountWei)
             const percent = target > BigInt(0) ? Math.min(100, Number((funded * BigInt(100)) / target)) : 0
 
             return (
               <div key={campaign.id} className="rounded-2xl border border-line-soft bg-surface p-5">
-                <p className="text-sm font-semibold leading-[1.3] text-ink">{campaign.title}</p>
+                  <p className="text-sm leading-[1.3] font-semibold text-ink">{campaign.title}</p>
                 <p className="mt-1 text-xs text-ink-muted">{campaign.organizerName}</p>
                 <div className="mt-4 flex items-center gap-3">
                   <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-brand-100 dark:bg-brand-900">
                     <div className="h-full rounded-full bg-brand-700" style={{ width: `${percent}%` }} />
                   </div>
-                  <span className="font-mono text-xs tabular-nums text-ink-muted">{percent}%</span>
+                    <span className="font-mono text-xs text-ink-muted tabular-nums">{percent}%</span>
                 </div>
-                <p className="mt-3 font-mono text-sm tabular-nums text-ink">
-                  {formatWeiBnb(campaign.fundedAmountWei).replace(".", ",")} / {formatWeiBnb(campaign.targetAmountWei).replace(".", ",")} BNB
+                  <p className="mt-3 font-mono text-sm text-ink tabular-nums">
+                    {formatWeiBnb(campaign.fundedAmountWei).replace(".", ",")} /{" "}
+                    {formatWeiBnb(campaign.targetAmountWei).replace(".", ",")} BNB
                 </p>
               </div>
             )
-          })}
+            })
+          )}
         </div>
       </section>
 

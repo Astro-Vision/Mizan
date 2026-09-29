@@ -10,7 +10,7 @@ export interface CampaignExtraction {
   targetAmount: number | null
   campaigner: string | null
   daysLeftText: number
-  image: string 
+  image: string
   summary: string
 }
 
@@ -61,5 +61,4 @@ export function buildCampaignText(extraction: CampaignExtraction): string {
     .join(" ")
     .trim()
 }
-
 

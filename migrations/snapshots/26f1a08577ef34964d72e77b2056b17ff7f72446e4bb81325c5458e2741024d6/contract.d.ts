@@ -38,7 +38,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'acfdf83749840ecd435ade306921d8f9ca8cce8838c7726bae1ce919dbb5709f'>;
+  StorageHashBase<'26f1a08577ef34964d72e77b2056b17ff7f72446e4bb81325c5458e2741024d6'>;
 export type ExecutionHash =
   ExecutionHashBase<'6b86caed6df2d444816aa64eeb669144155278cf4ba015232cd39a02c9ab7a76'>;
 export type ProfileHash =
@@ -1680,7 +1680,7 @@ type ContractBase = Omit<
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['aiReference'] }];
+              uniques: readonly [];
               indexes: readonly [
                 {
                   readonly name: 'campaign_communityId_idx_e2c72225';
@@ -1794,10 +1794,7 @@ type ContractBase = Omit<
                 };
               };
               primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [
-                { readonly columns: readonly ['transactionHash'] },
-                { readonly columns: readonly ['idempotencyKey'] },
-              ];
+              uniques: readonly [{ readonly columns: readonly ['idempotencyKey'] }];
               indexes: readonly [
                 {
                   readonly name: 'campaignPayment_campaignId_idx_3aacd648';
