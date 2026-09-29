@@ -38,7 +38,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'26f1a08577ef34964d72e77b2056b17ff7f72446e4bb81325c5458e2741024d6'>;
+  StorageHashBase<'c65487386100718e08fcdf3f707ea68d08ba8e59f370c899a5095258e00601c2'>;
 export type ExecutionHash =
   ExecutionHashBase<'6b86caed6df2d444816aa64eeb669144155278cf4ba015232cd39a02c9ab7a76'>;
 export type ProfileHash =
@@ -301,9 +301,6 @@ export type FieldOutputTypes = {
       readonly donorCount: CodecTypes['pg/int4@1']['output'];
       readonly contractCampaignId: CodecTypes['pg/text@1']['output'] | null;
       readonly contractTransactionHash: CodecTypes['pg/text@1']['output'] | null;
-      readonly onchainStatus: 'NOT_REGISTERED' | 'REGISTERING' | 'REGISTERED' | 'FAILED';
-      readonly onchainRegistrationError: CodecTypes['pg/text@1']['output'] | null;
-      readonly onchainRegisteredAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA' | null;
       readonly image: CodecTypes['pg/text@1']['output'] | null;
       readonly location: CodecTypes['pg/text@1']['output'] | null;
@@ -570,9 +567,6 @@ export type FieldInputTypes = {
       readonly donorCount: CodecTypes['pg/int4@1']['input'];
       readonly contractCampaignId: CodecTypes['pg/text@1']['input'] | null;
       readonly contractTransactionHash: CodecTypes['pg/text@1']['input'] | null;
-      readonly onchainStatus: 'NOT_REGISTERED' | 'REGISTERING' | 'REGISTERED' | 'FAILED';
-      readonly onchainRegistrationError: CodecTypes['pg/text@1']['input'] | null;
-      readonly onchainRegisteredAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly category: 'ZAKAT' | 'DONASI_UMUM' | 'WAKAF' | 'BENCANA' | null;
       readonly image: CodecTypes['pg/text@1']['input'] | null;
       readonly location: CodecTypes['pg/text@1']['input'] | null;
@@ -835,9 +829,6 @@ export type StorageColumnTypes = {
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly image: CodecTypes['pg/text@1']['output'] | null;
       readonly location: CodecTypes['pg/text@1']['output'] | null;
-      readonly onchainRegisteredAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
-      readonly onchainRegistrationError: CodecTypes['pg/text@1']['output'] | null;
-      readonly onchainStatus: 'NOT_REGISTERED' | 'REGISTERING' | 'REGISTERED' | 'FAILED';
       readonly organizerName: CodecTypes['pg/text@1']['output'];
       readonly raisedAmountWei: CodecTypes['pg/text@1']['output'];
       readonly recipientWallet: CodecTypes['pg/text@1']['output'] | null;
@@ -1104,9 +1095,6 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly image: CodecTypes['pg/text@1']['input'] | null;
       readonly location: CodecTypes['pg/text@1']['input'] | null;
-      readonly onchainRegisteredAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
-      readonly onchainRegistrationError: CodecTypes['pg/text@1']['input'] | null;
-      readonly onchainStatus: 'NOT_REGISTERED' | 'REGISTERING' | 'REGISTERED' | 'FAILED';
       readonly organizerName: CodecTypes['pg/text@1']['input'];
       readonly raisedAmountWei: CodecTypes['pg/text@1']['input'];
       readonly recipientWallet: CodecTypes['pg/text@1']['input'] | null;
@@ -1617,25 +1605,6 @@ type ContractBase = Omit<
                 readonly contractTransactionHash: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly onchainStatus: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'NOT_REGISTERED'>;
-                  };
-                };
-                readonly onchainRegistrationError: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly onchainRegisteredAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-string@1';
                   readonly nullable: true;
                 };
                 readonly category: {
@@ -2995,10 +2964,6 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['ZAKAT', 'DONASI_UMUM', 'WAKAF', 'BENCANA'];
             };
-            readonly CampaignOnchainStatus: {
-              readonly kind: 'valueSet';
-              readonly values: readonly ['NOT_REGISTERED', 'REGISTERING', 'REGISTERED', 'FAILED'];
-            };
             readonly CampaignReviewStatus: {
               readonly kind: 'valueSet';
               readonly values: readonly ['AI_DRAFT', 'PENDING_REVIEW', 'APPROVED', 'REJECTED'];
@@ -3395,21 +3360,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly onchainStatus: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly onchainRegistrationError: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly onchainRegisteredAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-string@1';
-                };
-              };
               readonly category: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -3501,9 +3451,6 @@ type ContractBase = Omit<
                 readonly donorCount: { readonly column: 'donorCount' };
                 readonly contractCampaignId: { readonly column: 'contractCampaignId' };
                 readonly contractTransactionHash: { readonly column: 'contractTransactionHash' };
-                readonly onchainStatus: { readonly column: 'onchainStatus' };
-                readonly onchainRegistrationError: { readonly column: 'onchainRegistrationError' };
-                readonly onchainRegisteredAt: { readonly column: 'onchainRegisteredAt' };
                 readonly category: { readonly column: 'category' };
                 readonly image: { readonly column: 'image' };
                 readonly location: { readonly column: 'location' };
@@ -4845,15 +4792,6 @@ type ContractBase = Omit<
               { readonly name: 'ACTIVE'; readonly value: 'ACTIVE' },
               { readonly name: 'COMPLETED'; readonly value: 'COMPLETED' },
               { readonly name: 'CLOSED'; readonly value: 'CLOSED' },
-            ];
-          };
-          readonly CampaignOnchainStatus: {
-            readonly codecId: 'pg/text@1';
-            readonly members: readonly [
-              { readonly name: 'NOT_REGISTERED'; readonly value: 'NOT_REGISTERED' },
-              { readonly name: 'REGISTERING'; readonly value: 'REGISTERING' },
-              { readonly name: 'REGISTERED'; readonly value: 'REGISTERED' },
-              { readonly name: 'FAILED'; readonly value: 'FAILED' },
             ];
           };
           readonly PaymentMode: {

@@ -8,6 +8,7 @@ import { selectNewestCampaigns } from "@/src/lib/beneficiary/summary"
 
 import { requireBeneficiaryCommunity } from "@/src/lib/beneficiary/access"
 import { db } from "@/src/prisma/db"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 export const metadata: Metadata = {
   title: "Dashboard Penerima",
@@ -73,8 +74,8 @@ export default async function PenerimaPage() {
   return (
     <div className="mx-auto max-w-[1240px]">
       <div className="mb-8">
-        <p className="mz-overline">Penerima Manfaat</p>
-        <h1 className="mt-3 text-h1 text-ink">Ringkasan Dana</h1>
+        <p className="mz-overline"><LocalizedText text="Penerima Manfaat" /></p>
+        <h1 className="mt-3 text-h1 text-ink"><LocalizedText text="Ringkasan Dana" /></h1>
         <p className="mt-2 text-sm text-ink-muted">{TESTNET_NOTICE}</p>
       </div>
 
@@ -86,9 +87,9 @@ export default async function PenerimaPage() {
 
       {/* Milestone statistics */}
       <section className="mt-8">
-        <h2 className="text-h3 text-ink">Penyaluran & Milestone</h2>
+        <h2 className="text-h3 text-ink"><LocalizedText text="Penyaluran & Milestone" /></h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Status verifikasi bukti penyaluran dan pencairan dana.
+          <LocalizedText text="Status verifikasi bukti penyaluran dan pencairan dana." />
         </p>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {milestoneStats.map((stat) => (
@@ -98,34 +99,34 @@ export default async function PenerimaPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-h3 text-ink">Campaign terbaru organisasi</h2>
+        <h2 className="text-h3 text-ink"><LocalizedText text="Campaign terbaru organisasi" /></h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Menampilkan maksimal tiga campaign terbaru. Daftar lengkap tersedia di halaman Campaign Saya.
+          <LocalizedText text="Menampilkan maksimal tiga campaign terbaru. Daftar lengkap tersedia di halaman Campaign Saya." />
         </p>
 
         <div className="mt-6 flex flex-col gap-4">
           {newestCampaigns.length === 0 ? (
             <p className="rounded-2xl border border-line-soft bg-surface p-5 text-sm text-ink-muted">
-              Organisasi ini belum memiliki campaign.
+              <LocalizedText text="Organisasi ini belum memiliki campaign." />
             </p>
           ) : newestCampaigns.map((campaign) => (
             <div key={campaign.id} className="rounded-2xl border border-line-soft bg-surface p-5 sm:p-6">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold leading-[1.3] text-ink">{campaign.title}</p>
-                  <p className="mt-1 text-xs text-ink-muted">{campaign.organizerName} · {formatCampaignStatus(campaign.reviewStatus)}</p>
+                  <p className="mt-1 text-xs text-ink-muted">{campaign.organizerName} · <LocalizedText text={formatCampaignStatus(campaign.reviewStatus)} /></p>
                 </div>
                 <p className="font-mono text-sm tabular-nums text-ink">
                   {formatWeiBnb(campaign.raisedAmountWei).replace(".", ",")} / {formatWeiBnb(campaign.targetAmountWei).replace(".", ",")} {campaign.currency}
                 </p>
               </div>
               <div className="mt-4 flex items-center justify-between border-t border-line-soft pt-3">
-                <span className="text-xs text-ink-muted">Dibuat {formatDate(campaign.createdAt)}</span>
+                <span className="text-xs text-ink-muted"><LocalizedText text="Dibuat" /> {formatDate(campaign.createdAt)}</span>
                 <a
                   href={`/beneficiary/campaigns/${campaign.id}`}
                   className="inline-flex items-center gap-1 text-xs text-brand-700 dark:text-brand-300"
                 >
-                  Lihat detail
+                  <LocalizedText text="Lihat detail" />
                   <ArrowUpRight className="size-3" strokeWidth={1.5} aria-hidden="true" />
                 </a>
               </div>

@@ -1,0 +1,785 @@
+[
+  {
+    "id": "table.disbursementRequest",
+    "label": "Create table \"disbursementRequest\"",
+    "summary": "Creates table \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"disbursementRequest\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"disbursementRequest\"",
+        "sql": "CREATE TABLE \"public\".\"disbursementRequest\" (\n  \"communityId\" int4 NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"description\" text NOT NULL,\n  \"documentFileName\" text NOT NULL,\n  \"documentMimeType\" text NOT NULL,\n  \"documentStoragePath\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"items\" json NOT NULL,\n  \"langflowConfidence\" float8,\n  \"langflowDecision\" text,\n  \"langflowOutput\" json,\n  \"milestoneId\" int4 NOT NULL,\n  \"region\" text DEFAULT 'Indonesia' NOT NULL,\n  \"requestedAmountWei\" text NOT NULL,\n  \"requestedByUserId\" int4 NOT NULL,\n  \"signatureStoragePath\" text,\n  \"status\" text DEFAULT 'SUBMITTED' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"disbursementRequest_status_check_4c477efe\" CHECK (\"status\" IN ('SUBMITTED', 'AI_VERIFIED', 'PROOF_SUBMITTED', 'REJECTED', 'DISBURSEMENT_REQUESTED', 'DISBURSED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"disbursementRequest\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.campaign.onchainRegisteredAt",
+    "label": "Add column \"onchainRegisteredAt\" to \"campaign\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "onchainRegisteredAt",
+        "table": "campaign"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"onchainRegisteredAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "campaign",
+          "onchainRegisteredAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"onchainRegisteredAt\"",
+        "sql": "ALTER TABLE \"public\".\"campaign\" ADD COLUMN \"onchainRegisteredAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"onchainRegisteredAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "campaign",
+          "onchainRegisteredAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.campaign.onchainRegistrationError",
+    "label": "Add column \"onchainRegistrationError\" to \"campaign\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "onchainRegistrationError",
+        "table": "campaign"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"onchainRegistrationError\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "campaign",
+          "onchainRegistrationError"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"onchainRegistrationError\"",
+        "sql": "ALTER TABLE \"public\".\"campaign\" ADD COLUMN \"onchainRegistrationError\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"onchainRegistrationError\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "campaign",
+          "onchainRegistrationError"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.campaign.onchainStatus",
+    "label": "Add column \"onchainStatus\" to \"campaign\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "onchainStatus",
+        "table": "campaign"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"onchainStatus\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "campaign",
+          "onchainStatus"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"onchainStatus\"",
+        "sql": "ALTER TABLE \"public\".\"campaign\" ADD COLUMN \"onchainStatus\" text DEFAULT 'NOT_REGISTERED' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"onchainStatus\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "campaign",
+          "onchainStatus"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.community.address",
+    "label": "Add column \"address\" to \"community\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "address",
+        "table": "community"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"address\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "address"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"address\"",
+        "sql": "ALTER TABLE \"public\".\"community\" ADD COLUMN \"address\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"address\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "address"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.community.contactEmail",
+    "label": "Add column \"contactEmail\" to \"community\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "contactEmail",
+        "table": "community"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"contactEmail\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "contactEmail"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"contactEmail\"",
+        "sql": "ALTER TABLE \"public\".\"community\" ADD COLUMN \"contactEmail\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"contactEmail\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "contactEmail"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.community.contactPhone",
+    "label": "Add column \"contactPhone\" to \"community\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "contactPhone",
+        "table": "community"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"contactPhone\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "contactPhone"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"contactPhone\"",
+        "sql": "ALTER TABLE \"public\".\"community\" ADD COLUMN \"contactPhone\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"contactPhone\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "contactPhone"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.community.description",
+    "label": "Add column \"description\" to \"community\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "description",
+        "table": "community"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"description\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "description"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"description\"",
+        "sql": "ALTER TABLE \"public\".\"community\" ADD COLUMN \"description\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"description\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "description"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.community.logoUrl",
+    "label": "Add column \"logoUrl\" to \"community\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "logoUrl",
+        "table": "community"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"logoUrl\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "logoUrl"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"logoUrl\"",
+        "sql": "ALTER TABLE \"public\".\"community\" ADD COLUMN \"logoUrl\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"logoUrl\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "logoUrl"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.community.websiteUrl",
+    "label": "Add column \"websiteUrl\" to \"community\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "websiteUrl",
+        "table": "community"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"websiteUrl\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "websiteUrl"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"websiteUrl\"",
+        "sql": "ALTER TABLE \"public\".\"community\" ADD COLUMN \"websiteUrl\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"websiteUrl\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "community",
+          "websiteUrl"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.campaign.campaign_onchainStatus_check_e8263ac8",
+    "label": "Add check constraint \"campaign_onchainStatus_check_e8263ac8\" on \"campaign\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "campaign_onchainStatus_check_e8263ac8",
+        "table": "campaign"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"campaign_onchainStatus_check_e8263ac8\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaign_onchainStatus_check_e8263ac8",
+          "public",
+          "\"public\".\"campaign\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"campaign_onchainStatus_check_e8263ac8\"",
+        "sql": "ALTER TABLE \"public\".\"campaign\" ADD CONSTRAINT \"campaign_onchainStatus_check_e8263ac8\" CHECK (\"onchainStatus\" IN ('NOT_REGISTERED', 'REGISTERING', 'REGISTERED', 'FAILED'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"campaign_onchainStatus_check_e8263ac8\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaign_onchainStatus_check_e8263ac8",
+          "public",
+          "\"public\".\"campaign\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.campaignPayment.campaignPayment_transactionHash_key",
+    "label": "Add unique constraint on \"campaignPayment\" (transactionHash)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "campaignPayment_transactionHash_key",
+        "table": "campaignPayment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"campaignPayment_transactionHash_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaignPayment_transactionHash_key",
+          "public",
+          "\"public\".\"campaignPayment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"campaignPayment_transactionHash_key\"",
+        "sql": "ALTER TABLE \"public\".\"campaignPayment\" ADD CONSTRAINT \"campaignPayment_transactionHash_key\" UNIQUE (\"transactionHash\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"campaignPayment_transactionHash_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "campaignPayment_transactionHash_key",
+          "public",
+          "\"public\".\"campaignPayment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.disbursementRequest.disbursementRequest_communityId_idx_e2c72225",
+    "label": "Create index \"disbursementRequest_communityId_idx_e2c72225\" on \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "disbursementRequest_communityId_idx_e2c72225",
+        "table": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"disbursementRequest_communityId_idx_e2c72225\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_communityId_idx_e2c72225\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"disbursementRequest_communityId_idx_e2c72225\"",
+        "sql": "CREATE INDEX \"disbursementRequest_communityId_idx_e2c72225\" ON \"public\".\"disbursementRequest\" (\"communityId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"disbursementRequest_communityId_idx_e2c72225\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_communityId_idx_e2c72225\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.disbursementRequest.disbursementRequest_milestoneId_idx_f1dac854",
+    "label": "Create index \"disbursementRequest_milestoneId_idx_f1dac854\" on \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "disbursementRequest_milestoneId_idx_f1dac854",
+        "table": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"disbursementRequest_milestoneId_idx_f1dac854\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_milestoneId_idx_f1dac854\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"disbursementRequest_milestoneId_idx_f1dac854\"",
+        "sql": "CREATE INDEX \"disbursementRequest_milestoneId_idx_f1dac854\" ON \"public\".\"disbursementRequest\" (\"milestoneId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"disbursementRequest_milestoneId_idx_f1dac854\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_milestoneId_idx_f1dac854\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.disbursementRequest.disbursementRequest_requestedByUserId_idx_85281b2d",
+    "label": "Create index \"disbursementRequest_requestedByUserId_idx_85281b2d\" on \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "disbursementRequest_requestedByUserId_idx_85281b2d",
+        "table": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"disbursementRequest_requestedByUserId_idx_85281b2d\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_requestedByUserId_idx_85281b2d\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"disbursementRequest_requestedByUserId_idx_85281b2d\"",
+        "sql": "CREATE INDEX \"disbursementRequest_requestedByUserId_idx_85281b2d\" ON \"public\".\"disbursementRequest\" (\"requestedByUserId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"disbursementRequest_requestedByUserId_idx_85281b2d\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_requestedByUserId_idx_85281b2d\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.disbursementRequest.disbursementRequest_status_idx_e98638ab",
+    "label": "Create index \"disbursementRequest_status_idx_e98638ab\" on \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "disbursementRequest_status_idx_e98638ab",
+        "table": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"disbursementRequest_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"disbursementRequest_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"disbursementRequest_status_idx_e98638ab\" ON \"public\".\"disbursementRequest\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"disbursementRequest_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"disbursementRequest_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.disbursementRequest.disbursementRequest_milestoneId_fkey",
+    "label": "Add foreign key \"disbursementRequest_milestoneId_fkey\" on \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "disbursementRequest_milestoneId_fkey",
+        "table": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"disbursementRequest_milestoneId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disbursementRequest_milestoneId_fkey",
+          "public",
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"disbursementRequest_milestoneId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"disbursementRequest\"\nADD CONSTRAINT \"disbursementRequest_milestoneId_fkey\"\nFOREIGN KEY (\"milestoneId\")\nREFERENCES \"public\".\"milestone\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"disbursementRequest_milestoneId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disbursementRequest_milestoneId_fkey",
+          "public",
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.disbursementRequest.disbursementRequest_communityId_fkey",
+    "label": "Add foreign key \"disbursementRequest_communityId_fkey\" on \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "disbursementRequest_communityId_fkey",
+        "table": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"disbursementRequest_communityId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disbursementRequest_communityId_fkey",
+          "public",
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"disbursementRequest_communityId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"disbursementRequest\"\nADD CONSTRAINT \"disbursementRequest_communityId_fkey\"\nFOREIGN KEY (\"communityId\")\nREFERENCES \"public\".\"community\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"disbursementRequest_communityId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disbursementRequest_communityId_fkey",
+          "public",
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.disbursementRequest.disbursementRequest_requestedByUserId_fkey",
+    "label": "Add foreign key \"disbursementRequest_requestedByUserId_fkey\" on \"disbursementRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "disbursementRequest_requestedByUserId_fkey",
+        "table": "disbursementRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"disbursementRequest_requestedByUserId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disbursementRequest_requestedByUserId_fkey",
+          "public",
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"disbursementRequest_requestedByUserId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"disbursementRequest\"\nADD CONSTRAINT \"disbursementRequest_requestedByUserId_fkey\"\nFOREIGN KEY (\"requestedByUserId\")\nREFERENCES \"public\".\"user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"disbursementRequest_requestedByUserId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "disbursementRequest_requestedByUserId_fkey",
+          "public",
+          "\"public\".\"disbursementRequest\""
+        ]
+      }
+    ]
+  }
+]

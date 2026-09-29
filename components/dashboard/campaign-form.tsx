@@ -11,6 +11,7 @@ import type { CampaignReview } from "@/src/lib/dashboard-data"
 import type { CampaignFormState } from "@/src/lib/campaign-workflow"
 import { uploadCampaignImage } from "@/src/lib/uploads/campaign-image"
 import { CATEGORY_OPTIONS } from "@/src/lib/campaign-category"
+import { useLanguage } from "@/components/site/language-provider"
 
 type CampaignFormProps = {
   action: (
@@ -28,6 +29,7 @@ export function CampaignForm({
   initialData,
   submitLabel = "Simpan",
 }: CampaignFormProps) {
+  const { t } = useLanguage()
   const [state, formAction, pending] = useActionState(action, INITIAL_STATE)
 
   const [imageUrl, setImageUrl] = React.useState<string>(
@@ -64,20 +66,21 @@ export function CampaignForm({
       ) : null}
 
       <p className="rounded-xl border border-line-soft bg-surface-sunken px-4 py-3 text-sm text-ink-muted">
-        Draft kampanye dibuat oleh AI mock, lalu harus ditinjau admin sebelum
-        aktif.
+        {t(
+          "Draft kampanye dibuat oleh AI mock, lalu harus ditinjau admin sebelum aktif."
+        )}
       </p>
 
       <Field
         id="title"
-        label="Judul kampanye"
+        label={t("Judul kampanye")}
         defaultValue={initialData?.title ?? initialData?.judul ?? ""}
         placeholder="Contoh: Bantuan pendidikan untuk 40 anak yatim"
         error={state.errors?.title ?? state.errors?.judul}
       />
       <Field
         id="organizerName"
-        label="Penyelenggara"
+        label={t("Penyelenggara")}
         defaultValue={
           initialData?.organizerName ?? initialData?.penyelenggara ?? ""
         }
@@ -88,14 +91,14 @@ export function CampaignForm({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <SelectField
           id="category"
-          label="Tipe kampanye"
+          label={t("Tipe kampanye")}
           defaultValue={initialData?.category ?? "DONASI_UMUM"}
           options={CATEGORY_OPTIONS}
           error={state.errors?.category}
         />
         <Field
           id="location"
-          label="Lokasi"
+          label={t("Lokasi")}
           required={false}
           defaultValue={initialData?.location ?? ""}
           placeholder="Contoh: Lombok Timur, NTB"
@@ -106,7 +109,7 @@ export function CampaignForm({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field
           id="target"
-          label="Target dana (BNB)"
+          label={t("Target dana (BNB)")}
           type="number"
           step="0.000000000000000001"
           min="0.000000000000000001"
@@ -117,7 +120,7 @@ export function CampaignForm({
         />
         <Field
           id="daysLeft"
-          label="Sisa hari kampanye"
+          label={t("Sisa hari kampanye")}
           type="number"
           step="1"
           min="0"
@@ -131,7 +134,7 @@ export function CampaignForm({
 
       <Field
         id="recipientWallet"
-        label="Wallet komunitas"
+        label={t("Wallet komunitas")}
         defaultValue={initialData?.recipientWallet ?? ""}
         placeholder="0x..."
         error={state.errors?.recipientWallet}
@@ -140,7 +143,7 @@ export function CampaignForm({
 
       <TextareaField
         id="summary"
-        label="Deskripsi singkat"
+        label={t("Deskripsi singkat")}
         required={false}
         defaultValue={initialData?.summary ?? ""}
         placeholder="Ringkasan singkat yang tampil di kartu kampanye."
@@ -150,7 +153,7 @@ export function CampaignForm({
       {/* Image upload + URL fallback. The hidden input carries the final value. */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-ink">
-          Gambar sampul
+          {t("Gambar sampul")}
         </label>
         <input type="hidden" name="image" value={imageUrl} />
 
@@ -169,7 +172,7 @@ export function CampaignForm({
                   type="button"
                   onClick={() => setImageUrl("")}
                   className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-full bg-ink/70 text-white transition-colors hover:bg-ink"
-                  aria-label="Hapus gambar"
+                  aria-label={t("Hapus gambar")}
                 >
                   <X className="size-3.5" strokeWidth={2} aria-hidden="true" />
                 </button>
@@ -181,7 +184,9 @@ export function CampaignForm({
                   strokeWidth={1.5}
                   aria-hidden="true"
                 />
-                <span className="text-[0.6875rem]">Belum ada gambar</span>
+                <span className="text-[0.6875rem]">
+                  {t("Belum ada gambar")}
+                </span>
               </div>
             )}
           </div>
@@ -209,7 +214,7 @@ export function CampaignForm({
                     aria-hidden="true"
                   />
                 )}
-                {uploading ? "Mengunggah…" : "Unggah gambar"}
+                {uploading ? t("Mengunggah…") : t("Unggah gambar")}
               </button>
               <input
                 ref={fileInputRef}
@@ -245,7 +250,7 @@ export function CampaignForm({
 
       <Field
         id="aiReference"
-        label="Source / reference AI"
+        label={t("Source / reference AI")}
         defaultValue={initialData?.aiReference ?? ""}
         placeholder="URL, ID laporan, atau referensi sumber"
         error={state.errors?.aiReference}
@@ -260,13 +265,13 @@ export function CampaignForm({
             "bg-brand-700 hover:bg-brand-600 active:bg-brand-800 disabled:pointer-events-none disabled:opacity-50"
           )}
         >
-          {pending ? "Menyimpan…" : submitLabel}
+          {pending ? t("Menyimpan…") : t(submitLabel)}
         </button>
         <Link
           href="/admin/campaigns"
           className="inline-flex h-12 items-center justify-center rounded-[10px] border border-brand-200 px-6 text-sm font-medium text-brand-700 transition-colors duration-150 hover:bg-brand-50 dark:border-brand-800 dark:text-brand-300 dark:hover:bg-brand-950"
         >
-          Batal
+          {t("Batal")}
         </Link>
       </div>
     </form>

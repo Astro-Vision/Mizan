@@ -9,7 +9,9 @@ export interface CampaignExtraction {
   collectedAmount: number
   targetAmount: number | null
   campaigner: string | null
-  daysLeftText: string | null
+  daysLeftText: number
+  image: string 
+  summary: string
 }
 
 export const DISASTER_CAMPAIGN_TYPE_KEYWORDS: Record<string, DisasterType> = {
@@ -36,12 +38,14 @@ export function extractCampaignFields(
   return {
     title: item.title?.trim() ?? "",
     description: null,
-    location: null,
+    location: item.location?.trim() || null,
     category: item.category?.trim() || null,
     collectedAmount: item.collectedAmount ?? 0,
     targetAmount: item.targetAmount ?? null,
     campaigner: item.campaigner?.trim() || null,
-    daysLeftText: item.daysLeftText?.trim() || null,
+    daysLeftText: item.daysLeftText ?? 0,
+    image: item.image || "",
+    summary: item.summary || "",
   }
 }
 

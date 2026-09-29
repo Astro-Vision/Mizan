@@ -1,9 +1,15 @@
 import "server-only"
 
 import { db } from "@/src/prisma/db"
-import { getDisbursementDocumentUrl } from "@/src/lib/storage"
+import { getMilestoneProofUrl } from "@/src/lib/storage"
 import type { Campaign } from "@/src/lib/site-data"
 import { toCategoryLabel } from "@/src/lib/campaign-category"
+import {
+  sortPublicDisbursementHistory,
+  toPublicDisbursementHistoryItem,
+  type DisbursedMilestone,
+  type PublicDisbursementHistoryItem,
+} from "@/src/lib/disbursement-history"
 
 /* =========================================================================
    Server data-access for the PUBLIC campaign pages (list + detail).
@@ -17,7 +23,12 @@ const DEFAULT_COVER = "/background-hero.png"
 
 // Categories the public filter understands. Anything unknown falls back to
 // "Donasi Umum" so the UI never renders an orphan filter chip.
-export const CAMPAIGN_CATEGORIES = ["Zakat", "Donasi Umum", "Wakaf", "Tanggap Bencana"] as const
+export const CAMPAIGN_CATEGORIES = [
+  "Zakat",
+  "Donasi Umum",
+  "Wakaf",
+  "Tanggap Bencana",
+] as const
 
 export type CampaignCategory = (typeof CAMPAIGN_CATEGORIES)[number]
 
@@ -34,7 +45,9 @@ function weiToBnbNumber(value: string | null | undefined): number {
   try {
     const wei = BigInt(value)
     // Scale by 1e6 first to keep 6 fractional digits, then divide back.
-    const scaled = Number((wei * BigInt(1_000_000)) / BigInt("1000000000000000000"))
+    const scaled = Number(
+      (wei * BigInt(1_000_000)) / BigInt("1000000000000000000")
+    )
     return scaled / 1_000_000
   } catch {
     return 0
@@ -94,7 +107,9 @@ function toCard(row: CampaignRow): Campaign {
       id: row.communityId ? String(row.communityId) : undefined,
       nama: organizer,
       tipe: "Komunitas terverifikasi",
-      bio: row.summary ? row.summary : `${organizer} mengelola penyaluran kampanye ini secara transparan di on-chain.`,
+      bio: row.summary
+        ? row.summary
+        : `${organizer} mengelola penyaluran kampanye ini secara transparan di on-chain.`,
       inisial: initials(organizer),
     },
     contractCampaignId: row.contractCampaignId,
@@ -138,7 +153,9 @@ export async function getPublicCampaigns(): Promise<Campaign[]> {
  * A single public campaign by its numeric id. Returns null when the id is
  * invalid, the campaign does not exist, or it is not publicly visible.
  */
-export async function getPublicCampaignById(id: string): Promise<Campaign | null> {
+export async function getPublicCampaignById(
+  id: string
+): Promise<Campaign | null> {
   const numId = Number(id)
   if (!Number.isInteger(numId) || numId <= 0) return null
 
@@ -147,7 +164,11 @@ export async function getPublicCampaignById(id: string): Promise<Campaign | null
     .first()
 
   if (!row) return null
-  if (row.reviewStatus !== "APPROVED" || !["ACTIVE", "COMPLETED", "CLOSED"].includes(row.status)) return null
+  if (
+    row.reviewStatus !== "APPROVED" ||
+    !["ACTIVE", "COMPLETED", "CLOSED"].includes(row.status)
+  )
+    return null
 
   return toCard(row as CampaignRow)
 }
@@ -169,74 +190,37 @@ export type PublicOrganization = {
   disbursementHistory: PublicDisbursementHistoryItem[]
 }
 
-export type PublicDisbursementHistoryItem = {
-  id: string
-  milestone: string
-  amountWei: string
-  currency: string
-  description: string
-  region: string
-  items: Array<{ name: string; quantity: number; unit: string }>
-  createdAt: string
-  documentUrl: string | null
-}
-
-const toPublicDisbursement = async (
-  request: {
-    id: number
-    milestoneId: number
-    requestedAmountWei: string
-    description: string
-    region: string
-    items: unknown
-    createdAt: string
-    documentStoragePath: string
-  },
-  milestone: { description: string },
-  currency: string
-): Promise<PublicDisbursementHistoryItem> => {
-  const rawItems = Array.isArray(request.items) ? request.items : []
-  const items = rawItems.flatMap((item) => {
-    if (!item || typeof item !== "object") return []
-    const value = item as Record<string, unknown>
-    if (typeof value.name !== "string" || typeof value.unit !== "string" || typeof value.quantity !== "number")
-      return []
-    return [{ name: value.name, quantity: value.quantity, unit: value.unit }]
-  })
-  const documentUrl = await getDisbursementDocumentUrl(request.documentStoragePath).catch((error) => {
-    console.error("Public disbursement document URL refresh failed:", error)
-    return null
-  })
-  return {
-    id: String(request.id),
-    milestone: milestone.description,
-    amountWei: request.requestedAmountWei,
-    currency,
-    description: request.description,
-    region: request.region,
-    items,
-    createdAt: request.createdAt,
-    documentUrl,
-  }
-}
-
 export async function getPublicDisbursementHistoryForCampaign(
   campaignId: number
 ): Promise<PublicDisbursementHistoryItem[]> {
-  const milestones = await db.orm.public.Milestone.where({ campaignId }).all()
-  const milestoneIds = new Set(milestones.map((milestone) => milestone.id))
   const campaign = await db.orm.public.Campaign.first({ id: campaignId })
   if (!campaign) return []
-  const requests = await db.orm.public.DisbursementRequest.where({
+
+  const milestones = await db.orm.public.Milestone.where({
+    campaignId,
     status: "DISBURSED",
-  }).all()
-  const visible = requests.filter((request) => milestoneIds.has(request.milestoneId))
-  return Promise.all(
-    visible.map((request) => {
-    const milestone = milestones.find((value) => value.id === request.milestoneId)
-    return toPublicDisbursement(request, milestone ?? { description: "Milestone" }, campaign.currency)
+  })
+    .orderBy((milestone) => milestone.updatedAt.desc())
+    .all()
+
+  const history = await Promise.all(
+    milestones.map(async (milestone) => {
+      const proofUrl = milestone.proofImageUrl
+        ? await getMilestoneProofUrl(milestone.proofImageUrl).catch((error) => {
+            console.error("Public milestone proof URL refresh failed:", error)
+            return null
+          })
+        : null
+
+      return toPublicDisbursementHistoryItem(
+        milestone as DisbursedMilestone,
+        campaign.currency,
+        proofUrl
+      )
     })
   )
+
+  return sortPublicDisbursementHistory(history)
 }
 
 export async function getPublicDisbursementHistoryForOrganization(
@@ -246,11 +230,18 @@ export async function getPublicDisbursementHistoryForOrganization(
     communityId,
     reviewStatus: "APPROVED",
   }).all()
-  const histories = await Promise.all(campaigns.map((campaign) => getPublicDisbursementHistoryForCampaign(campaign.id)))
-  return histories.flat().sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  const histories = await Promise.all(
+    campaigns.map(async (campaign) => {
+      const history = await getPublicDisbursementHistoryForCampaign(campaign.id)
+      return history.map((item) => ({ ...item, campaignTitle: campaign.title }))
+    })
+  )
+  return sortPublicDisbursementHistory(histories.flat())
 }
 
-export async function getPublicOrganizationById(id: string): Promise<PublicOrganization | null> {
+export async function getPublicOrganizationById(
+  id: string
+): Promise<PublicOrganization | null> {
   const organizationId = Number(id)
   if (!Number.isInteger(organizationId) || organizationId <= 0) return null
 
@@ -280,6 +271,7 @@ export async function getPublicOrganizationById(id: string): Promise<PublicOrgan
     legalDocumentUrl: community.legalDocumentUrl,
     verificationStatus: community.verificationStatus,
     campaigns: campaignRows.map((row) => toCard(row as CampaignRow)),
-    disbursementHistory: await getPublicDisbursementHistoryForOrganization(organizationId),
+    disbursementHistory:
+      await getPublicDisbursementHistoryForOrganization(organizationId),
   }
 }

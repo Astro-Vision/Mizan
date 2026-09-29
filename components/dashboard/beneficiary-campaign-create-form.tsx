@@ -146,7 +146,7 @@ export function BeneficiaryCampaignCreateForm({
       </section>
 
       {state.message ? <p className="rounded-[10px] border border-coral/40 bg-coral/10 p-4 text-sm text-coral" role="alert">{state.message}</p> : null}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line-soft bg-surface/95 p-4 sm:static sm:border-0 sm:bg-transparent sm:p-0"><button type="submit" disabled={pending || uploading || overTarget} className="flex h-12 w-full items-center justify-center rounded-[10px] bg-brand-700 px-6 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">{pending ? "Mengajukan…" : "Ajukan Kampanye"}</button></div>
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line-soft bg-surface/95 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:static sm:border-0 sm:bg-transparent sm:p-0"><button type="submit" disabled={pending || uploading || overTarget} className="flex h-12 w-full items-center justify-center rounded-[10px] bg-brand-700 px-6 font-medium text-white disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">{pending ? "Mengajukan…" : "Ajukan Kampanye"}</button></div>
       <p className="text-xs text-ink-muted">Data testnet — dana tidak nyata. Kampanye akan ditinjau Admin sebelum tampil ke publik.</p>
     </form>
   )

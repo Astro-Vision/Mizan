@@ -17,13 +17,15 @@ export interface AyobantuResult {
   url: string
   image?: string
   category?: string
-  campaignType: string        // "normal" | "qurban"
-  collectedAmount: number      // dalam Rupiah, contoh 10000000
-  targetAmount: number | null   // null = tidak terbatas / unlimited
+  campaignType: string        
+  collectedAmount: number     
+  targetAmount: number | null 
+  location?: string 
   campaigner?: string
   campaignerUrl?: string
   verified: boolean
-  daysLeftText?: string          // contoh: "10 hari lagi"
+  daysLeftText: number | 0   
+  summary : string
 }
 
 export interface AyobantuStructuredData {
@@ -32,7 +34,7 @@ export interface AyobantuStructuredData {
   campaignType: string
   collectedAmount: number
   targetAmount: number | null // null = tidak terbatas
-  daysLeftText?: string
+  daysLeftText?: number
   campaignerUrl?: string
 }
  
@@ -44,8 +46,8 @@ export interface AyobantuCampaignPromptInput {
   structured: {
     category?: string
     collectedAmount: number
-    targetAmount: number | null // null = tidak terbatas
-    daysLeftText?: string
+    targetAmount: number | null
+    daysLeftText?: number
   }
   relatedEvents: RelatedDisasterEvent[]
 }

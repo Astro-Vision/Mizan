@@ -16,7 +16,7 @@ export default function OnboardingLayout({
             alt="Mizan"
             width={144}
             height={48}
-            className="h-10 w-auto object-contain"
+            className="h-10 w-auto object-contain bg-transparent"
             priority
           />
           <span className="rounded-full bg-warm-yellow px-2 py-0.5 text-xs font-semibold text-ink">

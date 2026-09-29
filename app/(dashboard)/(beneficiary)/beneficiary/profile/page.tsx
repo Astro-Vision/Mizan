@@ -4,6 +4,7 @@ import { requireBeneficiaryCommunity } from "@/src/lib/beneficiary/access"
 import { db } from "@/src/prisma/db"
 import { TeamMembersSection, type MemberData } from "@/components/community/team-members-section"
 import { CommunityProfileEditor } from "@/components/community/community-profile-editor"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 const shorten = (value: string) =>
   value.length > 14 ? `${value.slice(0, 8)}…${value.slice(-6)}` : value
@@ -16,7 +17,7 @@ export default async function BeneficiaryProfilePage() {
       ? "Terverifikasi"
       : community.verificationStatus === "REJECTED"
       ? "Ditolak"
-      : "Menunggu Verifikasi"
+      : "Menunggu verifikasi"
 
   // Fetch all community members and user info
   const dbMembers = await db.orm.public.CommunityMember.where({
@@ -48,12 +49,12 @@ export default async function BeneficiaryProfilePage() {
         className="mb-6 inline-flex min-h-11 items-center gap-2 text-sm text-ink-muted"
       >
         <ChevronLeft size={18} strokeWidth={1.5} />
-        Kembali ke ringkasan
+        <LocalizedText text="Kembali ke ringkasan" />
       </Link>
-      <p className="mz-overline">Organisasi</p>
-      <h1 className="mt-2 text-h1 text-ink">Profil organisasi</h1>
+      <p className="mz-overline"><LocalizedText text="Organisasi" /></p>
+      <h1 className="mt-2 text-h1 text-ink"><LocalizedText text="Profil organisasi" /></h1>
       <p className="mt-3 max-w-2xl text-sm text-ink-muted">
-        Informasi organisasi yang digunakan saat kampanye ditinjau dan dana disalurkan.
+        <LocalizedText text="Informasi organisasi yang digunakan saat kampanye ditinjau dan dana disalurkan." />
       </p>
 
       {/* Detail Organisasi */}
@@ -61,16 +62,16 @@ export default async function BeneficiaryProfilePage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-h2 text-ink">{community.name}</h2>
-            <p className="mt-2 text-sm text-ink-muted">Community ID {community.id}</p>
+            <p className="mt-2 text-sm text-ink-muted"><LocalizedText text="Community ID" /> {community.id}</p>
           </div>
           <span className="inline-flex h-7 items-center rounded-full bg-warm-yellow px-3 text-[0.8125rem] font-semibold uppercase tracking-[0.02em] text-ink">
-            {status}
+            <LocalizedText text={status} />
           </span>
         </div>
         {memberRole === "OWNER" ? <div className="mt-5"><CommunityProfileEditor community={community} /></div> : null}
 
         <div className="mt-8 border-t border-line-soft pt-6">
-          <p className="text-sm font-medium text-ink">Dompet penerima</p>
+          <p className="text-sm font-medium text-ink"><LocalizedText text="Dompet penerima" /></p>
           <div className="mt-2 flex items-center justify-between gap-3 rounded-[10px] bg-brand-950 p-4 text-brand-100">
             <span className="font-mono text-sm">{shorten(community.walletAddress)}</span>
             <span className="flex items-center gap-3 text-xs">
@@ -86,14 +87,14 @@ export default async function BeneficiaryProfilePage() {
             rel="noreferrer"
             className="mt-3 inline-flex min-h-11 items-center text-sm text-brand-700 underline-offset-2 hover:underline"
           >
-            Lihat dompet di BscScan ↗
+            <LocalizedText text="Lihat dompet di BscScan ↗" />
           </a>
         </div>
       </section>
 
       <section className="mz-card mt-6 p-5 sm:p-8">
-        <h2 className="text-h2 text-ink">Informasi publik</h2>
-        <p className="mt-2 text-sm text-ink-muted">Data berikut dapat dilihat donatur melalui halaman profil organisasi.</p>
+        <h2 className="text-h2 text-ink"><LocalizedText text="Informasi publik" /></h2>
+        <p className="mt-2 text-sm text-ink-muted"><LocalizedText text="Data berikut dapat dilihat donatur melalui halaman profil organisasi." /></p>
         <dl className="mt-5 divide-y divide-line-soft">
           <InfoRow label="Deskripsi" value={community.description || "Belum diisi"} />
           <InfoRow label="Website" value={community.websiteUrl || "Belum diisi"} />
@@ -105,12 +106,12 @@ export default async function BeneficiaryProfilePage() {
 
       {/* Legalitas */}
       <section className="mz-card mt-6 p-5 sm:p-8">
-        <h2 className="text-h2 text-ink">Legalitas</h2>
+        <h2 className="text-h2 text-ink"><LocalizedText text="Legalitas" /></h2>
         <p className="mt-2 text-sm text-ink-muted">
-          Status verifikasi legalitas dikelola oleh Admin Mizan. Perubahan data akan ditinjau kembali sebelum status berubah.
+          <LocalizedText text="Status verifikasi legalitas dikelola oleh Admin Mizan. Perubahan data akan ditinjau kembali sebelum status berubah." />
         </p>
         <label className="mt-6 block text-sm font-medium text-ink">
-          Nomor registrasi
+          <LocalizedText text="Nomor registrasi" />
           <input
             className="mt-2 h-12 w-full rounded-[6px] border border-line-ui bg-surface px-4 text-sm"
             placeholder="Masukkan nomor registrasi"
@@ -119,7 +120,7 @@ export default async function BeneficiaryProfilePage() {
           />
         </label>
         <label className="mt-5 block text-sm font-medium text-ink">
-          Dokumen legalitas
+          <LocalizedText text="Dokumen legalitas" />
           <input
             type="file"
             accept="application/pdf,image/*"
@@ -131,8 +132,8 @@ export default async function BeneficiaryProfilePage() {
           type="button"
           className="mt-6 min-h-11 rounded-[10px] bg-brand-700 px-5 text-sm font-medium text-white"
         >
-          Ajukan perubahan profil
-        </button> : <p className="mt-6 text-xs text-ink-muted">Hanya owner organisasi yang dapat mengubah data profil.</p>}
+          <LocalizedText text="Ajukan perubahan profil" />
+        </button> : <p className="mt-6 text-xs text-ink-muted"><LocalizedText text="Hanya owner organisasi yang dapat mengubah data profil." /></p>}
       </section>
 
       {/* Section Anggota Tim */}
@@ -142,11 +143,11 @@ export default async function BeneficiaryProfilePage() {
         inviteCode={community.inviteCode}
       />
 
-      <p className="mt-6 text-xs text-ink-muted">Data testnet — dana tidak nyata.</p>
+      <p className="mt-6 text-xs text-ink-muted"><LocalizedText text="Data testnet — dana tidak nyata." /></p>
     </div>
   )
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
-  return <div className="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between sm:gap-4"><dt className="text-sm text-ink-muted">{label}</dt><dd className="whitespace-pre-wrap text-sm text-ink sm:max-w-[65%] sm:text-right">{value}</dd></div>
+  return <div className="flex flex-col gap-1 py-3 sm:flex-row sm:justify-between sm:gap-4"><dt className="text-sm text-ink-muted"><LocalizedText text={label} /></dt><dd className="whitespace-pre-wrap text-sm text-ink sm:max-w-[65%] sm:text-right">{value}</dd></div>
 }

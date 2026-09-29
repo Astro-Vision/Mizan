@@ -5,6 +5,7 @@ import { useIdentityToken, useWallets } from "@privy-io/react-auth"
 import { cn } from "@/src/lib/utils"
 import { BSC_TESTNET_CHAIN_ID, encodeFundCampaign } from "@/src/lib/chain/vault"
 import { decimalBnbToWei } from "@/src/lib/payments/validation"
+import { useLanguage } from "@/components/site/language-provider"
 
 export type PaymentCampaign = {
   id: string
@@ -27,12 +28,15 @@ export function CampaignPayment({
 }) {
   const { identityToken } = useIdentityToken()
   const { wallets, ready: walletsReady } = useWallets()
+  const { t } = useLanguage()
   const [campaignId, setCampaignId] = React.useState(lockedCampaignId ?? campaigns[0]?.id ?? "")
   const [amount, setAmount] = React.useState("")
   const [mode, setMode] = React.useState<"MOCK" | "ONCHAIN">("MOCK")
   const [message, setMessage] = React.useState<string | null>(null)
   const [busy, setBusy] = React.useState(false)
-  const [totalFundedWei, setTotalFundedWei] = React.useState<Record<string, string>>({})
+  const [totalFundedWei, setTotalFundedWei] = React.useState<
+    Record<string, string>
+  >({})
   const ethereumWallet = wallets.find((wallet) => wallet.type === "ethereum")
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -76,7 +80,8 @@ export function CampaignPayment({
           error?: string
           totalFundedWei?: string
         }
-        if (!response.ok || !body.ok) throw new Error(body.error || "Mock payment gagal")
+        if (!response.ok || !body.ok)
+          throw new Error(body.error || "Mock payment gagal")
         if (body.totalFundedWei) {
           setTotalFundedWei((current) => ({
             ...current,
@@ -95,12 +100,15 @@ export function CampaignPayment({
         if (!preflightResponse.ok || !preflight.active || !preflight.recipientMatches)
           throw new Error("Campaign belum aktif atau data penerima on-chain tidak cocok.")
         const contractAddress = process.env.NEXT_PUBLIC_MIZAN_CONTRACT_ADDRESS
-        if (!contractAddress) throw new Error("Contract v2 belum dikonfigurasi di client")
+        if (!contractAddress)
+          throw new Error("Contract v2 belum dikonfigurasi di client")
         await ethereumWallet.switchChain(BSC_TESTNET_CHAIN_ID)
         const provider = await ethereumWallet.getEthereumProvider()
         const activeChainId = await provider.request({ method: "eth_chainId" })
         if (activeChainId !== "0x61") {
-          throw new Error("Wallet belum berada di BSC Testnet. Switch network lalu coba lagi.")
+          throw new Error(
+            "Wallet belum berada di BSC Testnet. Switch network lalu coba lagi."
+          )
         }
         const hash = (await provider.request({
           method: "eth_sendTransaction",
@@ -142,7 +150,11 @@ export function CampaignPayment({
             [campaignId]: body.totalFundedWei!,
           }))
         }
-        setMessage(body.status === "PENDING" ? "Transaksi menunggu konfirmasi." : `Payment terkonfirmasi: ${hash}`)
+        setMessage(
+          body.status === "PENDING"
+            ? "Transaksi menunggu konfirmasi."
+            : `Payment terkonfirmasi: ${hash}`
+        )
       }
       setAmount("")
     } catch (error) {
@@ -161,19 +173,21 @@ export function CampaignPayment({
   return (
     <section className="rounded-2xl border border-line-soft bg-surface p-5 sm:p-6">
       <p className="mz-overline">Payment</p>
-      <h2 className="mt-2 text-h3 text-ink">Dukung campaign aktif</h2>
+      <h2 className="mt-2 text-h3 text-ink">{t("Dukung campaign aktif")}</h2>
       <p className="mt-1 text-sm text-ink-muted">
-        Simulasi tersimpan di database tanpa blockchain. On-chain memakai BSC Testnet dan saldo tBNB.
+        {t(
+          "Simulasi tersimpan di database tanpa blockchain. On-chain memakai BSC Testnet dan saldo tBNB."
+        )}
       </p>
 
       {campaigns.length === 0 ? (
         <p className="mt-5 rounded-xl border border-line-soft bg-surface-sunken p-4 text-sm text-ink-muted">
-          Belum ada campaign aktif yang siap menerima payment.
+          {t("Belum ada campaign aktif yang siap menerima payment.")}
         </p>
       ) : (
         <form onSubmit={submit} className="mt-5 space-y-4">
           <label className="block text-sm font-medium text-ink">
-            Campaign
+            {t("Campaign")}
             <select
               value={campaignId}
               disabled={Boolean(lockedCampaignId)}
@@ -185,18 +199,20 @@ export function CampaignPayment({
             >
               {campaigns.map((campaign) => (
                 <option key={campaign.id} value={campaign.id}>
-                  {campaign.title ?? campaign.judul} — {campaign.organizerName ?? campaign.penyelenggara}
+                  {campaign.title ?? campaign.judul} —{" "}
+                  {campaign.organizerName ?? campaign.penyelenggara}
                 </option>
               ))}
             </select>
           </label>
 
           <p className="rounded-lg bg-surface-sunken px-3 py-2 text-xs text-ink-muted">
-            Saldo campaign terkonfirmasi: {formatBnbWei(totalFundedWei[campaignId] ?? "0")} BNB
+            {t("Saldo campaign terkonfirmasi")}:{" "}
+            {formatBnbWei(totalFundedWei[campaignId] ?? "0")} BNB
           </p>
 
           <label className="block text-sm font-medium text-ink">
-            Nominal (BNB)
+            {t("Nominal")} (BNB)
             <input
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
@@ -212,22 +228,24 @@ export function CampaignPayment({
                 paymentMode === "ONCHAIN" &&
                 !campaigns.find((campaign) => campaign.id === campaignId)?.contractCampaignId
               return (
-              <button
-                key={paymentMode}
-                type="button"
+                <button
+                  key={paymentMode}
+                  type="button"
                   disabled={onchainUnavailable}
-                onClick={() => setMode(paymentMode)}
-                className={cn(
-                  "h-10 rounded-[6px] border text-xs font-semibold",
-                  mode === paymentMode
-                    ? "border-brand-700 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                    : "border-line-soft text-ink-muted",
+                  onClick={() => setMode(paymentMode)}
+                  className={cn(
+                    "h-10 rounded-[6px] border text-xs font-semibold",
+                    mode === paymentMode
+                      ? "border-brand-700 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
+                      : "border-line-soft text-ink-muted",
                     onchainUnavailable && "cursor-not-allowed opacity-50"
-                )}
+                  )}
                   title={onchainUnavailable ? "Campaign belum terdaftar on-chain" : undefined}
-              >
-                  {paymentMode === "MOCK" ? "Simulasi DB" : "On-chain BSC Testnet"}
-              </button>
+                >
+                  {paymentMode === "MOCK"
+                    ? t("Simulasi DB")
+                    : t("On-chain BSC Testnet")}
+                </button>
               )
             })}
           </div>
@@ -237,14 +255,21 @@ export function CampaignPayment({
             disabled={busy || !walletsReady}
             className="inline-flex h-12 w-full items-center justify-center rounded-[10px] bg-brand-700 px-6 text-sm font-medium text-white hover:bg-brand-600 disabled:pointer-events-none disabled:opacity-50"
           >
-            {busy ? "Memproses…" : mode === "MOCK" ? "Bayar simulasi" : "Bayar dengan wallet"}
+            {busy
+              ? t("Memproses…")
+              : mode === "MOCK"
+                ? t("Bayar simulasi")
+                : t("Bayar dengan wallet")}
           </button>
         </form>
       )}
 
       {message ? (
-        <p className="mt-4 rounded-xl border border-line-soft bg-surface-sunken p-3 text-sm text-ink" role="status">
-          {message}
+        <p
+          className="mt-4 rounded-xl border border-line-soft bg-surface-sunken p-3 text-sm text-ink"
+          role="status"
+        >
+          {t(message)}
         </p>
       ) : null}
     </section>

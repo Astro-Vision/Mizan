@@ -5,6 +5,7 @@ import { PaymentHistory } from "@/components/dashboard/payment-history"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { TESTNET_NOTICE } from "@/src/lib/site-data"
 import { formatWeiBnb, getLiveCampaignSnapshots } from "@/src/lib/dashboard-server"
+import { LocalizedText } from "@/components/dashboard/localized-text"
 
 export const metadata: Metadata = {
   title: "Dashboard Donatur",
@@ -49,8 +50,8 @@ export default async function DonaturPage() {
   return (
     <div className="mx-auto max-w-[1240px]">
       <div className="mb-8">
-        <p className="mz-overline">Donatur</p>
-        <h1 className="mt-3 text-h1 text-ink">Ringkasan Donasi</h1>
+        <p className="mz-overline"><LocalizedText text="Donatur" /></p>
+        <h1 className="mt-3 text-h1 text-ink"><LocalizedText text="Ringkasan Donasi" /></h1>
         <p className="mt-2 text-sm text-ink-muted">{TESTNET_NOTICE}</p>
       </div>
 
@@ -65,15 +66,15 @@ export default async function DonaturPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-h3 text-ink">Kampanye aktif</h2>
+        <h2 className="text-h3 text-ink"><LocalizedText text="Kampanye aktif" /></h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Progres dihitung dari CampaignPayment berstatus CONFIRMED di database.
+          <LocalizedText text="Progres dihitung dari CampaignPayment berstatus CONFIRMED di database." />
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {campaigns.length === 0 ? (
             <p className="rounded-2xl border border-line-soft bg-surface p-5 text-sm text-ink-muted">
-              Belum ada campaign aktif yang disetujui admin.
+              <LocalizedText text="Belum ada campaign aktif yang disetujui admin." />
             </p>
           ) : (
             campaigns.map((campaign) => {
@@ -103,8 +104,8 @@ export default async function DonaturPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-h3 text-ink">Riwayat transaksi wallet</h2>
-        <p className="mt-1 text-sm text-ink-muted">Payment MOCK dan ONCHAIN milik wallet Privy yang sedang login.</p>
+        <h2 className="text-h3 text-ink"><LocalizedText text="Riwayat transaksi wallet" /></h2>
+        <p className="mt-1 text-sm text-ink-muted"><LocalizedText text="Payment MOCK dan ONCHAIN milik wallet Privy yang sedang login." /></p>
         <PaymentHistory />
       </section>
     </div>
