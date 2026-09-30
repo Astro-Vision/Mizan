@@ -149,6 +149,7 @@ export async function scrapeAyobantu(
           sourceId: source.id,
           slug,
           title,
+          summary: title,
           url: campaignUrl,
           image,
           category: category || undefined,
