@@ -159,7 +159,7 @@ model Campaign {
 
   source       CampaignSource       @default(AI_MOCK)
   aiDraft      Json?
-  aiReference  String? 
+  aiReference  String? @unique
   aiConfidence Float?
 
   reviewStatus    CampaignReviewStatus @default(AI_DRAFT)

@@ -3670,7 +3670,13 @@
                   "id"
                 ]
               },
-              "uniques": []
+              "uniques": [
+                {
+                  "columns": [
+                    "aiReference"
+                  ]
+                }
+              ]
             },
             "campaignPayment": {
               "checks": [
@@ -5508,7 +5514,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "c65487386100718e08fcdf3f707ea68d08ba8e59f370c899a5095258e00601c2",
+    "storageHash": "e33a70edfd9f755b7ba63800f32d1f0a2357ecb409682f163aea1fb49c208219",
     "types": {
       "Embedding3072": {
         "codecId": "pg/vector@1",
