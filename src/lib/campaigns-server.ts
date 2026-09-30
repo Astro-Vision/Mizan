@@ -82,10 +82,14 @@ type CampaignRow = {
   currency: string
   donorCount: number
   reviewStatus: string
+  source: "AI_MOCK" | "MANUAL"
 }
 
 function toCard(row: CampaignRow): Campaign {
-  const organizer = row.organizerName || "Komunitas Mizan"
+  const organizer =
+    row.source === "AI_MOCK"
+      ? "Admin Mizan"
+      : row.organizerName || "Komunitas Mizan"
 
   return {
     id: String(row.id),
@@ -104,7 +108,8 @@ function toCard(row: CampaignRow): Campaign {
     komunitas: {
       id: row.communityId ? String(row.communityId) : undefined,
       nama: organizer,
-      tipe: "Komunitas terverifikasi",
+      tipe:
+        row.source === "AI_MOCK" ? "Admin Mizan" : "Komunitas terverifikasi",
       bio: row.summary
         ? row.summary
         : `${organizer} mengelola penyaluran kampanye ini secara transparan di on-chain.`,
@@ -128,6 +133,7 @@ const PUBLIC_SELECT = [
   "currency",
   "donorCount",
   "reviewStatus",
+  "source",
 ] as const
 
 /**

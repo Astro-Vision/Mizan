@@ -1,8 +1,5 @@
 export type CampaignReviewStatus =
-  | "AI_DRAFT"
-  | "PENDING_REVIEW"
-  | "APPROVED"
-  | "REJECTED"
+  "AI_DRAFT" | "PENDING_REVIEW" | "APPROVED" | "REJECTED"
 
 export type CampaignFormState = {
   success: boolean
@@ -10,16 +7,17 @@ export type CampaignFormState = {
   errors?: Record<string, string>
 }
 
-const allowedTransitions: Record<CampaignReviewStatus, CampaignReviewStatus[]> = {
-  AI_DRAFT: ["PENDING_REVIEW"],
-  PENDING_REVIEW: ["APPROVED", "REJECTED"],
-  APPROVED: [],
-  REJECTED: ["PENDING_REVIEW"],
-}
+const allowedTransitions: Record<CampaignReviewStatus, CampaignReviewStatus[]> =
+  {
+    AI_DRAFT: ["PENDING_REVIEW", "APPROVED"],
+    PENDING_REVIEW: ["APPROVED", "REJECTED"],
+    APPROVED: [],
+    REJECTED: ["PENDING_REVIEW"],
+  }
 
 export function transitionCampaignReviewStatus(
   current: CampaignReviewStatus,
-  next: CampaignReviewStatus,
+  next: CampaignReviewStatus
 ) {
   if (!allowedTransitions[current].includes(next)) {
     throw new Error(`Transisi campaign tidak valid: ${current} → ${next}`)

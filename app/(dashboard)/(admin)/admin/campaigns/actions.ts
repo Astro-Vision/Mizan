@@ -140,10 +140,12 @@ function toReview(row: {
   summary: string | null
   daysLeft: number
 }): CampaignReview {
+  const organizerName =
+    row.source === "AI_MOCK" ? "Admin Mizan" : row.organizerName
   return {
     id: String(row.id),
     title: row.title,
-    organizerName: row.organizerName,
+    organizerName,
     raisedAmountWei: row.raisedAmountWei,
     targetAmountWei: row.targetAmountWei,
     currency: row.currency,
@@ -161,7 +163,7 @@ function toReview(row: {
     summary: row.summary,
     daysLeft: row.daysLeft,
     judul: row.title,
-    penyelenggara: row.organizerName,
+    penyelenggara: organizerName,
     terkumpul: weiToBnb(row.raisedAmountWei),
     target: weiToBnb(row.targetAmountWei),
     satuan: row.currency,
@@ -196,13 +198,14 @@ export async function createMockAiCampaign(
 
   await db.orm.public.Campaign.create({
     title: data.title,
-    organizerName: data.organizerName,
+    organizerName: "Admin Mizan",
     raisedAmountWei: "0",
     targetAmountWei: data.targetAmountWei,
     currency: "BNB",
     donorCount: 0,
     status: "ACTIVE",
     source: "AI_MOCK",
+    communityId: null,
     category: data.category,
     location: data.location,
     summary: data.summary,
@@ -210,7 +213,7 @@ export async function createMockAiCampaign(
     daysLeft: data.daysLeft,
     aiDraft: {
       title: data.title,
-      organizer: data.organizerName,
+      organizer: "Admin Mizan",
       targetBnb: data.targetAmountWei,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
@@ -243,9 +246,12 @@ export async function updateCampaign(
   const existing = await db.orm.public.Campaign.first({ id: numId })
   if (!existing) return { success: false, message: "Kampanye tidak ditemukan." }
 
+  const isAiCampaign = existing.source === "AI_MOCK"
+  const organizerName = isAiCampaign ? "Admin Mizan" : data.organizerName
+
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
     title: data.title,
-    organizerName: data.organizerName,
+    organizerName,
     currency: "BNB",
     recipientWallet: data.recipientWallet.toLowerCase(),
     targetAmountWei: data.targetAmountWei,
@@ -257,7 +263,7 @@ export async function updateCampaign(
     aiReference: data.aiReference,
     aiDraft: {
       title: data.title,
-      organizer: data.organizerName,
+      organizer: organizerName,
       targetBnb: data.targetAmountWei,
       recipientWallet: data.recipientWallet,
       generatedBy: "AI_MOCK",
@@ -290,6 +296,10 @@ export async function approveCampaign(id: string): Promise<CampaignFormState> {
 
   await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
     reviewStatus: "APPROVED",
+    status: "ACTIVE",
+    ...(campaign.source === "AI_MOCK"
+      ? { organizerName: "Admin Mizan", communityId: null }
+      : {}),
     approvedAt: new Date().toISOString(),
     rejectionReason: null,
   })
@@ -339,15 +349,7 @@ export async function publishCampaign(id: string): Promise<CampaignFormState> {
     }
   }
 
-  // Scope 3 only exposes the approved state to the next publishing step.
-  await db.orm.public.Campaign.where((c) => c.id.eq(numId)).update({
-    status: "ACTIVE",
-  })
-  revalidatePath("/admin/campaigns")
-  return {
-    success: true,
-    message: "Campaign aktif dan siap menerima pembayaran.",
-  }
+  return { success: true, message: "Campaign sudah aktif." }
 }
 
 export async function deleteCampaign(id: string): Promise<CampaignFormState> {
