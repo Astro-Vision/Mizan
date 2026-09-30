@@ -160,6 +160,7 @@ export async function scrapeAyobantu(
           sourceId: source.id,
           slug,
           title,
+          summary: title,
           url: campaignUrl,
           image,
           category: category || undefined,
@@ -196,7 +197,6 @@ export async function scrapeAyobantu(
       rawResults.length - newItems.length
     } sudah ada (skip)`
   )
-
 
   return rawResults
 }
