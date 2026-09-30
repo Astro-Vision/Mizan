@@ -11,9 +11,10 @@ export async function draftCampaignExistsByReference(
 export async function createDraftCampaign(input: CreateDraftCampaignInput) {
   return db.orm.public.Campaign.create({
     title: input.title,
-    organizerName: input.organizerName,
+    organizerName: "Admin Mizan",
 
     source: "AI_MOCK",
+    communityId: null,
     aiDraft: input.aiDraftPayload,
     aiReference: input.aiReference,
     aiConfidence: input.aiConfidence,
