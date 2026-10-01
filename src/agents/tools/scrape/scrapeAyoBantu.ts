@@ -85,7 +85,8 @@ export async function scrapeAyobantu(
 
       for (const donateEl of campaignLinks) {
         const $donate = $(donateEl)
-        const $card = $donate.closest("div")
+
+        const $card = $donate.closest(".single-blog")
 
         const $titleLink = $card
           .find('a[href*="/campaign/"]')
@@ -116,27 +117,17 @@ export async function scrapeAyobantu(
               relativeUrl.startsWith("/") ? relativeUrl : `/${relativeUrl}`
             }`
 
-        const title = await getFullCampaignTitle(campaignUrl, listingTitle)
+        const campaignDetail = await getFullCampaignTitle(
+          campaignUrl,
+          listingTitle
+        )
 
-        const image =
-          $card.find('a[href*="/campaign/"] img').first().attr("src") ||
-          undefined
+        const title = campaignDetail.title
+        const daysLeftText = campaignDetail.daysLeftText ?? 0
 
-        const category = $card
-          .find("a, div")
-          .filter((_, el) => {
-            const text = $(el).text().trim()
+        const image = $card.find("img").first().attr("src") || undefined
 
-            return (
-              text.length > 0 &&
-              text.length < 30 &&
-              !text.includes("Rp") &&
-              !text.toLowerCase().includes("donasi")
-            )
-          })
-          .first()
-          .text()
-          .trim()
+        const category = $card.find(".badge").first().text().trim() || undefined
 
         const cardText = $card.text()
 
@@ -145,8 +136,6 @@ export async function scrapeAyobantu(
         const targetMatch = cardText.match(
           /dari\s+(Rp[\s.\d]+|∞\s*tidak terbatas)/
         )
-
-        const daysMatch = cardText.match(/\d+\s*hari lagi/)
 
         const $campaignerLink = $card.find('a[href*="?campaigner="]').first()
 
@@ -170,11 +159,16 @@ export async function scrapeAyobantu(
           campaigner,
           campaignerUrl,
           verified,
+<<<<<<< HEAD
           // Normalize parser output at the scraper boundary. The source
           // contract stores this presentation value as text, even when a
           // parser implementation returns a numeric day count.
           daysLeftText: daysMatch ? String(daysMatch) : undefined,
+=======
+          daysLeftText,
+>>>>>>> 9d992f18a50dce7ae23a59d1788da7c2569317cb
         })
+
       }
 
       hasNextPage = $('a:contains("Next")').length > 0

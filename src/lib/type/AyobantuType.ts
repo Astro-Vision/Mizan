@@ -33,7 +33,7 @@ export interface AyobantuStructuredData {
   campaignType: string
   collectedAmount: number
   targetAmount: number | null // null = tidak terbatas
-  daysLeftText?: string
+  daysLeftText?: number
   campaignerUrl?: string
 }
 
@@ -44,8 +44,8 @@ export interface AyobantuCampaignPromptInput {
   structured: {
     category?: string
     collectedAmount: number
-    targetAmount: number | null // null = tidak terbatas
-    daysLeftText?: string
+    targetAmount: number | null
+    daysLeftText?: number
   }
   relatedEvents: RelatedDisasterEvent[]
 }

@@ -25,6 +25,7 @@ import {
   draftCampaignExistsByReference,
 } from "@/src/service/campaignService"
 import { createScrapeJob } from "@/src/service/scrapeServices"
+import { extractLocationFromText } from "@/src/lib/campaign/locationHint"
 
 export async function runAnalysisCampaign() {
   const date = new Date()
@@ -125,12 +126,6 @@ export async function runAnalysisCampaign() {
 
       const hasDisasterMatch = hasDisasterTypeMatch || hasDisasterLocationMatch
 
-      console.log("[debug] hasDisasterTypeMatch:", hasDisasterTypeMatch)
-      console.log("[debug] hasDisasterLocationMatch:", hasDisasterLocationMatch)
-      console.log("[debug] hasDisasterMatch:", hasDisasterMatch)
-
-      console.log("====================================\n")
-
       let relatedEvents: RelatedDisasterEvent[]
 
       try {
@@ -221,7 +216,35 @@ export async function runAnalysisCampaign() {
         }
       }
 
-      // Semua konteks off-chain disimpan di aiDraft (Json), bukan sebagai kolom baru.
+      const matchedEvent = aiDraft.matchedDisasterEventId
+        ? relatedEvents.find((e) => e.id === aiDraft.matchedDisasterEventId)
+        : undefined
+
+      const matchedEventLocation = matchedEvent
+        ? [matchedEvent.city, matchedEvent.province]
+            .filter(Boolean)
+            .join(", ") ||
+          matchedEvent.locationName ||
+          null
+        : null
+
+      const textExtractedLocation = extractLocationFromText(campaignText)
+
+      const campaignLocation =
+        aiDraft.location ||
+        matchedEventLocation ||
+        textExtractedLocation ||
+        extraction.location ||
+        null
+
+      console.log("[aiCampaign] aiDraft.location:", aiDraft.location)
+      console.log("[aiCampaign] matched event location:", matchedEventLocation)
+      console.log(
+        "[aiCampaign] text-extracted location:",
+        textExtractedLocation
+      )
+      console.log("[aiCampaign] final location:", campaignLocation)
+
       const aiDraftPayload = {
         ...aiDraft,
         source: "ayobantu",
@@ -234,9 +257,10 @@ export async function runAnalysisCampaign() {
         sourceRaisedAmountIdr: extraction.collectedAmount,
         sourceTargetAmountIdr: extraction.targetAmount,
         daysLeftText: item.daysLeftText ?? null,
+        location: campaignLocation,
+        campaignerUrl: item.campaignerUrl ?? null,
       }
 
-      // 9. Campaign Service -> Campaign DB
       const campaign = await createDraftCampaign({
         title: aiDraft.title || extraction.title,
         organizerName:
@@ -246,6 +270,11 @@ export async function runAnalysisCampaign() {
         aiConfidence: aiDraft.confidenceScore,
         targetAmountWei,
         category: toCategoryCode(extraction.category) ?? "BENCANA",
+        summary: aiDraft.summary,
+        location: campaignLocation,
+        days: extraction.daysLeftText,
+        image: item.image,
+        recipientWallet: process.env.MIZAN_WALLET ?? "",
       })
 
       await markCaptureChecked(capture.id)
