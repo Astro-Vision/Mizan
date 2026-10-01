@@ -10,7 +10,7 @@ export interface CampaignExtraction {
   targetAmount: number | null
   campaigner: string | null
   daysLeftText: number
-  image: string 
+  image: string
   summary: string
 }
 
@@ -31,7 +31,6 @@ export const DISASTER_CAMPAIGN_TYPE_KEYWORDS: Record<string, DisasterType> = {
   kekeringan: "KEKERINGAN",
 }
 
-
 export function extractCampaignFields(
   item: AyobantuResult
 ): CampaignExtraction {
@@ -43,12 +42,11 @@ export function extractCampaignFields(
     collectedAmount: item.collectedAmount ?? 0,
     targetAmount: item.targetAmount ?? null,
     campaigner: item.campaigner?.trim() || null,
-    daysLeftText: item.daysLeftText ?? 0,
+    daysLeftText: Number(item.daysLeftText?.match(/\d+/)?.[0] ?? 0),
     image: item.image || "",
     summary: item.summary || "",
   }
 }
-
 
 export function buildCampaignText(extraction: CampaignExtraction): string {
   return [
@@ -61,5 +59,3 @@ export function buildCampaignText(extraction: CampaignExtraction): string {
     .join(" ")
     .trim()
 }
-
-
