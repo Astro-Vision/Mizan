@@ -18,6 +18,7 @@ export interface AyobantuResult {
   url: string
   image?: string
   category?: string
+  location?: string
   campaignType: string // "normal" | "qurban"
   collectedAmount: number // dalam Rupiah, contoh 10000000
   targetAmount: number | null // null = tidak terbatas / unlimited
