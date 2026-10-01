@@ -159,14 +159,10 @@ export async function scrapeAyobantu(
           campaigner,
           campaignerUrl,
           verified,
-<<<<<<< HEAD
           // Normalize parser output at the scraper boundary. The source
           // contract stores this presentation value as text, even when a
           // parser implementation returns a numeric day count.
           daysLeftText: daysMatch ? String(daysMatch) : undefined,
-=======
-          daysLeftText,
->>>>>>> 9d992f18a50dce7ae23a59d1788da7c2569317cb
         })
 
       }
