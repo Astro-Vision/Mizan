@@ -1,3 +1,5 @@
+"use client"
+
 import { ExternalLink, FileCheck2, Link2 } from "lucide-react"
 
 import { useLanguage } from "@/components/site/language-provider"
